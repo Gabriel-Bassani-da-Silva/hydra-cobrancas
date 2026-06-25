@@ -340,7 +340,7 @@ function carregarClientes(id, tipo) {
     container.innerHTML = '';
     loading.style.display = 'block';
 
-    fetch(`${BASE}/cobrancas/api-clientes-agrupamento?tipo=${tipo}&id=${id}`)
+    fetch(`${BASE}/cobranca/api/clientes?tipo=${tipo}&id=${id}`)
         .then(r => r.json())
         .then(data => {
             loading.style.display = 'none';
@@ -374,7 +374,7 @@ function confirmarCobranca() {
 }
 
 function enviarCobranca(tipo, id, clientes) {
-    return fetch(`${BASE}/cobrancas/puxar`, {
+    return fetch(`${BASE}/cobranca/puxar`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ tipo, id, clientes })
