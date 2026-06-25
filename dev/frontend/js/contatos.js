@@ -182,7 +182,13 @@ function toggleStatus(btn, idTel) {
         },
         body: formData
     })
-    .then(r => r.json())
+    .then(r => {
+        if (r.status === 419) {
+            window.location.reload();
+            return Promise.reject("419");
+        }
+        return r.json();
+    })
     .then(data => {
         if (data.ok) {
             window.phonesModified = true;
@@ -421,7 +427,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     'X-CSRF-TOKEN': csrfToken
                 }
             })
-            .then(r => r.json())
+            .then(r => {
+                if (r.status === 419) {
+                    console.warn("Sessão expirada (419). Recarregando a página silenciosamente...");
+                    window.location.reload();
+                    return Promise.reject("419");
+                }
+                return r.json();
+            })
             .then(data => {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
