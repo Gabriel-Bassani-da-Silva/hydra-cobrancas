@@ -104,12 +104,12 @@ $formatDoc = function($doc) {
             
             <div class="filters-group">
                 <label class="toggle-checkbox-wrapper">
-                    <input type="checkbox" id="filter-com-telefone" <?= isset($_GET['com_telefone']) && $_GET['com_telefone'] == '1' ? 'checked' : '' ?> onchange="window.location.href='{{ route('contatos-page') }}?aba=<?= $aba ?>' + (this.checked ? '&com_telefone=1' : '') + (document.getElementById('filter-com-confirmado').checked ? '&com_confirmado=1' : '')">
+                    <input type="checkbox" id="filter-com-telefone" <?= isset($_GET['com_telefone']) && $_GET['com_telefone'] == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) url.searchParams.set('com_telefone', '1'); else url.searchParams.delete('com_telefone'); window.location.href = url.toString();">
                     Apenas com telefone
                 </label>
                 
                 <label class="toggle-checkbox-wrapper confirmed">
-                    <input type="checkbox" id="filter-com-confirmado" <?= isset($_GET['com_confirmado']) && $_GET['com_confirmado'] == '1' ? 'checked' : '' ?> onchange="window.location.href='{{ route('contatos-page') }}?aba=<?= $aba ?>' + (document.getElementById('filter-com-telefone').checked ? '&com_telefone=1' : '') + (this.checked ? '&com_confirmado=1' : '')">
+                    <input type="checkbox" id="filter-com-confirmado" <?= isset($_GET['com_confirmado']) && $_GET['com_confirmado'] == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) url.searchParams.set('com_confirmado', '1'); else url.searchParams.delete('com_confirmado'); window.location.href = url.toString();">
                     Apenas confirmados
                 </label>
                 
@@ -191,12 +191,12 @@ $formatDoc = function($doc) {
             
             <div class="filters-group">
                 <label class="toggle-checkbox-wrapper">
-                    <input type="checkbox" id="filter-com-telefone" <?= isset($_GET['com_telefone']) && $_GET['com_telefone'] == '1' ? 'checked' : '' ?>>
+                    <input type="checkbox" id="filter-com-telefone" <?= isset($_GET['com_telefone']) && $_GET['com_telefone'] == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) url.searchParams.set('com_telefone', '1'); else url.searchParams.delete('com_telefone'); window.location.href = url.toString();">
                     Apenas com telefone
                 </label>
                 
                 <label class="toggle-checkbox-wrapper confirmed">
-                    <input type="checkbox" id="filter-com-confirmado" <?= isset($_GET['com_confirmado']) && $_GET['com_confirmado'] == '1' ? 'checked' : '' ?>>
+                    <input type="checkbox" id="filter-com-confirmado" <?= isset($_GET['com_confirmado']) && $_GET['com_confirmado'] == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) url.searchParams.set('com_confirmado', '1'); else url.searchParams.delete('com_confirmado'); window.location.href = url.toString();">
                     Apenas confirmados
                 </label>
 
@@ -318,12 +318,12 @@ $formatDoc = function($doc) {
                         Novo Contato
                     </button>
                     <label class="toggle-checkbox-wrapper">
-                        <input type="checkbox" id="filter-com-telefone" <?= isset($_GET['com_telefone']) && $_GET['com_telefone'] == '1' ? 'checked' : '' ?>>
+                        <input type="checkbox" id="filter-com-telefone" <?= isset($_GET['com_telefone']) && $_GET['com_telefone'] == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) url.searchParams.set('com_telefone', '1'); else url.searchParams.delete('com_telefone'); window.location.href = url.toString();">
                         Apenas com telefone
                     </label>
                     
                     <label class="toggle-checkbox-wrapper confirmed">
-                        <input type="checkbox" id="filter-com-confirmado" <?= isset($_GET['com_confirmado']) && $_GET['com_confirmado'] == '1' ? 'checked' : '' ?>>
+                        <input type="checkbox" id="filter-com-confirmado" <?= isset($_GET['com_confirmado']) && $_GET['com_confirmado'] == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) url.searchParams.set('com_confirmado', '1'); else url.searchParams.delete('com_confirmado'); window.location.href = url.toString();">
                         Apenas confirmados
                     </label>
 

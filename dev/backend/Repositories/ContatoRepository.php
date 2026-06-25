@@ -128,45 +128,48 @@ class ContatoRepository {
     // CONSULTAS
     // ═══════════════════════════════════════════════════════════════════════════
 
-    public function getClientesComTelefones(bool $somenteComTelefone = false, bool $somenteConfirmados = false): array {
+    public function getClientesComTelefones(bool $somenteComTelefone = false, bool $somenteConfirmados = false, bool $inadimplentes = false): array {
         $joinType = ($somenteComTelefone || $somenteConfirmados) ? "JOIN" : "LEFT JOIN";
         $whereConfirmado = $somenteConfirmados ? " AND t.CONFIRMADO = 1" : "";
+        $whereInadimplente = $inadimplentes ? " AND EXISTS(SELECT 1 FROM PEDIDO p WHERE p.ID_CLIENTE = ce.ID_CONTATO_BLING AND p.SITUACAO_PEDIDO IN (1, 3) AND p.EXIBIR = 1 AND p.DATA_VENCIMENTO < CURDATE())" : "";
         $stmt = $this->pdo->query(
             "SELECT ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO,
                     GROUP_CONCAT(DISTINCT CONCAT(t.ID_TEL, ':', t.NUM_TEL, ':', t.CONFIRMADO, ':', t.ORIGEM) SEPARATOR '|') AS telefones
              FROM CLIENTE c
              JOIN CONTATO_EXTERNO ce ON ce.ID_CONTATO_BLING = c.ID_CONTATO_BLING
              $joinType (SELECT ct.ID_CONTATO_BLING, t.ID_TEL, t.NUM_TEL, t.CONFIRMADO, t.ORIGEM FROM CONTATO_TEL ct JOIN TEL t ON t.ID_TEL = ct.ID_TEL) t ON t.ID_CONTATO_BLING = ce.ID_CONTATO_BLING $whereConfirmado
-             WHERE c.EXIBIR = 1
+             WHERE c.EXIBIR = 1 $whereInadimplente
              GROUP BY ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO
              ORDER BY ce.NOME_CONTATO"
         );
         return $this->parseTelefones($stmt->fetchAll());
     }
 
-    public function getRepresentantesComTelefones(bool $somenteComTelefone = false, bool $somenteConfirmados = false): array {
+    public function getRepresentantesComTelefones(bool $somenteComTelefone = false, bool $somenteConfirmados = false, bool $inadimplentes = false): array {
         $joinType = ($somenteComTelefone || $somenteConfirmados) ? "JOIN" : "LEFT JOIN";
         $whereConfirmado = $somenteConfirmados ? " AND t.CONFIRMADO = 1" : "";
+        $whereInadimplente = $inadimplentes ? " AND EXISTS(SELECT 1 FROM PEDIDO p WHERE p.ID_REPRESENTANTE = ce.ID_CONTATO_BLING AND p.SITUACAO_PEDIDO IN (1, 3) AND p.EXIBIR = 1 AND p.DATA_VENCIMENTO < CURDATE())" : "";
         $stmt = $this->pdo->query(
             "SELECT ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO, r.ID_VENDEDOR,
                     GROUP_CONCAT(DISTINCT CONCAT(t.ID_TEL, ':', t.NUM_TEL, ':', t.CONFIRMADO, ':', t.ORIGEM) SEPARATOR '|') AS telefones
              FROM REPRESENTANTE r
              JOIN CONTATO_EXTERNO ce ON ce.ID_CONTATO_BLING = r.ID_CONTATO_BLING
              $joinType (SELECT ct.ID_CONTATO_BLING, t.ID_TEL, t.NUM_TEL, t.CONFIRMADO, t.ORIGEM FROM CONTATO_TEL ct JOIN TEL t ON t.ID_TEL = ct.ID_TEL) t ON t.ID_CONTATO_BLING = ce.ID_CONTATO_BLING $whereConfirmado
-             WHERE r.EXIBIR = 1
+             WHERE r.EXIBIR = 1 $whereInadimplente
              GROUP BY ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO, r.ID_VENDEDOR
              ORDER BY ce.NOME_CONTATO"
         );
         return $this->parseTelefones($stmt->fetchAll());
     }
 
-    public function getClientesSemTelefone(): array {
+    public function getClientesSemTelefone(bool $inadimplentes = false): array {
+        $whereInadimplente = $inadimplentes ? " AND EXISTS(SELECT 1 FROM PEDIDO p WHERE p.ID_CLIENTE = ce.ID_CONTATO_BLING AND p.SITUACAO_PEDIDO IN (1, 3) AND p.EXIBIR = 1 AND p.DATA_VENCIMENTO < CURDATE())" : "";
         $stmt = $this->pdo->query(
             "SELECT ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO
              FROM CLIENTE c
              JOIN CONTATO_EXTERNO ce ON ce.ID_CONTATO_BLING = c.ID_CONTATO_BLING
              LEFT JOIN CONTATO_TEL ct ON ct.ID_CONTATO_BLING = ce.ID_CONTATO_BLING
-             WHERE c.EXIBIR = 1 AND ct.ID_TEL IS NULL
+             WHERE c.EXIBIR = 1 AND ct.ID_TEL IS NULL $whereInadimplente
              ORDER BY ce.NOME_CONTATO"
         );
         return $stmt->fetchAll();
