@@ -4,6 +4,13 @@
 @section('body_class', 'contatos-page scrollable-page')
 
 @section('content')
+<style>
+.scrollable-page main,
+.scrollable-page .contatos-wrapper {
+    height: auto !important;
+    overflow: visible !important;
+}
+</style>
 <?php
 $title = "Log de Importação";
 $body_class = "contatos-page scrollable-page";
