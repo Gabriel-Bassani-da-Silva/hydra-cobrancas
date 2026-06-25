@@ -373,7 +373,7 @@ $isPagos = (isset($_GET['status']) && $_GET['status'] === 'pagos');
     </div>
 </div>
 
-<script src="{{ asset('js/contas_receber.js') }}"></script>
+<script src="{{ asset('js/contas_receber.js') }}?v=<?= time() ?>"></script>
 
 @include('components.templates_js')
 
