@@ -2,8 +2,25 @@
 namespace App\Controllers;
 
 use Illuminate\Support\Facades\Log;
+use App\Integrations\Bling\BlingService;
+use App\Repositories\PedidoRepository;
+use App\Repositories\ContatoRepository;
 
 class BlingWebhookController extends Controller {
+
+    private $blingService;
+    private $pedidoRepository;
+    private $contatoRepository;
+
+    public function __construct(
+        BlingService $blingService,
+        PedidoRepository $pedidoRepository,
+        ContatoRepository $contatoRepository
+    ) {
+        $this->blingService = $blingService;
+        $this->pedidoRepository = $pedidoRepository;
+        $this->contatoRepository = $contatoRepository;
+    }
 
     /**
      * Rota responsável por receber e despachar os webhooks do Bling.
@@ -20,9 +37,7 @@ class BlingWebhookController extends Controller {
             return response()->json(['status' => 'ignored', 'message' => 'Payload vazio'], 200);
         }
 
-        // Recuperar o tipo de evento que gerou o webhook (depende de como o Bling estrutura o header/payload)
-        // No Bling V3, webhooks de contas a receber costumam ser 'conta.receber.alterada'
-        // Mas a identificação exata deve ser avaliada de acordo com a documentação do Webhook.
+        // Recuperar o tipo de evento que gerou o webhook
         $evento = $payload['tipo'] ?? 'desconhecido';
 
         Log::info("Webhook recebido do Bling", [
@@ -31,19 +46,30 @@ class BlingWebhookController extends Controller {
         ]);
 
         foreach ($data as $item) {
-            $idBling = $item['id'] ?? null;
-
+            $idBling = (int)($item['id'] ?? 0);
             if (!$idBling) {
                 continue;
             }
 
-            // TODO: Aqui será implementada a lógica de buscar o ID atualizado na API
-            // (ou utilizar os próprios dados do payload se vierem completos)
-            // e chamar $repository->importarPedidos([$item], $blingService, 'upsert');
-            //
-            // Exemplo de rascunho futuro:
-            // $detalhe = $blingService->getContaReceber($idBling);
-            // se ($detalhe) importa para o banco...
+            try {
+                if (strpos($evento, 'conta.receber') !== false) {
+                    $conta = $this->blingService->getContaReceber($idBling);
+                    if ($conta) {
+                        $this->pedidoRepository->importarPedidos([$conta], $this->blingService, 'upsert');
+                    }
+                } elseif (strpos($evento, 'contato') !== false) {
+                    $contato = $this->blingService->getContato($idBling);
+                    if ($contato) {
+                        $this->contatoRepository->importarContatos([$contato]);
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::error("Erro ao processar item do webhook", [
+                    'id_bling' => $idBling,
+                    'evento' => $evento,
+                    'erro' => $e->getMessage()
+                ]);
+            }
         }
 
         // O Bling exige que a resposta seja sempre 200 OK para confirmar o recebimento
