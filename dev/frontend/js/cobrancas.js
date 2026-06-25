@@ -304,6 +304,14 @@ function setupModalCobranca() {
     document.getElementById('modal-cobranca-close').addEventListener('click', () => modal.style.display = 'none');
     document.getElementById('modal-cobranca-overlay').addEventListener('click', () => modal.style.display = 'none');
 
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay').forEach(m => {
+                if (m.style.display !== 'none') m.style.display = 'none';
+            });
+        }
+    });
+
     document.getElementById('check-all-clientes').addEventListener('change', e => {
         document.querySelectorAll('.check-cliente-cob').forEach(cb => cb.checked = e.target.checked);
     });

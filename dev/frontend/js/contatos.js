@@ -38,6 +38,16 @@ document.querySelectorAll('.modal-overlay').forEach(m => {
     });
 });
 
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+        document.querySelectorAll('.modal-overlay').forEach(m => {
+            if (m.style.display !== 'none') {
+                m.style.display = 'none';
+            }
+        });
+    }
+});
+
 // ── Autocomplete: Telefone ──────────────────────────────────────────────
 (function() {
     const telInput = document.getElementById('cf-tel-input');
