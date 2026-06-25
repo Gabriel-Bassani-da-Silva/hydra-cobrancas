@@ -65,9 +65,13 @@ document.addEventListener('DOMContentLoaded', () => {
             e.currentTarget.disabled = true;
             e.currentTarget.innerHTML = 'Atualizando...';
 
-            fetch(`${url}/cobrancas/atualizar-pedidos`, {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            fetch(`${url}/cobranca/atualizar-pedidos`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
                 body: JSON.stringify({ id_cobranca: idCobranca })
             })
             .then(res => res.json())
@@ -102,9 +106,13 @@ document.addEventListener('DOMContentLoaded', () => {
             e.currentTarget.disabled = true;
             e.currentTarget.innerHTML = 'Cancelando...';
 
-            fetch(`${url}/cobrancas/desistir`, {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            fetch(`${url}/cobranca/desistir`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken
+                },
                 body: JSON.stringify({ id_cobranca: idCobranca })
             })
             .then(res => res.json())
