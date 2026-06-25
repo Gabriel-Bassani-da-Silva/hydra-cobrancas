@@ -23,6 +23,7 @@ USER www-data
 WORKDIR /var/www/html/framework
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+USER root
 # Criar o serviço do Laravel Reverb no s6-overlay para rodar em background na porta 9080
 RUN mkdir -p /etc/s6-overlay/s6-rc.d/reverb && \
     echo "longrun" > /etc/s6-overlay/s6-rc.d/reverb/type && \
@@ -37,6 +38,9 @@ RUN mkdir -p /etc/nginx/site-opts.d && \
 # Criamos os links simbólicos do CSS e JS para a pasta public do framework, para o Nginx encontrá-los
 RUN ln -s /var/www/html/dev/frontend/css /var/www/html/framework/public/css && \
     ln -s /var/www/html/dev/frontend/js /var/www/html/framework/public/js
+
+# Voltar para o usuário normal para segurança
+USER www-data
 
 # Evita rodar cache na build porque variáveis de ambiente não estão presentes ainda.
 # O cache deve ser evitado ou feito via entrypoint.
