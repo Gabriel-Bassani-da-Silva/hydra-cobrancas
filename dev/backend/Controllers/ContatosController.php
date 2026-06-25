@@ -164,7 +164,7 @@ class ContatosController extends Controller {
         // Atualiza a data do último sync
         $blingService->updateUltimaSincContatos(date('Y-m-d H:i:s'));
 
-        $aba = request()->query()['aba'] ?? 'representantes';
+        $aba = 'representantes'; // Força para ir pra aba de representantes e ver as mudanças
         session()->flash('flash_msg', "Vendedores atualizados! Vendedores verificados: " . count($novosRepresentantes));
         return redirect(url('/') . '/contatos?aba=' . $aba);
     }

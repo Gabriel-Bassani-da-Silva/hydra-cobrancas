@@ -97,7 +97,7 @@ class ContatoRepository {
 
     public function importarRepresentantes(array $vendedores): array {
         $novos = [];
-        $stmtCheck = $this->pdo->prepare("SELECT 1 FROM CONTATO_EXTERNO WHERE ID_CONTATO_BLING = :id");
+        $stmtInsertContato = $this->pdo->prepare("INSERT IGNORE INTO CONTATO_EXTERNO (ID_CONTATO_BLING, NOME_CONTATO) VALUES (:id, :nome)");
         $stmtInsert = $this->pdo->prepare("INSERT IGNORE INTO REPRESENTANTE (ID_CONTATO_BLING, ID_VENDEDOR) VALUES (:id_contato, :id_vendedor)");
 
         foreach ($vendedores as $v) {
@@ -106,9 +106,7 @@ class ContatoRepository {
             $nome = $v['contato']['nome'] ?? '';
             if (!$idVendedor || !$idContato) continue;
 
-            $stmtCheck->execute(['id' => $idContato]);
-            if (!$stmtCheck->fetch()) continue;
-
+            $stmtInsertContato->execute(['id' => $idContato, 'nome' => $nome]);
             $stmtInsert->execute(['id_contato' => $idContato, 'id_vendedor' => $idVendedor]);
             if ($stmtInsert->rowCount() > 0) {
                 $novos[] = ['id_vendedor' => $idVendedor, 'id_contato' => $idContato, 'nome' => $nome];
