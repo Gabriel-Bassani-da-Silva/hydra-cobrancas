@@ -154,8 +154,8 @@ class ContatosController extends Controller {
     public function sincronizarVendedores() {
         
         $blingService = new \App\Integrations\Bling\BlingService();
-        $ultimaSinc = $blingService->getUltimaSincContatos();
-        $resVendedores = $blingService->getAllVendedores($ultimaSinc);
+        // Vendedores são poucos, fazemos sincronização completa sempre para evitar falhas em atualizações
+        $resVendedores = $blingService->getAllVendedores(null);
         $vendedores = $resVendedores['vendedores'];
 
         $novosRepresentantes = $this->model->importarRepresentantes($vendedores);
