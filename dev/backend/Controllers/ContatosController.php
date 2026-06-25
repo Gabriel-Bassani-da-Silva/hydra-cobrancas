@@ -17,15 +17,18 @@ class ContatosController extends Controller {
         $aba = request()->query()['aba'] ?? 'clientes';
         $somenteComTelefone = isset(request()->query()['com_telefone']) && request()->query()['com_telefone'] == '1';
         $somenteConfirmados = isset(request()->query()['com_confirmado']) && request()->query()['com_confirmado'] == '1';
-        $clientes = $this->model->getClientesComTelefones($somenteComTelefone, $somenteConfirmados);
-        $representantes = $this->model->getRepresentantesComTelefones($somenteComTelefone, $somenteConfirmados);
-        $semTelefone = $this->model->getClientesSemTelefone();
-        $contatosFinanceiros = $this->model->getAllContatosFinanceiros($somenteConfirmados);
+        $somenteTentativas = isset(request()->query()['com_tentativa']) && request()->query()['com_tentativa'] == '1';
+        $inadimplentes = isset(request()->query()['inadimplentes']) && request()->query()['inadimplentes'] == '1';
+        $clientes = $this->model->getClientesComTelefones($somenteComTelefone, $somenteConfirmados, $somenteTentativas, $inadimplentes);
+        $representantes = $this->model->getRepresentantesComTelefones($somenteComTelefone, $somenteConfirmados, $somenteTentativas, $inadimplentes);
+        $semTelefone = $this->model->getClientesSemTelefone($inadimplentes);
+        $contatosFinanceiros = $this->model->getAllContatosFinanceiros($somenteConfirmados, $somenteTentativas);
 
         return view('pages.contatos', [
             'aba' => $aba,
             'somenteComTelefone' => $somenteComTelefone,
             'somenteConfirmados' => $somenteConfirmados,
+            'inadimplentes' => $inadimplentes,
             'clientes' => $clientes,
             'representantes' => $representantes,
             'semTelefone' => $semTelefone,

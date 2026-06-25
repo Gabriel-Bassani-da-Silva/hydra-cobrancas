@@ -128,10 +128,23 @@ class ContatoRepository {
     // CONSULTAS
     // ═══════════════════════════════════════════════════════════════════════════
 
-    public function getClientesComTelefones(bool $somenteComTelefone = false, bool $somenteConfirmados = false, bool $inadimplentes = false): array {
-        $joinType = ($somenteComTelefone || $somenteConfirmados) ? "JOIN" : "LEFT JOIN";
-        $whereConfirmado = $somenteConfirmados ? " AND t.CONFIRMADO = 1" : "";
-        $whereInadimplente = $inadimplentes ? " AND EXISTS(SELECT 1 FROM PEDIDO p WHERE p.ID_CLIENTE = ce.ID_CONTATO_BLING AND p.SITUACAO_PEDIDO IN (1, 3) AND p.EXIBIR = 1 AND p.DATA_VENCIMENTO < CURDATE())" : "";
+    public function getClientesComTelefones(bool $somenteComTelefone = false, bool $somenteConfirmados = false, bool $somenteTentativas = false, bool $inadimplentes = false): array {
+        $joinType = ($somenteComTelefone || $somenteConfirmados || $somenteTentativas) ? "JOIN" : "LEFT JOIN";
+        $whereConfirmado = "";
+        if ($somenteConfirmados && !$somenteTentativas) $whereConfirmado = " AND t.CONFIRMADO = 1";
+        if (!$somenteConfirmados && $somenteTentativas) $whereConfirmado = " AND t.CONFIRMADO = 0";
+        $whereInadimplente = "";
+        if ($inadimplentes) {
+            $pedidoRepo = new \App\Repositories\PedidoRepository();
+            $resumo = $pedidoRepo->getResumoClientes('inadimplentes');
+            $ids = array_filter(array_column($resumo, 'ID_CONTATO_BLING'));
+            if (empty($ids)) {
+                $whereInadimplente = " AND 1=0";
+            } else {
+                $idsList = implode(',', array_map('intval', $ids));
+                $whereInadimplente = " AND ce.ID_CONTATO_BLING IN ($idsList)";
+            }
+        }
         $stmt = $this->pdo->query(
             "SELECT ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO,
                     GROUP_CONCAT(DISTINCT CONCAT(t.ID_TEL, ':', t.NUM_TEL, ':', t.CONFIRMADO, ':', t.ORIGEM) SEPARATOR '|') AS telefones
@@ -145,10 +158,23 @@ class ContatoRepository {
         return $this->parseTelefones($stmt->fetchAll());
     }
 
-    public function getRepresentantesComTelefones(bool $somenteComTelefone = false, bool $somenteConfirmados = false, bool $inadimplentes = false): array {
-        $joinType = ($somenteComTelefone || $somenteConfirmados) ? "JOIN" : "LEFT JOIN";
-        $whereConfirmado = $somenteConfirmados ? " AND t.CONFIRMADO = 1" : "";
-        $whereInadimplente = $inadimplentes ? " AND EXISTS(SELECT 1 FROM PEDIDO p WHERE p.ID_REPRESENTANTE = ce.ID_CONTATO_BLING AND p.SITUACAO_PEDIDO IN (1, 3) AND p.EXIBIR = 1 AND p.DATA_VENCIMENTO < CURDATE())" : "";
+    public function getRepresentantesComTelefones(bool $somenteComTelefone = false, bool $somenteConfirmados = false, bool $somenteTentativas = false, bool $inadimplentes = false): array {
+        $joinType = ($somenteComTelefone || $somenteConfirmados || $somenteTentativas) ? "JOIN" : "LEFT JOIN";
+        $whereConfirmado = "";
+        if ($somenteConfirmados && !$somenteTentativas) $whereConfirmado = " AND t.CONFIRMADO = 1";
+        if (!$somenteConfirmados && $somenteTentativas) $whereConfirmado = " AND t.CONFIRMADO = 0";
+        $whereInadimplente = "";
+        if ($inadimplentes) {
+            $pedidoRepo = new \App\Repositories\PedidoRepository();
+            $resumo = $pedidoRepo->getResumoRepresentantes();
+            $ids = array_filter(array_column($resumo, 'ID_CONTATO_BLING'));
+            if (empty($ids)) {
+                $whereInadimplente = " AND 1=0";
+            } else {
+                $idsList = implode(',', array_map('intval', $ids));
+                $whereInadimplente = " AND ce.ID_CONTATO_BLING IN ($idsList)";
+            }
+        }
         $stmt = $this->pdo->query(
             "SELECT ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO, r.ID_VENDEDOR,
                     GROUP_CONCAT(DISTINCT CONCAT(t.ID_TEL, ':', t.NUM_TEL, ':', t.CONFIRMADO, ':', t.ORIGEM) SEPARATOR '|') AS telefones
@@ -163,7 +189,18 @@ class ContatoRepository {
     }
 
     public function getClientesSemTelefone(bool $inadimplentes = false): array {
-        $whereInadimplente = $inadimplentes ? " AND EXISTS(SELECT 1 FROM PEDIDO p WHERE p.ID_CLIENTE = ce.ID_CONTATO_BLING AND p.SITUACAO_PEDIDO IN (1, 3) AND p.EXIBIR = 1 AND p.DATA_VENCIMENTO < CURDATE())" : "";
+        $whereInadimplente = "";
+        if ($inadimplentes) {
+            $pedidoRepo = new \App\Repositories\PedidoRepository();
+            $resumo = $pedidoRepo->getResumoClientes('inadimplentes');
+            $ids = array_filter(array_column($resumo, 'ID_CONTATO_BLING'));
+            if (empty($ids)) {
+                $whereInadimplente = " AND 1=0";
+            } else {
+                $idsList = implode(',', array_map('intval', $ids));
+                $whereInadimplente = " AND ce.ID_CONTATO_BLING IN ($idsList)";
+            }
+        }
         $stmt = $this->pdo->query(
             "SELECT ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO
              FROM CLIENTE c
@@ -192,8 +229,10 @@ class ContatoRepository {
     /**
      * Lista TODOS os contatos financeiros com seus vínculos.
      */
-    public function getAllContatosFinanceiros(bool $somenteConfirmados = false): array {
-        $whereConfirmado = $somenteConfirmados ? " AND t.CONFIRMADO = 1" : "";
+    public function getAllContatosFinanceiros(bool $somenteConfirmados = false, bool $somenteTentativas = false): array {
+        $whereConfirmado = "";
+        if ($somenteConfirmados && !$somenteTentativas) $whereConfirmado = " AND t.CONFIRMADO = 1";
+        if (!$somenteConfirmados && $somenteTentativas) $whereConfirmado = " AND t.CONFIRMADO = 0";
         $stmt = $this->pdo->query(
             "SELECT cf.ID_CONTATO, cf.NOME_CONTATO AS NOME_CF, t.NUM_TEL, t.ID_TEL,
                     GROUP_CONCAT(
