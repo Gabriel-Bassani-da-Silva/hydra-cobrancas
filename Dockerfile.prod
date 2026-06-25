@@ -6,6 +6,10 @@ ENV WEB_DOCUMENT_ROOT=/var/www/html/framework/public
 ENV PHP_OPCACHE_ENABLE=1
 ENV APP_ENV=production
 
+# INTERRUPTOR: Define se o Laravel roda migrations e limpa cache sozinho ao iniciar o contêiner
+# Para desligar, basta ir nas Variáveis do Railway e setar AUTORUN_ENABLED=false
+ENV AUTORUN_ENABLED=false
+
 # Usuário root para instalar dependências do sistema
 USER root
 
