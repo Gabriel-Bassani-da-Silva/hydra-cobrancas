@@ -76,16 +76,22 @@ $formatDoc = function($doc) {
 
     <!-- Abas -->
     <div class="tabs">
-        <a href="{{ route('contatos-page') }}?aba=clientes" class="tab <?= $aba === 'clientes' ? 'active' : '' ?>">
+        <?php 
+            function getTabUrl($tabName) {
+                $params = array_merge(request()->query(), ['aba' => $tabName]);
+                return route('contatos-page') . '?' . http_build_query($params);
+            }
+        ?>
+        <a href="<?= getTabUrl('clientes') ?>" class="tab <?= $aba === 'clientes' ? 'active' : '' ?>">
             Clientes <span class="tab-count"><?= count($clientes) ?></span>
         </a>
-        <a href="{{ route('contatos-page') }}?aba=representantes" class="tab <?= $aba === 'representantes' ? 'active' : '' ?>">
+        <a href="<?= getTabUrl('representantes') ?>" class="tab <?= $aba === 'representantes' ? 'active' : '' ?>">
             Representantes <span class="tab-count"><?= count($representantes) ?></span>
         </a>
-        <a href="{{ route('contatos-page') }}?aba=sem-telefone" class="tab <?= $aba === 'sem-telefone' ? 'active' : '' ?>">
+        <a href="<?= getTabUrl('sem-telefone') ?>" class="tab <?= $aba === 'sem-telefone' ? 'active' : '' ?>">
             Sem Telefone <span class="tab-count"><?= count($semTelefone) ?></span>
         </a>
-        <a href="{{ route('contatos-page') }}?aba=financeiros" class="tab <?= $aba === 'financeiros' ? 'active' : '' ?>">
+        <a href="<?= getTabUrl('financeiros') ?>" class="tab <?= $aba === 'financeiros' ? 'active' : '' ?>">
             Contatos Financeiros <span class="tab-count"><?= count($contatosFinanceiros) ?></span>
         </a>
     </div>
