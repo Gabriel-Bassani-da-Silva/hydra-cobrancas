@@ -141,7 +141,7 @@ class ContatoRepository {
             if (empty($ids)) {
                 $whereInadimplente = " AND 1=0";
             } else {
-                $idsList = implode(',', array_map('intval', $ids));
+                $idsList = implode(',', array_map(function($id) { return "'" . addslashes($id) . "'"; }, $ids));
                 $whereInadimplente = " AND ce.ID_CONTATO_BLING IN ($idsList)";
             }
         }
@@ -171,7 +171,7 @@ class ContatoRepository {
             if (empty($ids)) {
                 $whereInadimplente = " AND 1=0";
             } else {
-                $idsList = implode(',', array_map('intval', $ids));
+                $idsList = implode(',', array_map(function($id) { return "'" . addslashes($id) . "'"; }, $ids));
                 $whereInadimplente = " AND ce.ID_CONTATO_BLING IN ($idsList)";
             }
         }
@@ -197,7 +197,7 @@ class ContatoRepository {
             if (empty($ids)) {
                 $whereInadimplente = " AND 1=0";
             } else {
-                $idsList = implode(',', array_map('intval', $ids));
+                $idsList = implode(',', array_map(function($id) { return "'" . addslashes($id) . "'"; }, $ids));
                 $whereInadimplente = " AND ce.ID_CONTATO_BLING IN ($idsList)";
             }
         }
