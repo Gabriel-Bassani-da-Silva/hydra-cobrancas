@@ -59,8 +59,8 @@ class CsvExportController extends Controller {
             }
         }
 
-        // Buscar contatos financeiros para vincular
-        $todosContatosFinanceiros = $contatoRepo->getAllContatosFinanceiros();
+        // Buscar contatos financeiros para vincular (apenas confirmados)
+        $todosContatosFinanceiros = $contatoRepo->getAllContatosFinanceiros(true);
         $vinculosPorContato = [];
         foreach ($todosContatosFinanceiros as $cf) {
             // cf_vinculos_arr vem no formato [['id_bling' => '...', 'nome' => '...'], ...]
