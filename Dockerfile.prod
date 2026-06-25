@@ -10,6 +10,14 @@ ENV APP_ENV=production
 # Para desligar, basta ir nas Variáveis do Railway e setar AUTORUN_ENABLED=false
 ENV AUTORUN_ENABLED=false
 
+# Configurações padrão do WebSockets (Reverb) para subir sozinho sem precisar configurar no Railway
+ENV BROADCAST_CONNECTION=reverb
+ENV REVERB_APP_ID=123456
+ENV REVERB_APP_KEY=hydra_key
+ENV REVERB_APP_SECRET=hydra_secret_super_seguro
+ENV REVERB_HOST="0.0.0.0"
+ENV REVERB_PORT=80
+
 # Usuário root para instalar dependências do sistema
 USER root
 

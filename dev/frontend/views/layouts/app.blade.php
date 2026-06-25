@@ -11,6 +11,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('css/main.css') }}?v={{ time() }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Pusher e Echo para WebSockets (Reverb) -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/laravel-echo@1.16.1/dist/echo.iife.js"></script>
+    
     @stack('styles')
 </head>
 
@@ -71,7 +76,21 @@
         @yield('content')
     </main>
 
-    <!-- Scripts auxiliares -->
+    <!-- Inicialização do WebSockets -->
+    <script>
+        // O Reverb precisa dessas variáveis que virão do .env / Railway
+        window.Pusher = Pusher;
+        window.Echo = new Echo({
+            broadcaster: 'reverb',
+            key: '{{ env("REVERB_APP_KEY", "hydra_key") }}',
+            wsHost: window.location.hostname,
+            wsPort: {{ env("REVERB_PORT", 80) }},
+            wssPort: {{ env("REVERB_PORT", 443) }},
+            forceTLS: (window.location.protocol === 'https:'),
+            enabledTransports: ['ws', 'wss'],
+        });
+    </script>
+
     @stack('scripts')
 </body>
 

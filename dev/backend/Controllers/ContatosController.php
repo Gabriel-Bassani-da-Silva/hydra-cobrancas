@@ -45,19 +45,40 @@ class ContatosController extends Controller {
 
         if ($action === 'edit' && $idTel) {
             $this->model->editarTelefone($idTel, $numTel);
+            if (!$idContato) $idContato = $this->model->getIdContatoByTel($idTel) ?? null;
         } elseif ($idContato) {
             $this->model->adicionarTelefone($idContato, $numTel);
         }
 
+        if (request()->ajax() || request()->wantsJson()) {
+            if ($idContato) {
+                $telefones = $this->model->getTelefonesPorContato($idContato);
+                event(new \App\Events\TelefonesAtualizados($idContato, $telefones));
+            }
+            return response()->json(['ok' => true]);
+        }
+
         $aba = request()->post()['aba'] ?? 'clientes';
         return redirect(url('/') . '/contatos?aba=' . $aba);
-        exit;
     }
 
     public function excluirTelefone() {
         
         $idTel = request()->post()['id_tel'] ?? null;
-        if ($idTel) $this->model->excluirTelefone($idTel);
+        $idContato = request()->post()['id_contato'] ?? null;
+        
+        if ($idTel) {
+            if (!$idContato) $idContato = $this->model->getIdContatoByTel($idTel) ?? null;
+            $this->model->excluirTelefone($idTel);
+        }
+
+        if (request()->ajax() || request()->wantsJson()) {
+            if ($idContato) {
+                $telefones = $this->model->getTelefonesPorContato($idContato);
+                event(new \App\Events\TelefonesAtualizados($idContato, $telefones));
+            }
+            return response()->json(['ok' => true]);
+        }
 
         $aba = request()->post()['aba'] ?? 'clientes';
         return redirect(url('/') . '/contatos?aba=' . $aba);
@@ -66,7 +87,14 @@ class ContatosController extends Controller {
     public function toggleConfirmado() {
         
         $idTel = request()->post()['id_tel'] ?? null;
-        if ($idTel) $this->model->toggleConfirmado($idTel);
+        if ($idTel) {
+            $this->model->toggleConfirmado($idTel);
+            $idContato = $this->model->getIdContatoByTel($idTel);
+            if ($idContato) {
+                $telefones = $this->model->getTelefonesPorContato($idContato);
+                event(new \App\Events\TelefonesAtualizados($idContato, $telefones));
+            }
+        }
 
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             return response()->json(['ok' => true, 'user' => auth()->user()->NOME_COLABORADOR ?? '']);
@@ -79,7 +107,14 @@ class ContatosController extends Controller {
     public function toggleOrigem() {
         
         $idTel = request()->post()['id_tel'] ?? null;
-        if ($idTel) $this->model->toggleOrigem($idTel);
+        if ($idTel) {
+            $this->model->toggleOrigem($idTel);
+            $idContato = $this->model->getIdContatoByTel($idTel);
+            if ($idContato) {
+                $telefones = $this->model->getTelefonesPorContato($idContato);
+                event(new \App\Events\TelefonesAtualizados($idContato, $telefones));
+            }
+        }
 
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
             return response()->json(['ok' => true, 'user' => auth()->user()->NOME_COLABORADOR ?? '']);
@@ -195,6 +230,18 @@ class ContatosController extends Controller {
         $novosContatos  = $this->model->importarContatos($contatosArray);
         $novosTelefones = $this->model->importarTelefones($contatosArray);
         $this->model->importarClientes(); // Sync clients relation just in case
+
+        // Dispara o evento de WebSockets!
+        $telefones = $this->model->getTelefonesPorContato($idContato);
+        event(new \App\Events\TelefonesAtualizados($idContato, $telefones));
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'ok' => true,
+                'msg' => "Contato {$contato['nome']} ({$idContato}) atualizado com sucesso! Novos telefones: " . count($novosTelefones),
+                'telefones' => $telefones
+            ]);
+        }
 
         session()->flash('flash_msg', "Contato {$contato['nome']} ({$idContato}) atualizado com sucesso! Novos telefones: " . count($novosTelefones));
         return redirect(url('/') . '/contatos?aba=' . $aba);

@@ -395,13 +395,88 @@ document.addEventListener('DOMContentLoaded', () => {
             const tel = btnEditCF.getAttribute('data-tel');
             const vinculos = btnEditCF.getAttribute('data-vinculos');
             openEditCF(id, nome, tel, vinculos);
-            // Close dropdown if opened
-            const dropdownMenu = btnEditCF.closest('.dropdown-menu');
-            if (dropdownMenu) dropdownMenu.classList.remove('show');
-            return;
+        }
+    });
+    
+    // Interceptar formulários para enviar via AJAX (Evita recarregar a página)
+    document.addEventListener('submit', (e) => {
+        const form = e.target;
+        if (form.matches('form[action*="salvar-telefone-contato"]') || form.matches('form[action*="excluir-telefone"]') || form.matches('form[action*="sincronizar-contato-unico"]')) {
+            e.preventDefault();
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '⏳';
+            btn.disabled = true;
+
+            fetch(form.action, {
+                method: form.method,
+                body: new FormData(form),
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                if (form.id !== 'manage-form-sync') closeModal('modal-tel'); // Fecha modal de edição/adição
+            })
+            .catch(err => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                console.error(err);
+            });
         }
     });
 });
+
+// ── WebSockets (Tempo Real) ───────────────────────────────────────────────
+if (window.Echo) {
+    window.Echo.channel('contatos')
+        .listen('TelefonesAtualizados', (e) => {
+            console.log('Recebido update via WebSockets:', e);
+            const idContato = e.idContatoBling;
+            const telefones = e.telefones;
+            
+            // 1. Atualizar o JSON embutido na tabela
+            const dataDiv = document.getElementById('phones-data-' + idContato);
+            if (dataDiv) {
+                dataDiv.textContent = JSON.stringify(telefones);
+            }
+            
+            // 2. Atualizar a Tabela de Contatos visível
+            const row = document.querySelector(`tr[onclick*="'${idContato}'"]`);
+            if (row) {
+                const telColBling = row.querySelector('td:nth-child(3)');
+                const telColManual = row.querySelector('td:nth-child(4)');
+                
+                const blingTels = telefones.filter(t => t.origem === 'bling');
+                const manualTels = telefones.filter(t => t.origem === 'manual');
+                
+                const renderTels = (tels) => {
+                    if (!tels || tels.length === 0) return '<span class="no-phone">Sem telefone</span>';
+                    let html = '<div class="tel-list-container">';
+                    tels.forEach(t => {
+                        const cssClass = t.confirmado == 1 ? 'confirmed-text' : 'attempt-text';
+                        html += `<div class="tel-item simplified"><span class="tel-num ${cssClass}">${formatPhoneJS(t.num)}</span></div>`;
+                    });
+                    html += '</div>';
+                    return html;
+                };
+
+                if (telColBling) telColBling.innerHTML = renderTels(blingTels);
+                if (telColManual) telColManual.innerHTML = renderTels(manualTels);
+            }
+            
+            // 3. Atualizar o Modal de Gerenciamento, se estiver aberto para este contato
+            if (document.getElementById('modal-manage-phones').style.display !== 'none') {
+                const currentSyncId = document.getElementById('manage-sync-id').value;
+                if (currentSyncId == idContato) {
+                    const nome = document.getElementById('manage-phones-title').textContent.replace('Telefones de ', '');
+                    const aba = document.getElementById('manage-sync-aba').value;
+                    window.openManagePhonesModal(idContato, nome, aba);
+                }
+            }
+        });
+}
 
 // ── Funções Auxiliares: Gerenciar Telefones Modal ────────────────────────
 window.phonesModified = false;
@@ -467,6 +542,7 @@ window.openManagePhonesModal = function(idContato, nomeContato, aba) {
                     <form method="POST" action="${BASE}/contatos/excluir-telefone" class="inline-form" onsubmit="return confirm('Excluir?')">
                         <input type="hidden" name="_token" value="${document.querySelector('meta[name=csrf-token]')?.content || ''}">
                         <input type="hidden" name="id_tel" value="${t.id}">
+                        <input type="hidden" name="id_contato" value="${idContato}">
                         <input type="hidden" name="aba" value="${aba}">
                         <button type="submit" class="btn-icon btn-delete" title="Excluir">✕</button>
                     </form>

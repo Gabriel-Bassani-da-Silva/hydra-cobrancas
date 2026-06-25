@@ -198,6 +198,27 @@ class ContatoRepository {
         return $this->parseTelefones($stmt->fetchAll());
     }
 
+    public function getTelefonesPorContato($idContatoBling): array {
+        $stmt = $this->pdo->prepare(
+            "SELECT t.ID_TEL as id, t.NUM_TEL as num, t.CONFIRMADO as confirmado, t.ORIGEM as origem, 
+                    cc.NOME_COLABORADOR as criado_por, ca.NOME_COLABORADOR as alterado_por
+             FROM CONTATO_TEL ct
+             JOIN TEL t ON t.ID_TEL = ct.ID_TEL
+             LEFT JOIN COLABORADOR cc ON cc.ID_COLABORADOR = t.ID_COLAB_CRIACAO
+             LEFT JOIN COLABORADOR ca ON ca.ID_COLABORADOR = t.ID_COLAB_ALTERACAO
+             WHERE ct.ID_CONTATO_BLING = :id
+             ORDER BY t.CONFIRMADO DESC, t.ID_TEL DESC"
+        );
+        $stmt->execute(['id' => $idContatoBling]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    public function getIdContatoByTel($idTel) {
+        $stmt = $this->pdo->prepare("SELECT ID_CONTATO_BLING FROM CONTATO_TEL WHERE ID_TEL = :id LIMIT 1");
+        $stmt->execute(['id' => $idTel]);
+        return $stmt->fetchColumn();
+    }
+
     public function getClientesSemTelefone(bool $inadimplentes = false): array {
         $whereInadimplente = "";
         if ($inadimplentes) {

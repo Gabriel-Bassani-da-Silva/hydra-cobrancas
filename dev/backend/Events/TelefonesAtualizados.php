@@ -33,9 +33,9 @@ class TelefonesAtualizados implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-        // Usar um canal público para facilitar, focado no ID do contato
+        // Usar um canal global para que a listagem de contatos possa escutar todas as atualizações
         return [
-            new Channel('contato.' . $this->idContatoBling),
+            new Channel('contatos'),
         ];
     }
 }
