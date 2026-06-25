@@ -535,7 +535,7 @@ class ContatoRepository {
 
         // Verifica telefone
         if (empty($telefone)) {
-            $acao_telefone = 'Nenhum telefone informado';
+            return ['status' => 'erro', 'mensagem' => 'Nenhum telefone informado'];
         } else {
             $stmtBusca = $this->pdo->prepare("SELECT ID_TEL, CONFIRMADO FROM TEL WHERE NUM_TEL = :num");
             $stmtBusca->execute(['num' => $telefone]);
@@ -578,7 +578,7 @@ class ContatoRepository {
                 }
 
                 if (empty($msgsTel)) {
-                    $acao_telefone = 'Telefone já vinculado com mesmo status';
+                    return ['status' => 'erro', 'mensagem' => 'Telefone já vinculado ao cliente com o mesmo status'];
                 } else {
                     $acao_telefone = implode(' + ', $msgsTel);
                 }
