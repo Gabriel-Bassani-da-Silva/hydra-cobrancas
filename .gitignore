@@ -1,0 +1,53 @@
+# ───────────────────────────────────────────────
+# Segredos e ambiente
+# ───────────────────────────────────────────────
+.env
+*.env
+!*.env.example
+framework/.env
+framework/.env.backup
+framework/.env.production
+framework/.env.docker
+
+# ───────────────────────────────────────────────
+# Dependências
+# ───────────────────────────────────────────────
+framework/vendor/
+framework/node_modules/
+node_modules/
+
+# ───────────────────────────────────────────────
+# Build / cache
+# ───────────────────────────────────────────────
+framework/public/build/
+framework/public/hot
+framework/public/storage
+framework/storage/*.key
+framework/storage/pail
+framework/storage/app/logs/sync/
+framework/bootstrap/cache/*.php
+framework/.phpunit.result.cache
+framework/.phpunit.cache/
+
+# Logs
+*.log
+
+# ───────────────────────────────────────────────
+# Banco local (SQLite)
+# ───────────────────────────────────────────────
+dev/database/*.sqlite
+dev/database/*.sqlite-journal
+
+# ───────────────────────────────────────────────
+# IDE / SO
+# ───────────────────────────────────────────────
+.idea/
+.vscode/
+.fleet/
+.nova/
+.zed/
+.DS_Store
+Thumbs.db
+
+# Dados de volumes Docker (se mapeados localmente)
+.docker/data/

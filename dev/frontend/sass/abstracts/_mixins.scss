@@ -1,0 +1,18 @@
+@mixin flexAlign($align:center, $justify:center, $direction:column, $gap:null) {
+    display: flex;
+    align-items: $align;
+    justify-content: $justify;
+    flex-direction: $direction;
+
+    @if $gap != null {
+        gap: $gap;
+    }
+}
+@mixin heightWidth($height,$width){
+    height: $height;
+    width: $width;
+}
+@mixin bgColor($background-color, $color){
+    background-color: $background-color;
+    color: $color;
+}

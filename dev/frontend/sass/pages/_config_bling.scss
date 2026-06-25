@@ -1,0 +1,225 @@
+@use "../abstracts/" as mx;
+@use "sass:color";
+
+.config-bling-page {
+    background: radial-gradient(circle at top left, #fdfbfb 0%, #f5f7fa 40%, #e2e8f0 100%);
+    min-height: 100vh;
+
+    main {
+        padding-top: 90px;
+        width: 100%;
+        height: 100%;
+    }
+
+    .dashboard-container {
+        padding: 24px;
+        max-width: 800px;
+        margin: 0 auto;
+
+        h1 {
+            margin-bottom: 24px;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2c3345;
+        }
+    }
+
+    // Alerts
+    .alert {
+        padding: 15px 20px;
+        margin-bottom: 24px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border: 1px solid transparent;
+
+        &.alert-error {
+            background: #fff5f5;
+            color: #c53030;
+            border-color: #feb2b2;
+        }
+
+        &.alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border-color: #9ae6b4;
+        }
+
+        &.alert-warning {
+            background: #fffaf0;
+            color: #dd6b20;
+            border-color: #fbd38d;
+        }
+    }
+
+    // Settings Card
+    .card {
+        padding: 32px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.01);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        max-width: 650px;
+        margin-bottom: 32px;
+
+        h2 {
+            margin: 0 0 10px;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #2c3345;
+        }
+
+        p {
+            margin: 0 0 24px;
+            color: #718096;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+    }
+
+    // Forms
+    .form-group {
+        margin-bottom: 20px;
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            outline: none;
+            background: #f8fafc;
+
+            &:focus {
+                border-color: mx.$laranja-poran;
+                box-shadow: 0 0 0 3px rgba(mx.$laranja-poran, 0.15);
+                background: #fff;
+            }
+        }
+
+        small {
+            color: #a0aec0;
+            display: block;
+            margin-top: 6px;
+            font-size: 0.8rem;
+            line-height: 1.4;
+
+            strong {
+                color: #718096;
+            }
+        }
+    }
+
+    // Action Buttons
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        text-decoration: none;
+
+        &.btn-primary {
+            background: linear-gradient(135deg, mx.$laranja-poran, color.adjust(mx.$laranja-poran, $lightness: -8%));
+            color: white;
+            box-shadow: 0 4px 14px rgba(mx.$laranja-poran, 0.3);
+
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 18px rgba(mx.$laranja-poran, 0.4);
+            }
+        }
+
+        &.btn-success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+            color: white;
+            box-shadow: 0 4px 14px rgba(56, 161, 105, 0.3);
+
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 18px rgba(56, 161, 105, 0.4);
+            }
+        }
+
+        &.btn-info {
+            background: linear-gradient(135deg, #3182ce, #2b6cb0);
+            color: white;
+            box-shadow: 0 4px 14px rgba(43, 108, 176, 0.3);
+
+            &:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 6px 18px rgba(43, 108, 176, 0.4);
+            }
+        }
+    }
+
+    // Authorization Flow Section
+    .auth-section {
+        margin-top: 32px;
+        padding-top: 24px;
+        border-top: 1px solid #edf2f7;
+
+        h3 {
+            margin: 0 0 12px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #2c3345;
+        }
+
+        p {
+            margin-bottom: 16px;
+        }
+
+        ol {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            color: #4a5568;
+            font-size: 0.9rem;
+            line-height: 1.6;
+
+            li {
+                margin-bottom: 8px;
+
+                strong {
+                    color: #2d3748;
+                }
+            }
+        }
+
+        .auth-step-1 {
+            margin-bottom: 24px;
+        }
+
+        .auth-step-2-box {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+
+            .form-group {
+                margin-bottom: 16px;
+
+                input {
+                    background: #fff;
+                    font-family: var(--font-mono, monospace);
+                    font-size: 0.88rem;
+                }
+            }
+        }
+    }
+}

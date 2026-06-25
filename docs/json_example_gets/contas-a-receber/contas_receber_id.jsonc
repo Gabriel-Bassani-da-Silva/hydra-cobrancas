@@ -1,0 +1,27 @@
+{
+    "data": {
+        "id": 12345678,
+        "situacao": 3,
+        "vencimento": "2023-01-12",
+        "valor": 1500.75,
+        "saldo": 500.00,
+        // "idTransacao": "vX98D",
+        // "linkQRCodePix": "doc.view.php?id=9ab1671b3f05765cb49fee83ee0f2496",
+        // "linkBoleto": "doc.view.php?id=9ab1671b3f05765cb49fee83ee0f2496",
+        // "dataEmissao": "2023-01-12",
+        // "vendedor": {
+        //     "id": 0
+        // },
+        "historico": "Referente ao pedido de Venda nº 12345"
+        // "contato": {
+        //     "id": 12345678,
+        //     "nome": "Contato Teste"
+        // },
+        // "formaPagamento": {
+        //     "id": 12345678
+        // },
+        // "origem": {
+        //     "numero": "0921132"
+        // }
+    }
+}

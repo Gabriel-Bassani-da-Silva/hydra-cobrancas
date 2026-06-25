@@ -1,0 +1,20 @@
+.btn-cancel {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    background: #f1f3f5;
+    color: #495057;
+    border: 1px solid #dee2e6;
+    transition: all 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+        background: #e9ecef;
+        color: #212529;
+    }
+}

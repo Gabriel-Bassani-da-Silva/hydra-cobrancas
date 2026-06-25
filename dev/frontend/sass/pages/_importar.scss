@@ -1,0 +1,51 @@
+@use "../abstracts" as mx;
+
+.import-form {
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    #drop-zone {
+        text-align: center;
+        padding: 40px;
+        border: 2px dashed #ccc;
+        border-radius: 8px;
+        background: #f9f9f9;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        svg {
+            margin-bottom: 15px;
+        }
+
+        h3 {
+            pointer-events: none;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 15px;
+            pointer-events: none;
+        }
+
+        #file-name-display {
+            color: #0d6efd;
+            font-weight: 500;
+            margin-top: 15px;
+        }
+    }
+}
+
+.mapping-field {
+    select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, .25);
+        outline: 0;
+    }
+
+    .text-danger {
+        font-size: 0.85rem;
+        margin-top: 4px;
+        color: #dc3545;
+    }
+}

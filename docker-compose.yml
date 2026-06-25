@@ -1,0 +1,86 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: hydra-laravel-app
+    container_name: hydra-app
+    restart: unless-stopped
+    working_dir: /var/www/html/framework
+    volumes:
+      - ./:/var/www/html
+      - ./.docker/php/local.ini:/usr/local/etc/php/conf.d/local.ini
+    networks:
+      - hydra-network
+    depends_on:
+      - db
+      - redis
+    entrypoint: ["bash", "/var/www/html/.docker/entrypoint.sh"]
+    command: ["php-fpm"]
+
+  web:
+    image: nginx:alpine
+    container_name: hydra-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./:/var/www/html
+      - ./.docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - hydra-network
+    depends_on:
+      - app
+
+  db:
+    image: mysql:8.0
+    container_name: hydra-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-cobrancas_hydra}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-secret}
+      MYSQL_USER: ${DB_USERNAME:-hydra}
+    command: --lower_case_table_names=1
+    volumes:
+      - hydra-mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - hydra-network
+
+  redis:
+    image: redis:alpine
+    container_name: hydra-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - hydra-redis-data:/data
+    networks:
+      - hydra-network
+
+  queue:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hydra-queue
+    restart: unless-stopped
+    working_dir: /var/www/html/framework
+    volumes:
+      - ./:/var/www/html
+    networks:
+      - hydra-network
+    depends_on:
+      - db
+      - redis
+      - app
+    command: ["php", "artisan", "queue:work", "--tries=3", "--timeout=90"]
+
+networks:
+  hydra-network:
+    driver: bridge
+
+volumes:
+  hydra-mysql-data:
+  hydra-redis-data:

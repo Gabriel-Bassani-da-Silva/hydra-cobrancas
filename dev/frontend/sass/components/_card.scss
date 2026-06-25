@@ -1,0 +1,196 @@
+@use "sass:color";
+@use "../abstracts" as mx;
+
+.card {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.table-wrap {
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    width: 100%;
+
+    .billing-table {
+        width: 100%;
+        border-collapse: collapse;
+
+        thead tr {
+            background: mx.$laranja-poran;
+        }
+
+        thead th {
+            padding: 16px 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-align: left;
+            border-bottom: none;
+
+            &.text-center {
+                text-align: center;
+            }
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #e5e7eb;
+            transition: background-color 0.2s ease;
+
+            &:hover {
+                background-color: #fff7f0;
+            }
+        }
+
+        tbody td {
+            padding: 16px 20px;
+            font-size: 0.875rem;
+            color: #1f2937;
+            vertical-align: middle;
+
+            &.text-center {
+                text-align: center;
+            }
+        }
+    }
+
+    // Informações da Célula
+    .name-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+
+        .badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            &.active {
+                background: #dcfce7;
+                color: #16a34a;
+            }
+
+            &.inactive {
+                background: #f3f4f6;
+                color: #9ca3af;
+            }
+        }
+    }
+
+    .date-cell,
+    .qty-cell {
+        color: #4b5563;
+        font-weight: 500;
+    }
+
+    .value-cell {
+        font-weight: 800;
+        color: color.adjust(mx.$laranja-poran, $lightness: -10%);
+        font-size: 0.95rem;
+    }
+
+    // Botões de Ação
+    .btn-group {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+    }
+
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: 1px solid #e5e7eb;
+        background: #ffffff;
+        color: #4b5563;
+        cursor: pointer;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+        svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        &.btn-manage {
+            color: #db2777;
+
+            &:hover {
+                background: #fdf2f8;
+                border-color: #fbcfe8;
+                color: #be185d;
+            }
+        }
+
+        &.btn-hide {
+            color: #4b5563;
+
+            &:hover {
+                background: #f3f4f6;
+                border-color: #d1d5db;
+                color: #1f2937;
+            }
+        }
+    }
+
+    .btn-charge {
+        padding: 8px 20px;
+        border-radius: 6px;
+        border: none;
+        background: mx.$laranja-poran;
+        color: #ffffff;
+        font-size: 0.8rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        width: 100%;
+
+        &:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+    }
+
+    // Rodapé da Tabela
+    .table-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: #fff7f0;
+        border-top: 1px solid #fed7aa;
+
+        .footer-info {
+            font-size: 0.85rem;
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .footer-total {
+            font-weight: 800;
+            color: color.adjust(mx.$laranja-poran, $lightness: -10%);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+
+            span {
+                font-weight: 500;
+                color: #4b5563;
+                font-size: 0.85rem;
+            }
+        }
+    }
+}

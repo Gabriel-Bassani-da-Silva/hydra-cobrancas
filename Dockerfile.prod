@@ -1,0 +1,25 @@
+FROM serversideup/php:8.2-fpm-nginx
+
+# O Railway passa a variável PORT automaticamente. A imagem serversideup vai respeitar essa variável ou escutar na 8080.
+# Ajustamos o root do Nginx para apontar para a nossa pasta dividida.
+ENV WEB_DOCUMENT_ROOT=/var/www/html/framework/public
+ENV PHP_OPCACHE_ENABLE=1
+ENV APP_ENV=production
+
+# Usuário root para instalar dependências do sistema
+USER root
+
+# Copiamos o projeto inteiro mantendo as permissões do www-data
+COPY --chown=www-data:www-data . /var/www/html/
+
+# Voltamos para o usuário do servidor web
+USER www-data
+
+# Entramos na pasta framework onde está o composer.json e baixamos as bibliotecas de produção
+WORKDIR /var/www/html/framework
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Limpeza e otimização do Laravel
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache

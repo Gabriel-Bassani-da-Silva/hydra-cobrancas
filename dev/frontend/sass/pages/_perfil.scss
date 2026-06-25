@@ -1,0 +1,157 @@
+// ═══════════════════════════════════════════════════════════
+// PERFIL PAGE — Estilos específicos
+// ═══════════════════════════════════════════════════════════
+
+// Span auxiliar em sub-tabs
+.sub-tab-count {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+// Largura mínima para coluna de ações
+.cr-col-acoes-wide {
+  min-width: 200px;
+}
+
+// Texto auxiliar cinza em cells
+.text-muted-sm {
+  color: #777;
+}
+
+.text-doc {
+  color: #64748b;
+  font-size: 13px;
+}
+
+// Valor em negrito na tabela
+.text-bold-value {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+// Badge de status da cobrança (perfil)
+.badge-status-atendimento {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #fff3cd;
+  color: #856404;
+}
+
+// Dropdown hover de clientes
+.dropdown-hover {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-hover-trigger {
+  color: #007bff;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 10;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: max-content;
+}
+
+.dropdown-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 12px;
+
+  li {
+    margin-bottom: 4px;
+  }
+}
+
+// Container relativo para dropdown de ações
+.action-menu-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+// Botão de opções (3 linhas)
+.btn-options {
+  padding: 6px;
+  background: transparent;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: #0f172a;
+  }
+}
+
+// Dropdown de ações (menu flutuante)
+.action-menu-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  min-width: 170px;
+  overflow: hidden;
+}
+
+// Itens do menu de ações
+.action-menu-item {
+  width: 100%;
+  text-align: left;
+  border-radius: 0;
+  border: none;
+  border-bottom: 1px solid #f1f5f9;
+  padding: 10px 12px;
+  background: transparent;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  cursor: pointer;
+  transition: background-color 0.15s;
+
+  svg {
+    margin-right: 8px;
+  }
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &--default {
+    color: #334155;
+
+    &:hover {
+      background-color: #f8fafc;
+    }
+  }
+
+  &--danger {
+    color: #ef4444;
+
+    &:hover {
+      background-color: #fef2f2;
+    }
+  }
+}
+
+// Modal container wide
+.cr-modal-container--wide {
+  max-width: 1000px;
+}

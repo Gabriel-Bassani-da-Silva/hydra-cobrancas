@@ -1,0 +1,13 @@
+/framework/vendor/
+/framework/node_modules/
+/framework/public/build/
+/framework/storage/logs/*
+/framework/storage/framework/cache/*
+/framework/storage/framework/sessions/*
+/framework/storage/framework/views/*
+/.git
+/framework/.env
+/.idea
+/.vscode
+*.sqlite
+/dev/database/*.sqlite

@@ -1,0 +1,77 @@
+@use '../abstracts' as mx;
+
+.header {
+    position: fixed;
+    top: 0;
+    background: #ffffff;
+    @include mx.heightWidth(10%, 100%);
+    @include mx.flexAlign($direction: row);
+    z-index: 999;
+
+    .header-dates {
+        position: absolute;
+        left: 1.5rem;
+        bottom: 0.5rem;
+        font-size: 0.75rem;
+        color: #888;
+        @include mx.flexAlign($direction: row, $gap: 1rem);
+
+        .bling-status {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.7rem;
+
+            &.ok {
+                color: #28a745;
+                background: rgba(40, 167, 69, 0.1);
+            }
+
+            &.error {
+                color: #dc3545;
+                background: rgba(220, 53, 69, 0.1);
+            }
+        }
+    }
+
+    nav {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        gap: 0.75rem;
+        @include mx.flexAlign($direction: row);
+
+        .header-icon-btn {
+            padding: 0.45rem 0.9rem;
+            border-radius: 20px;
+            border: 2px solid #ddd;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.2s ease;
+
+            @include mx.flexAlign($direction: row, $gap: 0.4rem);
+
+            &:hover {
+                border-color: mx.$laranja-poran;
+                color: mx.$laranja-poran;
+                cursor: pointer;
+            }
+
+            &.profile {
+                padding: 0;
+                border-radius: 50%;
+                @include mx.heightWidth(42px, 42px);
+                @include mx.flexAlign();
+
+                span {
+                    display: none;
+                }
+
+                svg {
+                    @include mx.heightWidth(24px, 24px);
+                }
+            }
+        }
+    }
+}

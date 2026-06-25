@@ -1,0 +1,70 @@
+@use "../abstracts" as mx;
+
+.home-page {
+    background: radial-gradient(circle at top left, #fdfbfb 0%, #f5f7fa 40%, #e2e8f0 100%);
+    min-height: 100vh;
+
+    main {
+        padding-top: 90px;
+        width: 100%;
+    }
+
+    .dashboard-container {
+        padding: 24px;
+        max-width: 800px;
+        margin: 0 auto;
+
+        h1 {
+            margin-bottom: 24px;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #2c3345;
+        }
+    }
+
+    // Alerts
+    .alert {
+        padding: 15px 20px;
+        margin-bottom: 24px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        border: 1px solid transparent;
+
+        &.alert-error {
+            background: #fff5f5;
+            color: #c53030;
+            border-color: #feb2b2;
+        }
+
+        &.alert-success {
+            background: #f0fff4;
+            color: #22543d;
+            border-color: #9ae6b4;
+        }
+    }
+
+    // Card
+    .card {
+        padding: 32px;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.01);
+        border: 1px solid rgba(0, 0, 0, 0.04);
+        margin-bottom: 32px;
+
+        h2 {
+            margin: 0 0 10px;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #2c3345;
+        }
+
+        p {
+            margin: 12px 0 0;
+            color: #718096;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+    }
+}
