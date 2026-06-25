@@ -409,10 +409,13 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.disabled = true;
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            const formData = new FormData(form);
+            formData.append('_token', csrfToken);
             
             fetch(form.action, {
                 method: form.method,
-                body: new FormData(form),
+                body: formData,
+                credentials: 'same-origin',
                 headers: { 
                     'X-Requested-With': 'XMLHttpRequest',
                     'X-CSRF-TOKEN': csrfToken

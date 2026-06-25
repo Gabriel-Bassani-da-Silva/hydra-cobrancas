@@ -36,7 +36,7 @@ USER root
 RUN mkdir -p /etc/s6-overlay/s6-rc.d/reverb && \
     echo "longrun" > /etc/s6-overlay/s6-rc.d/reverb/type && \
     echo "#!/bin/sh" > /etc/s6-overlay/s6-rc.d/reverb/run && \
-    echo "exec su www-data -s /bin/sh -c \"php /var/www/html/framework/artisan reverb:start --host=0.0.0.0 --port=9080\"" >> /etc/s6-overlay/s6-rc.d/reverb/run && \
+    echo "exec php /var/www/html/framework/artisan reverb:start --host=0.0.0.0 --port=9080" >> /etc/s6-overlay/s6-rc.d/reverb/run && \
     chmod +x /etc/s6-overlay/s6-rc.d/reverb/run && \
     touch /etc/s6-overlay/s6-rc.d/user/contents.d/reverb
 
