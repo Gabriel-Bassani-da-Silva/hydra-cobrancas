@@ -42,8 +42,8 @@ Route::middleware('auth')->group(function () {
     // Contas a Receber
     Route::get('/contas-receber', [ContasReceberController::class, 'index'])->name('contas-receber-page');
     Route::get('/contas-receber/detalhes-contato-financeiro/{id}', [ContasReceberController::class, 'detalhesContatoFinanceiro'])->name('detalhes-contato-financeiro');
-    Route::post('/contas-receber/sincronizar-unico', [ContasReceberController::class, 'sincronizarUnico'])->name('sincronizar-conta-unica');
-    Route::post('/contas-receber/sincronizar', [ContasReceberController::class, 'sincronizar'])->name('sincronizar-contas-receber');
+    Route::any('/contas-receber/sincronizar-unico', [ContasReceberController::class, 'sincronizarUnico'])->name('sincronizar-conta-unica');
+    Route::any('/contas-receber/sincronizar', [ContasReceberController::class, 'sincronizar'])->name('sincronizar-contas-receber');
     Route::post('/contas-receber/atualizar', [ContasReceberController::class, 'atualizar'])->name('atualizar-contas-receber');
     Route::post('/contas-receber/vincular-representantes', [ContasReceberController::class, 'vincularRepresentantes'])->name('vincular-reps-contas');
     Route::post('/contas-receber/baixar', [ContasReceberController::class, 'baixar'])->name('baixar-parcelas');
@@ -62,9 +62,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/contatos/excluir-contato-financeiro', [ContatosController::class, 'excluirContatoFinanceiro'])->name('excluir-contato-financeiro');
     Route::get('/contatos/api/contatos', [ContatosController::class, 'apiContatos'])->name('api-contatos');
     Route::get('/contatos/api/telefones', [ContatosController::class, 'apiTelefones'])->name('api-telefones');
-    Route::post('/contatos/sincronizar-contatos', [ContatosController::class, 'sincronizarContatos'])->name('sincronizar-contatos-bling');
-    Route::post('/contatos/sincronizar-vendedores', [ContatosController::class, 'sincronizarVendedores'])->name('sincronizar-vendedores-bling');
-    Route::post('/contatos/sincronizar-unico', [ContatosController::class, 'sincronizar-unico'])->name('sincronizar-contato-unico');
+    Route::any('/contatos/sincronizar-contatos', [ContatosController::class, 'sincronizarContatos'])->name('sincronizar-contatos-bling');
+    Route::any('/contatos/sincronizar-vendedores', [ContatosController::class, 'sincronizarVendedores'])->name('sincronizar-vendedores-bling');
+    Route::any('/contatos/sincronizar-unico', [ContatosController::class, 'sincronizarUnico'])->name('sincronizar-contato-unico');
     
     // Contatos - Importação
     Route::get('/contatos/importar', [ContatosController::class, 'importar'])->name('importar-contatos-page');
