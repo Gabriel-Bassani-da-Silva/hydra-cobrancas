@@ -170,7 +170,7 @@ function toggleStatus(btn, idTel) {
     formData.append('id_tel', idTel);
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-    fetch(BASE + '/contatos/telefone/confirmar', {
+    fetch(BASE + '/contatos/toggle-confirmado', {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
@@ -203,7 +203,7 @@ function toggleOrigem(btn, idTel, novaOrigem) {
     formData.append('id_tel', idTel);
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-    fetch(BASE + '/contatos/telefone/toggle-origem', {
+    fetch(BASE + '/contatos/toggle-origem', {
         method: 'POST',
         headers: {
             'X-Requested-With': 'XMLHttpRequest',
@@ -475,7 +475,7 @@ window.openManagePhonesModal = function(idContato, nomeContato, aba) {
                 <div class="tel-actions" style="margin-left: auto;">
                     <button type="button" class="btn-icon btn-toggle" title="Mover para ${nextOrigem === 'manual' ? 'Manual' : 'Bling'}" data-id="${t.id}" data-origem="${nextOrigem}">⟳</button>
                     <button type="button" class="btn-icon btn-edit" data-id="${t.id}" data-num="${formattedNum}" data-aba="${aba}" title="Editar">✎</button>
-                    <form method="POST" action="${BASE}/contatos/telefone/excluir" class="inline-form" onsubmit="return confirm('Excluir?')">
+                    <form method="POST" action="${BASE}/contatos/excluir-telefone" class="inline-form" onsubmit="return confirm('Excluir?')">
                         <input type="hidden" name="id_tel" value="${t.id}">
                         <input type="hidden" name="aba" value="${aba}">
                         <button type="submit" class="btn-icon btn-delete" title="Excluir">✕</button>
