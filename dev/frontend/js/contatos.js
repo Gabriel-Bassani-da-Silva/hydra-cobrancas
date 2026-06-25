@@ -438,8 +438,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── WebSockets (Tempo Real) ───────────────────────────────────────────────
 try {
-    if (typeof window !== 'undefined' && window.Echo) {
-        window.Echo.channel('contatos')
+    if (typeof window !== 'undefined' && window.EchoApp) {
+        window.EchoApp.channel('contatos')
             .listen('TelefonesAtualizados', (e) => {
                 console.log('Recebido update via WebSockets:', e);
                 const idContato = e.idContatoBling;

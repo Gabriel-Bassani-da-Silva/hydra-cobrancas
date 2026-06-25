@@ -14,7 +14,7 @@ $app = Application::configure(basePath: dirname(__DIR__))
         ['attributes' => ['middleware' => ['api', 'auth']]]
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        //
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
