@@ -229,7 +229,7 @@ class BlingService {
                 $stmt->execute(['dt' => $date, 'id' => $config['ID']]);
             } catch (\PDOException $e) {
                 if (strpos($e->getMessage(), 'Unknown column') !== false && strpos($e->getMessage(), 'ULTIMA_SINC_CONTATOS') !== false) {
-                    $this->pdo->exec("ALTER TABLE bling_config ADD COLUMN ULTIMA_SINC_CONTATOS DATETIME NULL");
+                    $this->pdo->exec("ALTER TABLE BLING_CONFIG ADD COLUMN ULTIMA_SINC_CONTATOS DATETIME NULL");
                     $stmt = $this->pdo->prepare("UPDATE BLING_CONFIG SET ULTIMA_SINC_CONTATOS = :dt WHERE ID = :id");
                     $stmt->execute(['dt' => $date, 'id' => $config['ID']]);
                 }
