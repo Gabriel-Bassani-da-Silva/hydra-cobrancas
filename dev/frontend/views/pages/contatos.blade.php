@@ -457,7 +457,7 @@ $formatDoc = function($doc) {
 
 <!-- ═══ MODAL: Gerenciar Telefones ═══ -->
 <div id="modal-manage-phones" class="modal-overlay">
-    <div class="modal-box modal-large" style="max-width: 650px;">
+    <div class="modal-box modal-large" style="max-width: 900px;">
         <h3 id="manage-phones-title" style="margin-bottom: 20px;">Telefones de [Nome]</h3>
         
         <div style="display: flex; gap: 20px; margin-bottom: 20px;">
@@ -475,6 +475,7 @@ $formatDoc = function($doc) {
             <div style="display: flex; gap: 10px;">
                 <button type="button" class="btn btn-add" id="manage-btn-add" style="background: #e6f4ea; color: #137333;">📞 Adicionar Telefone</button>
                 <form id="manage-form-sync" method="POST" action="{{ route('sincronizar-contato-unico') }}" style="display:inline;">
+                    @csrf
                     <input type="hidden" name="id_contato" id="manage-sync-id">
                     <input type="hidden" name="aba" id="manage-sync-aba">
                     <button type="submit" class="btn btn-toggle" style="background: #e3f2fd; color: #1565c0;">🔄 Sincronizar Bling</button>
