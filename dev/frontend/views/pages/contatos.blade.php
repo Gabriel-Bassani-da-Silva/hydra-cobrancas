@@ -54,16 +54,16 @@ $formatDoc = function($doc) {
             </a>
             
             <select class="btn-sync secondary" style="padding: 10px 15px; border-radius: 8px; background: #fff; border: 1px solid #ced4da; cursor: pointer; color: #495057; outline: none; font-weight: 500;" onchange="
-                const url = new URL(window.location.href);
+                const u = new URL(window.location.href);
                 if (this.value === '1') {
-                    url.searchParams.set('inadimplentes', '1');
+                    u.searchParams.set('inadimplentes', '1');
                 } else {
-                    url.searchParams.delete('inadimplentes');
+                    u.searchParams.delete('inadimplentes');
                 }
-                window.location.href = url.toString();
+                window.location.href = u.toString();
             ">
-                <option value="0" <?= empty($inadimplentes) ? 'selected' : '' ?>>Mostrar Todos</option>
-                <option value="1" <?= !empty($inadimplentes) ? 'selected' : '' ?>>Apenas Inadimplentes</option>
+                <option value="0" <?= request('inadimplentes') != '1' ? 'selected' : '' ?>>Mostrar Todos</option>
+                <option value="1" <?= request('inadimplentes') == '1' ? 'selected' : '' ?>>Apenas Inadimplentes</option>
             </select>
         </div>
     </div>
@@ -109,17 +109,15 @@ $formatDoc = function($doc) {
                 </label>
                 
                 <div style="display: flex; align-items: center; gap: 8px; margin-left: 10px; padding-left: 15px; border-left: 2px solid #e2e8f0;">
-                    <label class="toggle-checkbox-wrapper" style="border: 1px solid #16a34a; background: <?= request('com_confirmado') == '1' ? '#16a34a' : 'transparent' ?>; color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; cursor: pointer; transition: all 0.2s;">
-                        <input type="checkbox" id="filter-com-confirmado" style="display:none;" <?= request('com_confirmado') == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) { url.searchParams.set('com_confirmado', '1'); url.searchParams.delete('com_tentativa'); } else url.searchParams.delete('com_confirmado'); window.location.href = url.toString();">
+                    <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #16a34a; background: <?= request('com_confirmado') == '1' ? '#16a34a' : 'transparent' ?>; color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_confirmado') ?>' === '1') { u.searchParams.delete('com_confirmado'); } else { u.searchParams.set('com_confirmado', '1'); u.searchParams.delete('com_tentativa'); } window.location.href = u.toString();">
                         <span style="width: 8px; height: 8px; border-radius: 50%; background-color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; display: inline-block;"></span>
                         Confirmados
-                    </label>
+                    </button>
                     
-                    <label class="toggle-checkbox-wrapper" style="border: 1px solid #ca8a04; background: <?= request('com_tentativa') == '1' ? '#ca8a04' : 'transparent' ?>; color: <?= request('com_tentativa') == '1' ? '#fff' : '#ca8a04' ?>; cursor: pointer; transition: all 0.2s;">
-                        <input type="checkbox" id="filter-com-tentativa" style="display:none;" <?= request('com_tentativa') == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) { url.searchParams.set('com_tentativa', '1'); url.searchParams.delete('com_confirmado'); } else url.searchParams.delete('com_tentativa'); window.location.href = url.toString();">
+                    <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #ca8a04; background: <?= request('com_tentativa') == '1' ? '#ca8a04' : 'transparent' ?>; color: <?= request('com_tentativa') == '1' ? '#fff' : '#ca8a04' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_tentativa') ?>' === '1') { u.searchParams.delete('com_tentativa'); } else { u.searchParams.set('com_tentativa', '1'); u.searchParams.delete('com_confirmado'); } window.location.href = u.toString();">
                         <span style="width: 8px; height: 8px; border-radius: 50%; background-color: <?= request('com_tentativa') == '1' ? '#fff' : '#ca8a04' ?>; display: inline-block;"></span>
                         Tentativas
-                    </label>
+                    </button>
                 </div>
             </div>
         </div>
@@ -200,17 +198,15 @@ $formatDoc = function($doc) {
                 </label>
                 
                 <div style="display: flex; align-items: center; gap: 8px; margin-left: 10px; padding-left: 15px; border-left: 2px solid #e2e8f0;">
-                    <label class="toggle-checkbox-wrapper" style="border: 1px solid #16a34a; background: <?= request('com_confirmado') == '1' ? '#16a34a' : 'transparent' ?>; color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; cursor: pointer; transition: all 0.2s;">
-                        <input type="checkbox" id="filter-com-confirmado" style="display:none;" <?= request('com_confirmado') == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) { url.searchParams.set('com_confirmado', '1'); url.searchParams.delete('com_tentativa'); } else url.searchParams.delete('com_confirmado'); window.location.href = url.toString();">
+                    <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #16a34a; background: <?= request('com_confirmado') == '1' ? '#16a34a' : 'transparent' ?>; color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_confirmado') ?>' === '1') { u.searchParams.delete('com_confirmado'); } else { u.searchParams.set('com_confirmado', '1'); u.searchParams.delete('com_tentativa'); } window.location.href = u.toString();">
                         <span style="width: 8px; height: 8px; border-radius: 50%; background-color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; display: inline-block;"></span>
                         Confirmados
-                    </label>
+                    </button>
                     
-                    <label class="toggle-checkbox-wrapper" style="border: 1px solid #ca8a04; background: <?= request('com_tentativa') == '1' ? '#ca8a04' : 'transparent' ?>; color: <?= request('com_tentativa') == '1' ? '#fff' : '#ca8a04' ?>; cursor: pointer; transition: all 0.2s;">
-                        <input type="checkbox" id="filter-com-tentativa" style="display:none;" <?= request('com_tentativa') == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) { url.searchParams.set('com_tentativa', '1'); url.searchParams.delete('com_confirmado'); } else url.searchParams.delete('com_tentativa'); window.location.href = url.toString();">
+                    <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #ca8a04; background: <?= request('com_tentativa') == '1' ? '#ca8a04' : 'transparent' ?>; color: <?= request('com_tentativa') == '1' ? '#fff' : '#ca8a04' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_tentativa') ?>' === '1') { u.searchParams.delete('com_tentativa'); } else { u.searchParams.set('com_tentativa', '1'); u.searchParams.delete('com_confirmado'); } window.location.href = u.toString();">
                         <span style="width: 8px; height: 8px; border-radius: 50%; background-color: <?= request('com_tentativa') == '1' ? '#fff' : '#ca8a04' ?>; display: inline-block;"></span>
                         Tentativas
-                    </label>
+                    </button>
                 </div>
             </div>
         </div>
@@ -331,17 +327,15 @@ $formatDoc = function($doc) {
                     </label>
                     
                     <div style="display: flex; align-items: center; gap: 8px; margin-left: 10px; padding-left: 15px; border-left: 2px solid #e2e8f0;">
-                        <label class="toggle-checkbox-wrapper" style="border: 1px solid #16a34a; background: <?= request('com_confirmado') == '1' ? '#16a34a' : 'transparent' ?>; color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; cursor: pointer; transition: all 0.2s;">
-                            <input type="checkbox" id="filter-com-confirmado" style="display:none;" <?= request('com_confirmado') == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) { url.searchParams.set('com_confirmado', '1'); url.searchParams.delete('com_tentativa'); } else url.searchParams.delete('com_confirmado'); window.location.href = url.toString();">
+                        <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #16a34a; background: <?= request('com_confirmado') == '1' ? '#16a34a' : 'transparent' ?>; color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_confirmado') ?>' === '1') { u.searchParams.delete('com_confirmado'); } else { u.searchParams.set('com_confirmado', '1'); u.searchParams.delete('com_tentativa'); } window.location.href = u.toString();">
                             <span style="width: 8px; height: 8px; border-radius: 50%; background-color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; display: inline-block;"></span>
                             Confirmados
-                        </label>
+                        </button>
                         
-                        <label class="toggle-checkbox-wrapper" style="border: 1px solid #ca8a04; background: <?= request('com_tentativa') == '1' ? '#ca8a04' : 'transparent' ?>; color: <?= request('com_tentativa') == '1' ? '#fff' : '#ca8a04' ?>; cursor: pointer; transition: all 0.2s;">
-                            <input type="checkbox" id="filter-com-tentativa" style="display:none;" <?= request('com_tentativa') == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) { url.searchParams.set('com_tentativa', '1'); url.searchParams.delete('com_confirmado'); } else url.searchParams.delete('com_tentativa'); window.location.href = url.toString();">
+                        <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #ca8a04; background: <?= request('com_tentativa') == '1' ? '#ca8a04' : 'transparent' ?>; color: <?= request('com_tentativa') == '1' ? '#fff' : '#ca8a04' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_tentativa') ?>' === '1') { u.searchParams.delete('com_tentativa'); } else { u.searchParams.set('com_tentativa', '1'); u.searchParams.delete('com_confirmado'); } window.location.href = u.toString();">
                             <span style="width: 8px; height: 8px; border-radius: 50%; background-color: <?= request('com_tentativa') == '1' ? '#fff' : '#ca8a04' ?>; display: inline-block;"></span>
                             Tentativas
-                        </label>
+                        </button>
                     </div>
                 </div>
             </div>
