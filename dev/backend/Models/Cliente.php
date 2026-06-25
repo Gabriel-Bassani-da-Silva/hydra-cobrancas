@@ -27,7 +27,7 @@ class Cliente extends Model
     {
         return $this->belongsToMany(
             ContatoFinanceiro::class,
-            'vinculo_contato_cliente',
+            'VINCULO_CONTATO_CLIENTE',
             'ID_CLIENTE',
             'ID_CONTATO',
             'ID_CONTATO_BLING',

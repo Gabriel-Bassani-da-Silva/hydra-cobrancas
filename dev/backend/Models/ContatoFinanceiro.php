@@ -21,7 +21,7 @@ class ContatoFinanceiro extends Model
     {
         return $this->belongsToMany(
             Cliente::class,
-            'vinculo_contato_cliente',
+            'VINCULO_CONTATO_CLIENTE',
             'ID_CONTATO',
             'ID_CLIENTE',
             'ID_CONTATO',
@@ -33,7 +33,7 @@ class ContatoFinanceiro extends Model
     {
         return $this->belongsToMany(
             Representante::class,
-            'vinculo_contato_representante',
+            'VINCULO_CONTATO_REPRESENTANTE',
             'ID_CONTATO',
             'ID_REPRESENTANTE',
             'ID_CONTATO',

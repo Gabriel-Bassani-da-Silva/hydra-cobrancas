@@ -21,7 +21,7 @@ class Telefone extends Model
     {
         return $this->belongsToMany(
             ContatoExterno::class,
-            'contato_tel',
+            'CONTATO_TEL',
             'ID_TEL',
             'ID_CONTATO_BLING',
             'ID_TEL',

@@ -31,7 +31,7 @@ class Pedido extends Model
     {
         return $this->belongsToMany(
             Cobranca::class,
-            'vinculo_cobranca_pedido',
+            'VINCULO_COBRANCA_PEDIDO',
             'ID_PEDIDO',
             'ID_COBRANCA',
             'ID_PEDIDO',

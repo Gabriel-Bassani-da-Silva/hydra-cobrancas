@@ -34,7 +34,7 @@ class Cobranca extends Model
     {
         return $this->belongsToMany(
             Cliente::class,
-            'vinculo_cobranca_cliente',
+            'VINCULO_COBRANCA_CLIENTE',
             'ID_COBRANCA',
             'ID_CONTATO_BLING',
             'ID_COBRANCA',
@@ -46,7 +46,7 @@ class Cobranca extends Model
     {
         return $this->belongsToMany(
             Pedido::class,
-            'vinculo_cobranca_pedido',
+            'VINCULO_COBRANCA_PEDIDO',
             'ID_COBRANCA',
             'ID_PEDIDO',
             'ID_COBRANCA',
