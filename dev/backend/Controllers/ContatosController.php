@@ -267,7 +267,8 @@ class ContatosController extends Controller {
 
             return view('pages.importar_mapeamento', [
                 'amostra' => $amostra,
-                'primeiraLinha' => $primeiraLinha
+                'primeiraLinha' => $primeiraLinha,
+                'allRows' => $allRows
             ]);
         } else {
             session()->flash('flash_msg', "Erro ao processar arquivo XLSX.");
