@@ -16,7 +16,7 @@ class CobrancaService {
         ];
 
         // This view is very fast, let's just query it using DB facade.
-        $rows = DB::table('VW_COBRANCAS_ATIVAS')->get();
+        $rows = DB::table('vw_cobrancas_ativas')->get();
         
         foreach ($rows as $row) {
             $tipo = $row->TIPO;

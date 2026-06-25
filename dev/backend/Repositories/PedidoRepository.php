@@ -430,7 +430,7 @@ class PedidoRepository {
     }
 
     public function getDivergencias(): array {
-        $stmt = DB::connection()->getPdo()->query("SELECT * FROM VW_DIVERGENCIAS_PAGAMENTO");
+        $stmt = DB::connection()->getPdo()->query("SELECT * FROM vw_divergencias_pagamento");
         return $stmt->fetchAll();
     }
 
