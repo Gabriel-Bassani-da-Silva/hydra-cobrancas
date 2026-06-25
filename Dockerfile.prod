@@ -29,7 +29,8 @@ USER www-data
 
 # Entramos na pasta framework onde está o composer.json e baixamos as bibliotecas de produção
 WORKDIR /var/www/html/framework
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN composer install --no-dev --optimize-autoloader --no-interaction && \
+    composer require laravel/reverb --no-interaction --no-dev
 
 USER root
 # Criar o serviço do Laravel Reverb no s6-overlay para rodar em background na porta 9080
