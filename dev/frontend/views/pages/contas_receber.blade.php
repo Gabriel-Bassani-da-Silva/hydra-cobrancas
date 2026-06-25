@@ -11,13 +11,13 @@ $show_header = true;
 
 
 
-$isPagos = (isset($_GET['status']) && $_GET['status'] === 'pagos');
+$isPagos = request('status') === 'pagos';
 ?>
 
 <div class="cr-wrapper" data-initial-state='<?= htmlspecialchars(json_encode([
     "aba" => $aba ?? "clientes",
     "grupo" => $grupo ?? "padrao",
-    "status" => $_GET["status"] ?? "pendentes",
+    "status" => request('status', 'pendentes'),
     "isPagos" => $isPagos,
     "clientes" => $resumoClientes ?? [],
     "representantes" => $resumoRepresentantes ?? [],
@@ -168,22 +168,22 @@ $isPagos = (isset($_GET['status']) && $_GET['status'] === 'pagos');
     <?php if ($aba === 'pedidos'): ?>
     <div class="cr-sub-tabs">
         <div class="cr-sub-tabs-group">
-            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=pendentes" class="sub-tab-btn <?= (!isset($_GET['status']) || $_GET['status'] === 'pendentes') ? 'active' : '' ?>">
+            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=pendentes" class="sub-tab-btn <?= (request('status', 'pendentes') === 'pendentes') ? 'active' : '' ?>">
                 Inadimplentes
             </a>
-            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=antecipado" class="sub-tab-btn <?= (isset($_GET['status']) && $_GET['status'] === 'antecipado') ? 'active' : '' ?>">
+            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=antecipado" class="sub-tab-btn <?= (request('status') === 'antecipado') ? 'active' : '' ?>">
                 Antecipados
             </a>
-            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=cheque" class="sub-tab-btn <?= (isset($_GET['status']) && $_GET['status'] === 'cheque') ? 'active' : '' ?>">
+            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=cheque" class="sub-tab-btn <?= (request('status') === 'cheque') ? 'active' : '' ?>">
                 Cheques
             </a>
-            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=todos_pendentes" class="sub-tab-btn <?= (isset($_GET['status']) && $_GET['status'] === 'todos_pendentes') ? 'active' : '' ?>">
+            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=todos_pendentes" class="sub-tab-btn <?= (request('status') === 'todos_pendentes') ? 'active' : '' ?>">
                 Todos os Pendentes
             </a>
-            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=pagos" class="sub-tab-btn <?= (isset($_GET['status']) && $_GET['status'] === 'pagos') ? 'active' : '' ?>">
+            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=pagos" class="sub-tab-btn <?= (request('status') === 'pagos') ? 'active' : '' ?>">
                 Pagos
             </a>
-            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=todos" class="sub-tab-btn <?= (isset($_GET['status']) && $_GET['status'] === 'todos') ? 'active' : '' ?>">
+            <a href="{{ route('contas-receber-page') }}?aba=pedidos&status=todos" class="sub-tab-btn <?= (request('status') === 'todos') ? 'active' : '' ?>">
                 Todos
             </a>
         </div>

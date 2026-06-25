@@ -11,7 +11,7 @@ $show_header = true;
 
 
 
-$grupo = $_GET['grupo'] ?? 'padrao';
+$grupo = request('grupo', 'padrao');
 ?>
 
 <div class="cr-wrapper" data-initial-state='<?= htmlspecialchars(json_encode([

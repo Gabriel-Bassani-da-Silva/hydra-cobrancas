@@ -71,8 +71,7 @@
         @yield('content')
     </main>
 
-    <!-- Linkando o JS original do sistema legado temporariamente -->
-    <script src="{{ asset('js/main.js') }}?v={{ time() }}"></script>
+    <!-- Scripts auxiliares -->
     @stack('scripts')
 </body>
 
