@@ -11,6 +11,8 @@ use App\Controllers\ContatosController;
 use App\Controllers\DivergenciaController;
 use App\Controllers\PerfilController;
 
+use App\Controllers\ExportController;
+
 // Autenticação
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
@@ -80,4 +82,7 @@ Route::middleware('auth')->group(function () {
     // Perfil
     Route::get('/perfil', [PerfilController::class, 'index'])->name('perfil-page');
     Route::get('/perfil/api/pedidos', [PerfilController::class, 'apiPedidos'])->name('api-pedidos-perfil');
+    // Exportação
+    Route::get('/exportar/tudo', [ExportController::class, 'exportarTudo'])->name('exportar-tudo');
+    Route::get('/exportar/{tabela}', [ExportController::class, 'exportarTabela'])->name('exportar-tabela');
 });
