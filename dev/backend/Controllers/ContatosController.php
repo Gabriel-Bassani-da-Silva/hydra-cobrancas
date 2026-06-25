@@ -14,11 +14,11 @@ class ContatosController extends Controller {
 
 
     public function index() {
-        $aba = request()->query()['aba'] ?? 'clientes';
-        $somenteComTelefone = isset(request()->query()['com_telefone']) && request()->query()['com_telefone'] == '1';
-        $somenteConfirmados = isset(request()->query()['com_confirmado']) && request()->query()['com_confirmado'] == '1';
-        $somenteTentativas = isset(request()->query()['com_tentativa']) && request()->query()['com_tentativa'] == '1';
-        $inadimplentes = isset(request()->query()['inadimplentes']) && request()->query()['inadimplentes'] == '1';
+        $aba = request('aba', 'clientes');
+        $somenteComTelefone = request('com_telefone') == '1';
+        $somenteConfirmados = request('com_confirmado') == '1';
+        $somenteTentativas = request('com_tentativa') == '1';
+        $inadimplentes = request('inadimplentes') == '1';
         $clientes = $this->model->getClientesComTelefones($somenteComTelefone, $somenteConfirmados, $somenteTentativas, $inadimplentes);
         $representantes = $this->model->getRepresentantesComTelefones($somenteComTelefone, $somenteConfirmados, $somenteTentativas, $inadimplentes);
         $semTelefone = $this->model->getClientesSemTelefone($inadimplentes);
