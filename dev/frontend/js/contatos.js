@@ -15,7 +15,9 @@ function openAddTel(id, aba) {
     document.getElementById('tel-aba').value = aba;
     document.getElementById('tel-num').value = '';
     document.getElementById('modal-tel-title').textContent = 'Adicionar Telefone';
-    document.getElementById('modal-tel').style.display = 'flex';
+    const modalTel = document.getElementById('modal-tel');
+    modalTel.style.zIndex = '9999';
+    modalTel.style.display = 'flex';
 }
 
 function openEditTel(idTel, num, aba) {
@@ -25,7 +27,9 @@ function openEditTel(idTel, num, aba) {
     document.getElementById('tel-aba').value = aba;
     document.getElementById('tel-num').value = num;
     document.getElementById('modal-tel-title').textContent = 'Editar Telefone';
-    document.getElementById('modal-tel').style.display = 'flex';
+    const modalTel = document.getElementById('modal-tel');
+    modalTel.style.zIndex = '9999';
+    modalTel.style.display = 'flex';
 }
 
 function closeModal(id) {
@@ -214,62 +218,6 @@ function toggleStatus(btn, idTel) {
         }
     })
     .catch(err => console.error('Erro ao alternar status:', err));
-}
-
-// ── Alternar Origem (Manual/Bling) via AJAX ──────────────────────────────
-function toggleOrigem(btn, idTel, novaOrigem) {
-    const formData = new FormData();
-    formData.append('id_tel', idTel);
-
-    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-    fetch(BASE + '/contatos/toggle-origem', {
-        method: 'POST',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'X-CSRF-TOKEN': csrfToken
-        },
-        body: formData
-    })
-    .then(r => r.json())
-    .then(data => {
-        if (data.ok) {
-            window.phonesModified = true;
-            const telItem = btn.closest('.tel-item');
-            
-            // Suporte para o novo modal
-            if (telItem.closest('#modal-manage-phones')) {
-                const targetContainer = novaOrigem === 'manual' ? document.getElementById('manage-phones-manual') : document.getElementById('manage-phones-bling');
-                
-                const nextOrigem = novaOrigem === 'manual' ? 'bling' : 'manual';
-                btn.setAttribute('data-origem', nextOrigem);
-                btn.setAttribute('title', `Mover para ${nextOrigem === 'manual' ? 'Manual' : 'Bling'}`);
-                
-                targetContainer.appendChild(telItem);
-                
-                // Atualizar rastro visual se movido para manual
-                if (novaOrigem === 'manual' && data.user) {
-                    let trackDiv = telItem.querySelector('.tracking-info');
-                    if (!trackDiv) {
-                        trackDiv = document.createElement('div');
-                        trackDiv.className = 'tracking-info';
-                        trackDiv.style.cssText = 'font-size: 0.75rem; color: #94a3b8; margin-top: 4px; padding-left: 28px;';
-                        telItem.appendChild(trackDiv);
-                    }
-                    const oldText = trackDiv.innerHTML;
-                    const criado = oldText.match(/Criado por: ([^|]+)/);
-                    trackDiv.innerHTML = '';
-                    if (criado && criado[1].trim() !== '') {
-                        trackDiv.innerHTML = `Criado por: ${criado[1].trim()} | `;
-                    }
-                    trackDiv.innerHTML += `Alterado por: ${data.user}`;
-                } else if (novaOrigem === 'bling') {
-                    const trackDiv = telItem.querySelector('.tracking-info');
-                    if (trackDiv) trackDiv.remove();
-                }
-            }
-        }
-    })
-    .catch(err => console.error('Erro ao alternar origem:', err));
 }
 
 // ── Busca Dinâmica na Tabela ─────────────────────────────────────────────
@@ -492,8 +440,9 @@ window.openManagePhonesModal = function(idContato, nomeContato, aba) {
         const div = document.createElement('div');
         div.className = 'tel-item';
         
-        const badgeClass = t.confirmado ? 'badge-confirmed' : 'badge-attempt';
-        const badgeIcon = t.confirmado ? '✓' : '?';
+        const isConfirmado = t.confirmado == 1;
+        const badgeClass = isConfirmado ? 'badge-confirmed' : 'badge-attempt';
+        const badgeIcon = isConfirmado ? '✓' : '?';
         const formattedNum = formatPhoneJS(t.num);
         const nextOrigem = t.origem === 'bling' ? 'manual' : 'bling';
 
@@ -513,9 +462,9 @@ window.openManagePhonesModal = function(idContato, nomeContato, aba) {
                 <button type="button" class="badge ${badgeClass}" title="Alternar status" data-id="${t.id}">${badgeIcon}</button>
                 <span class="tel-num" style="font-weight: 500;">${formattedNum}</span>
                 <div class="tel-actions" style="margin-left: auto;">
-                    <button type="button" class="btn-icon btn-toggle" title="Mover para ${nextOrigem === 'manual' ? 'Manual' : 'Bling'}" data-id="${t.id}" data-origem="${nextOrigem}">⟳</button>
                     <button type="button" class="btn-icon btn-edit" data-id="${t.id}" data-num="${formattedNum}" data-aba="${aba}" title="Editar">✎</button>
                     <form method="POST" action="${BASE}/contatos/excluir-telefone" class="inline-form" onsubmit="return confirm('Excluir?')">
+                        <input type="hidden" name="_token" value="${document.querySelector('meta[name=csrf-token]')?.content || ''}">
                         <input type="hidden" name="id_tel" value="${t.id}">
                         <input type="hidden" name="aba" value="${aba}">
                         <button type="submit" class="btn-icon btn-delete" title="Excluir">✕</button>

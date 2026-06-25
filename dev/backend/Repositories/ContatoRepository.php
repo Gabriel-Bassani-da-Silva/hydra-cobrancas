@@ -376,7 +376,7 @@ class ContatoRepository {
         }
 
         try {
-            $this->pdo->prepare("UPDATE TEL SET NUM_TEL = :num, ORIGEM = 'manual', ID_COLAB_ALTERACAO = :id_colab WHERE ID_TEL = :id")
+            $this->pdo->prepare("UPDATE TEL SET NUM_TEL = :num, ID_COLAB_ALTERACAO = :id_colab WHERE ID_TEL = :id")
                 ->execute(['num' => $numTel, 'id' => $idTel, 'id_colab' => auth()->id()]);
             return ['ok' => true];
         } catch (\PDOException $e) {
@@ -396,7 +396,7 @@ class ContatoRepository {
     }
 
     public function toggleConfirmado($idTel): array {
-        $this->pdo->prepare("UPDATE TEL SET CONFIRMADO = NOT CONFIRMADO, ORIGEM = 'manual', ID_COLAB_ALTERACAO = :id_colab WHERE ID_TEL = :id")
+        $this->pdo->prepare("UPDATE TEL SET CONFIRMADO = NOT CONFIRMADO, ID_COLAB_ALTERACAO = :id_colab WHERE ID_TEL = :id")
             ->execute(['id' => $idTel, 'id_colab' => auth()->id()]);
         return ['ok' => true];
     }
