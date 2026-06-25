@@ -52,6 +52,19 @@ $formatDoc = function($doc) {
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
                 Sincronizar Vendedores
             </a>
+            
+            <select class="btn-sync secondary" style="padding: 10px 15px; border-radius: 8px; background: #fff; border: 1px solid #ced4da; cursor: pointer; color: #495057; outline: none; font-weight: 500;" onchange="
+                const url = new URL(window.location.href);
+                if (this.value === '1') {
+                    url.searchParams.set('inadimplentes', '1');
+                } else {
+                    url.searchParams.delete('inadimplentes');
+                }
+                window.location.href = url.toString();
+            ">
+                <option value="0" <?= empty($inadimplentes) ? 'selected' : '' ?>>Mostrar Todos</option>
+                <option value="1" <?= !empty($inadimplentes) ? 'selected' : '' ?>>Apenas Inadimplentes</option>
+            </select>
         </div>
     </div>
 
@@ -99,6 +112,11 @@ $formatDoc = function($doc) {
                     <input type="checkbox" id="filter-com-confirmado" <?= isset($_GET['com_confirmado']) && $_GET['com_confirmado'] == '1' ? 'checked' : '' ?> onchange="window.location.href='{{ route('contatos-page') }}?aba=<?= $aba ?>' + (document.getElementById('filter-com-telefone').checked ? '&com_telefone=1' : '') + (this.checked ? '&com_confirmado=1' : '')">
                     Apenas confirmados
                 </label>
+                
+                <div style="display: flex; align-items: center; gap: 12px; margin-left: 10px; padding-left: 15px; border-left: 2px solid #e2e8f0; font-size: 0.85rem; color: #64748b; font-weight: 500;">
+                    <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 50%; background-color: #16a34a; display: inline-block;"></span> Confirmado</span>
+                    <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 50%; background-color: #ca8a04; display: inline-block;"></span> Tentativa</span>
+                </div>
             </div>
         </div>
         <div class="table-responsive">
@@ -181,6 +199,11 @@ $formatDoc = function($doc) {
                     <input type="checkbox" id="filter-com-confirmado" <?= isset($_GET['com_confirmado']) && $_GET['com_confirmado'] == '1' ? 'checked' : '' ?>>
                     Apenas confirmados
                 </label>
+
+                <div style="display: flex; align-items: center; gap: 12px; margin-left: 10px; padding-left: 15px; border-left: 2px solid #e2e8f0; font-size: 0.85rem; color: #64748b; font-weight: 500;">
+                    <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 50%; background-color: #16a34a; display: inline-block;"></span> Confirmado</span>
+                    <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 50%; background-color: #ca8a04; display: inline-block;"></span> Tentativa</span>
+                </div>
             </div>
         </div>
         <div class="table-responsive">
@@ -303,6 +326,11 @@ $formatDoc = function($doc) {
                         <input type="checkbox" id="filter-com-confirmado" <?= isset($_GET['com_confirmado']) && $_GET['com_confirmado'] == '1' ? 'checked' : '' ?>>
                         Apenas confirmados
                     </label>
+
+                    <div style="display: flex; align-items: center; gap: 12px; margin-left: 10px; padding-left: 15px; border-left: 2px solid #e2e8f0; font-size: 0.85rem; color: #64748b; font-weight: 500;">
+                        <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 50%; background-color: #16a34a; display: inline-block;"></span> Confirmado</span>
+                        <span style="display: flex; align-items: center; gap: 5px;"><span style="width: 10px; height: 10px; border-radius: 50%; background-color: #ca8a04; display: inline-block;"></span> Tentativa</span>
+                    </div>
                 </div>
             </div>
             <div class="table-responsive">
