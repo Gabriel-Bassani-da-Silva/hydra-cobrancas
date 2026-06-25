@@ -6,7 +6,7 @@
 /framework/storage/framework/sessions/*
 /framework/storage/framework/views/*
 /.git
-/framework/.env
+/framework/
 /.idea
 /.vscode
 *.sqlite
