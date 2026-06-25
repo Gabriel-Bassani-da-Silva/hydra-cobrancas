@@ -159,10 +159,12 @@ function toggleStatus(btn, idTel) {
     const formData = new FormData();
     formData.append('id_tel', idTel);
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     fetch(BASE + '/contatos/telefone/confirmar', {
         method: 'POST',
         headers: {
-            'X-Requested-With': 'XMLHttpRequest'
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': csrfToken
         },
         body: formData
     })
@@ -190,9 +192,13 @@ function toggleOrigem(btn, idTel, novaOrigem) {
     const formData = new FormData();
     formData.append('id_tel', idTel);
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     fetch(BASE + '/contatos/telefone/toggle-origem', {
         method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': csrfToken
+        },
         body: formData
     })
     .then(r => r.json())

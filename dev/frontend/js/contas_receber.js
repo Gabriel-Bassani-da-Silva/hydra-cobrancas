@@ -964,9 +964,13 @@ function confirmarCobranca() {
 }
 
 function enviarCobranca(tipo, id, clientes) {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     return fetch(`${BASE}/cobranca/puxar`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
         body: JSON.stringify({ tipo, id, clientes })
     })
     .then(r => r.json())
@@ -1252,9 +1256,13 @@ function confirmarBaixa() {
     btnConfirma.innerHTML = 'Baixando...';
     btnConfirma.disabled = true;
 
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     fetch(BASE + '/contas-receber/baixar', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
         body: JSON.stringify({ baixas })
     })
     .then(r => r.json())
