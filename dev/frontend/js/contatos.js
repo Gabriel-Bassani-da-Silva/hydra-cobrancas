@@ -192,6 +192,25 @@ function toggleStatus(btn, idTel) {
                 btn.classList.add('badge-confirmed');
                 btn.textContent = '✓';
             }
+            
+            // Atualizar rastro visual
+            if (data.user) {
+                const telItem = btn.closest('.tel-item');
+                let trackDiv = telItem.querySelector('.tracking-info');
+                if (!trackDiv) {
+                    trackDiv = document.createElement('div');
+                    trackDiv.className = 'tracking-info';
+                    trackDiv.style.cssText = 'font-size: 0.75rem; color: #94a3b8; margin-top: 4px; padding-left: 28px;';
+                    telItem.appendChild(trackDiv);
+                }
+                const oldText = trackDiv.innerHTML;
+                const criado = oldText.match(/Criado por: ([^|]+)/);
+                trackDiv.innerHTML = '';
+                if (criado && criado[1].trim() !== '') {
+                    trackDiv.innerHTML = `Criado por: ${criado[1].trim()} | `;
+                }
+                trackDiv.innerHTML += `Alterado por: ${data.user}`;
+            }
         }
     })
     .catch(err => console.error('Erro ao alternar status:', err));
@@ -226,6 +245,27 @@ function toggleOrigem(btn, idTel, novaOrigem) {
                 btn.setAttribute('title', `Mover para ${nextOrigem === 'manual' ? 'Manual' : 'Bling'}`);
                 
                 targetContainer.appendChild(telItem);
+                
+                // Atualizar rastro visual se movido para manual
+                if (novaOrigem === 'manual' && data.user) {
+                    let trackDiv = telItem.querySelector('.tracking-info');
+                    if (!trackDiv) {
+                        trackDiv = document.createElement('div');
+                        trackDiv.className = 'tracking-info';
+                        trackDiv.style.cssText = 'font-size: 0.75rem; color: #94a3b8; margin-top: 4px; padding-left: 28px;';
+                        telItem.appendChild(trackDiv);
+                    }
+                    const oldText = trackDiv.innerHTML;
+                    const criado = oldText.match(/Criado por: ([^|]+)/);
+                    trackDiv.innerHTML = '';
+                    if (criado && criado[1].trim() !== '') {
+                        trackDiv.innerHTML = `Criado por: ${criado[1].trim()} | `;
+                    }
+                    trackDiv.innerHTML += `Alterado por: ${data.user}`;
+                } else if (novaOrigem === 'bling') {
+                    const trackDiv = telItem.querySelector('.tracking-info');
+                    if (trackDiv) trackDiv.remove();
+                }
             }
         }
     })

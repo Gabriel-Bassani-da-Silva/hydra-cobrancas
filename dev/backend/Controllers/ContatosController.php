@@ -69,7 +69,7 @@ class ContatosController extends Controller {
         if ($idTel) $this->model->toggleConfirmado($idTel);
 
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-            return response()->json(['ok' => true]);
+            return response()->json(['ok' => true, 'user' => auth()->user()->NOME_COLABORADOR ?? '']);
         }
 
         $aba = request()->post()['aba'] ?? 'clientes';
@@ -82,7 +82,7 @@ class ContatosController extends Controller {
         if ($idTel) $this->model->toggleOrigem($idTel);
 
         if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
-            return response()->json(['ok' => true]);
+            return response()->json(['ok' => true, 'user' => auth()->user()->NOME_COLABORADOR ?? '']);
         }
 
         $aba = request()->post()['aba'] ?? 'clientes';
