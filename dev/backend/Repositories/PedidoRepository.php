@@ -456,7 +456,7 @@ class PedidoRepository {
              FROM " . $this->getPedidoBaseSql() . " p
              LEFT JOIN CLIENTE c ON c.ID_CONTATO_BLING = p.ID_CLIENTE
              LEFT JOIN CONTATO_EXTERNO c_ext ON c_ext.ID_CONTATO_BLING = p.ID_CLIENTE
-             LEFT JOIN contato_tel ct ON ct.ID_CONTATO_BLING = p.ID_CLIENTE
+             LEFT JOIN CONTATO_TEL ct ON ct.ID_CONTATO_BLING = p.ID_CLIENTE
              LEFT JOIN TEL tel ON tel.ID_TEL = ct.ID_TEL
              WHERE p.SITUACAO_EFETIVA IN (1, 3)
                AND " . $this->getDateFilter($this->getExibirAte(), $this->getExibirAPartirDe()) . "
@@ -537,7 +537,7 @@ class PedidoRepository {
              INNER JOIN REPRESENTANTE r ON r.ID_CONTATO_BLING = p.ID_REPRESENTANTE
              INNER JOIN CONTATO_EXTERNO c_ext ON c_ext.ID_CONTATO_BLING = p.ID_REPRESENTANTE
              INNER JOIN CONTATO_EXTERNO cli_ext ON cli_ext.ID_CONTATO_BLING = p.ID_CLIENTE
-             LEFT JOIN contato_tel ct ON ct.ID_CONTATO_BLING = p.ID_REPRESENTANTE
+             LEFT JOIN CONTATO_TEL ct ON ct.ID_CONTATO_BLING = p.ID_REPRESENTANTE
              LEFT JOIN TEL tel ON tel.ID_TEL = ct.ID_TEL
              WHERE p.SITUACAO_EFETIVA IN (1, 3)
                AND " . $this->getDateFilter($this->getExibirAte(), $this->getExibirAPartirDe()) . "
