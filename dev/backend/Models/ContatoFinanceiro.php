@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class ContatoFinanceiro extends Model
 {
-    protected $table = 'contato_financeiro';
+    protected $table = 'CONTATO_FINANCEIRO';
     protected $primaryKey = 'ID_CONTATO';
     public $timestamps = false;
 

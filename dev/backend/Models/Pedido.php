@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pedido extends Model
 {
-    protected $table = 'pedido';
+    protected $table = 'PEDIDO';
     protected $primaryKey = 'ID_PEDIDO';
     public $incrementing = false;
     public $timestamps = false;

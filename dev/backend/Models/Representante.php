@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Representante extends Model
 {
-    protected $table = 'representante';
+    protected $table = 'REPRESENTANTE';
     protected $primaryKey = 'ID_CONTATO_BLING';
     public $incrementing = false;
     public $timestamps = false;
