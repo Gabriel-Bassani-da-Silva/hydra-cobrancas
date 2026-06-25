@@ -2939,7 +2939,7 @@ body {
   margin-top: 3px;
 }
 .card-overflow { overflow: hidden; }
-.table-scroll { overflow-x: auto; }
+.table-scroll { overflow-x: auto; max-width: 100%; width: 100%; }
 .form-no-margin { margin: 0; }
 .text-empty {
   text-align: center;
@@ -3025,9 +3025,9 @@ body {
   color: #333;
 }
 .preview-table {
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   border-collapse: collapse;
-  min-width: 600px;
 }
 .preview-table th {
   padding: 10px 15px;
