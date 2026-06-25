@@ -12,6 +12,10 @@ use App\Controllers\DivergenciaController;
 use App\Controllers\PerfilController;
 
 use App\Controllers\ExportController;
+use App\Controllers\CsvExportController;
+
+// Exportação Google Sheets (sem auth middleware para ser lido publicamente pelo Sheets)
+Route::get('/api/exportar-contatos-csv', [CsvExportController::class, 'exportarContatos'])->name('api-export-csv');
 
 // Autenticação
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
