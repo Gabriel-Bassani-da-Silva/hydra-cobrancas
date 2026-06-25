@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
     Route::any('/contas-receber/sincronizar-unico', [ContasReceberController::class, 'sincronizarUnico'])->name('sincronizar-conta-unica');
     Route::any('/contas-receber/sincronizar', [ContasReceberController::class, 'sincronizar'])->name('sincronizar-contas-receber');
     Route::post('/contas-receber/atualizar', [ContasReceberController::class, 'atualizar'])->name('atualizar-contas-receber');
-    Route::post('/contas-receber/vincular-representantes', [ContasReceberController::class, 'vincularRepresentantes'])->name('vincular-reps-contas');
+    Route::any('/contas-receber/vincular-representantes', [ContasReceberController::class, 'vincularRepresentantes'])->name('vincular-reps-contas');
     Route::post('/contas-receber/baixar', [ContasReceberController::class, 'baixar'])->name('baixar-parcelas');
     Route::post('/contas-receber/recuperar', [ContasReceberController::class, 'recuperar'])->name('recuperar-parcelas');
     Route::post('/contas-receber/api/parcelas-por-ids', [ContasReceberController::class, 'apiParcelasPorIds'])->name('api-parcelas-contas');
