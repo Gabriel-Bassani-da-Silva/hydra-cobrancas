@@ -19,9 +19,9 @@ class CsvExportController extends Controller {
         $contatoRepo = new ContatoRepository();
         $pedidoRepo = new PedidoRepository();
 
-        // Buscar todos os clientes e representantes (sem filtros)
-        $clientes = $contatoRepo->getClientesComTelefones();
-        $reps = $contatoRepo->getRepresentantesComTelefones();
+        // Buscar clientes e representantes (apenas os confirmados)
+        $clientes = $contatoRepo->getClientesComTelefones(false, true);
+        $reps = $contatoRepo->getRepresentantesComTelefones(false, true);
 
         // Buscar inadimplentes para marcar na planilha
         $inadimplentesClientes = $pedidoRepo->getResumoClientes('inadimplentes');
