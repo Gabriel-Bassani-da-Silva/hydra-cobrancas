@@ -116,9 +116,9 @@ $formatDoc = function($doc) {
                         <tr><td colspan="5" class="empty-msg">Nenhum cliente encontrado.</td></tr>
                     @endif
                     <?php foreach ($clientes as $c): ?>
-                    <tr>
+                    <tr class="c-table-row clickable-row" onclick="openManagePhonesModal('<?= $c['ID_CONTATO_BLING'] ?>', '<?= htmlspecialchars($c['NOME_CONTATO'], ENT_QUOTES) ?>', 'clientes')" title="Gerenciar Telefones">
                         <td class="nome-col">
-                            <div class="nome-container clickable-name" onclick="openManagePhonesModal('<?= $c['ID_CONTATO_BLING'] ?>', '<?= htmlspecialchars($c['NOME_CONTATO'], ENT_QUOTES) ?>', 'clientes')" title="Gerenciar Telefones">
+                            <div class="nome-container">
                                 <?= htmlspecialchars($c['NOME_CONTATO']) ?>
                             </div>
                             <div style="display: none;" id="phones-data-<?= $c['ID_CONTATO_BLING'] ?>"><?= htmlspecialchars(json_encode($c['telefones_arr']), ENT_QUOTES) ?></div>
@@ -198,9 +198,9 @@ $formatDoc = function($doc) {
                         <tr><td colspan="5" class="empty-msg">Nenhum representante encontrado.</td></tr>
                     @endif
                     <?php foreach ($representantes as $r): ?>
-                    <tr>
+                    <tr class="c-table-row clickable-row" onclick="openManagePhonesModal('<?= $r['ID_CONTATO_BLING'] ?>', '<?= htmlspecialchars($r['NOME_CONTATO'], ENT_QUOTES) ?>', 'representantes')" title="Gerenciar Telefones">
                         <td class="nome-col">
-                            <div class="nome-container clickable-name" onclick="openManagePhonesModal('<?= $r['ID_CONTATO_BLING'] ?>', '<?= htmlspecialchars($r['NOME_CONTATO'], ENT_QUOTES) ?>', 'representantes')" title="Gerenciar Telefones">
+                            <div class="nome-container">
                                 <?= htmlspecialchars($r['NOME_CONTATO']) ?>
                             </div>
                             <div style="display: none;" id="phones-data-<?= $r['ID_CONTATO_BLING'] ?>"><?= htmlspecialchars(json_encode($r['telefones_arr']), ENT_QUOTES) ?></div>
@@ -261,9 +261,9 @@ $formatDoc = function($doc) {
                         <tr><td colspan="2" class="empty-msg">Todos os clientes possuem telefone.</td></tr>
                     @endif
                     <?php foreach ($semTelefone as $s): ?>
-                    <tr>
+                    <tr class="c-table-row clickable-row" onclick="openManagePhonesModal('<?= $s['ID_CONTATO_BLING'] ?>', '<?= htmlspecialchars($s['NOME_CONTATO'], ENT_QUOTES) ?>', 'sem-telefone')" title="Gerenciar Telefones">
                         <td class="nome-col">
-                            <div class="nome-container clickable-name" onclick="openManagePhonesModal('<?= $s['ID_CONTATO_BLING'] ?>', '<?= htmlspecialchars($s['NOME_CONTATO'], ENT_QUOTES) ?>', 'sem-telefone')" title="Gerenciar Telefones">
+                            <div class="nome-container">
                                 <?= htmlspecialchars($s['NOME_CONTATO']) ?>
                             </div>
                             <div style="display: none;" id="phones-data-<?= $s['ID_CONTATO_BLING'] ?>">[]</div>

@@ -3014,6 +3014,24 @@ body {
   display: block;
   margin-bottom: 10px;
 }
+.clickable-name {
+  cursor: pointer;
+  color: #1e40af;
+  transition: color 0.2s;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+}
+.clickable-name:hover {
+  color: #1d4ed8;
+  text-decoration-color: #1d4ed8;
+}
+.clickable-row {
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.clickable-row:hover {
+  background: #f1f5f9;
+}
 .mapping-field-select {
   width: 100%;
   padding: 10px;
