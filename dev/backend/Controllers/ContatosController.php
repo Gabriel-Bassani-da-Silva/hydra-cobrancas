@@ -243,11 +243,18 @@ class ContatosController extends Controller {
 
     public function processarImportacao() {
         
+        $dir = __DIR__ . '/../../Libraries/';
+        if (!is_dir($dir)) mkdir($dir, 0777, true);
         
-        if (!file_exists(__DIR__ . '/../../Libraries/SimpleXLSX.php')) {
-            die('Biblioteca SimpleXLSX não instalada.');
+        if (!file_exists($dir . 'SimpleXLSX.php')) {
+            $content = @file_get_contents('https://raw.githubusercontent.com/shuchkin/simplexlsx/master/src/SimpleXLSX.php');
+            if ($content) file_put_contents($dir . 'SimpleXLSX.php', $content);
         }
-        require_once __DIR__ . '/../../Libraries/SimpleXLSX.php';
+
+        if (!file_exists($dir . 'SimpleXLSX.php')) {
+            die('Erro ao baixar Biblioteca SimpleXLSX.');
+        }
+        require_once $dir . 'SimpleXLSX.php';
 
         if (!request()->isMethod('post') || !request()->hasFile('arquivo_xlsx')) {
             session()->flash('flash_msg', "Nenhum arquivo enviado.");
