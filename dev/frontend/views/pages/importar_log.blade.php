@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('title', 'Log de Importação')
-@section('body_class', 'contatos-page')
+@section('body_class', 'contatos-page scrollable-page')
 
 @section('content')
 <?php
 $title = "Log de Importação";
-$body_class = "contatos-page";
+$body_class = "contatos-page scrollable-page";
 $show_header = true;
 
 $totalLinhas = count($importLog['log']);

@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('title', 'Mapear Colunas')
-@section('body_class', 'contatos-page')
+@section('body_class', 'contatos-page scrollable-page')
 
 @section('content')
 <?php
 $title = "Mapear Colunas";
-$body_class = "contatos-page";
+$body_class = "contatos-page scrollable-page";
 $show_header = true;
 
 $totalColunas = !empty($primeiraLinha) ? count($primeiraLinha) : 0;

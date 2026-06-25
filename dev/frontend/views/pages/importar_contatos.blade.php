@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Importar Contatos')
-@section('body_class', 'contatos-page')
+@section('body_class', 'contatos-page scrollable-page')
 
 @section('content')
 

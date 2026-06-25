@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
 @section('title', 'Pré-visualização da Importação')
-@section('body_class', 'contatos-page')
+@section('body_class', 'contatos-page scrollable-page')
 
 @section('content')
 <?php
 $title = "Pré-visualização da Importação";
-$body_class = "contatos-page";
+$body_class = "contatos-page scrollable-page";
 $show_header = true;
 
 // Conta estatísticas

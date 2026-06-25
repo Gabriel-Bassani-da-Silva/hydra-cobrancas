@@ -3430,6 +3430,22 @@ body {
   align-items: center;
   gap: 10px;
 }
+.manage-list .tel-actions .btn-options {
+  padding: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   SCROLLABLE PAGES (IMPORTACAO)
+   ═══════════════════════════════════════════════════════════ */
+.scrollable-page {
+  height: auto !important;
+  overflow: auto !important;
+}
+
+.scrollable-page main {
+  height: auto !important;
+  overflow: visible !important;
+}
 .manage-list .tel-actions {
   opacity: 1;
   display: flex;
