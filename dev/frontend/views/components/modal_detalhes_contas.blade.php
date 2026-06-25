@@ -22,7 +22,7 @@ function getSyncBtnHtml($url, $title, $isSmall = false) {
     $className = $isSmall ? 'btn-action-icon-sm' : 'btn-action-icon';
     $svgSize = $isSmall ? '14' : '16';
     return '<a href="'.htmlspecialchars($url).'" title="'.htmlspecialchars($title).'" class="'.$className.'">
-                <x-icons.refresh width="2" height="'.$svgSize.'" />
+                ' . \Illuminate\Support\Facades\Blade::render('<x-icons.refresh width="2" height="'.$svgSize.'" />') . '
             </a>';
 }
 
@@ -91,7 +91,7 @@ if ($tipo === 'financeiros' || $tipo === 'representantes') {
         if ($totalPedidos > 0) {
             $svgPathCli = $isAutoExpandCli ? 'M7 14l5-5 5 5z' : 'M7 10l5 5 5-5z';
             $expandedCls = $isAutoExpandCli ? 'expanded' : '';
-            $expandBtnCli = '<button class="btn-expand '.$expandedCls.'" data-toggle-parcelas="'.$subGroupIdCli.'" title="Ver pedidos"><x-icons.icon-3 width="18" height="18" /></button>';
+            $expandBtnCli = '<button class="btn-expand '.$expandedCls.'" data-toggle-parcelas="'.$subGroupIdCli.'" title="Ver pedidos">' . \Illuminate\Support\Facades\Blade::render('<x-icons.icon-3 width="18" height="18" />') . '</button>';
         }
         
         $nomeDisplay = htmlspecialchars($grupo['nomeCli']) . $docCli;
@@ -117,7 +117,7 @@ if ($tipo === 'financeiros' || $tipo === 'representantes') {
             if ($qtdParc > 1) {
                 $svgPathPed = $isAutoExpandPed ? 'M7 14l5-5 5 5z' : 'M7 10l5 5 5-5z';
                 $expandedClsPed = $isAutoExpandPed ? 'expanded' : '';
-                $expandBtnPed = '<button class="btn-expand '.$expandedClsPed.'" data-toggle-parcelas="'.$subGroupIdPed.'" title="Ver parcelas"><x-icons.icon-4 width="18" height="18" /></button>';
+                $expandBtnPed = '<button class="btn-expand '.$expandedClsPed.'" data-toggle-parcelas="'.$subGroupIdPed.'" title="Ver parcelas">' . \Illuminate\Support\Facades\Blade::render('<x-icons.icon-4 width="18" height="18" />') . '</button>';
             }
             
             $numPedStr = !empty($ped['numPedido']) && $ped['numPedido'] !== '—' ? htmlspecialchars($ped['numPedido']) : 'Sem Nº';
@@ -249,7 +249,7 @@ if ($tipo === 'financeiros' || $tipo === 'representantes') {
         if ($qtd > 1) {
             $svgPath = $isAutoExpand ? 'M7 14l5-5 5 5z' : 'M7 10l5 5 5-5z';
             $expandedCls = $isAutoExpand ? 'expanded' : '';
-            $expandBtn = '<button class="btn-expand '.$expandedCls.'" data-toggle-parcelas="'.$subGroupId.'" title="Ver parcelas"><x-icons.icon-5 width="18" height="18" /></button>';
+            $expandBtn = '<button class="btn-expand '.$expandedCls.'" data-toggle-parcelas="'.$subGroupId.'" title="Ver parcelas">' . \Illuminate\Support\Facades\Blade::render('<x-icons.icon-5 width="18" height="18" />') . '</button>';
         }
         
         $numPedStr = !empty($grupo['numPedido']) && $grupo['numPedido'] !== '—' ? htmlspecialchars($grupo['numPedido']) : 'Sem Nº';

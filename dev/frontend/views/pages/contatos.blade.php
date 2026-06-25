@@ -58,7 +58,7 @@ $formatDoc = function($doc) {
                     Mostrar Todos
                 </button>
                 <button class="filtro-cob-btn <?= request('inadimplentes') == '1' ? 'filtro-cob-btn--active' : '' ?>" onclick="setInadimplentesFilter('1')">
-                    <?= request('inadimplentes') == '1' ? '<x-icons.check-1 width="2" height="13" />' : '' ?>
+                    @if(request('inadimplentes') == '1') <x-icons.check-1 width="2" height="13" /> @endif
                     Apenas Inadimplentes
                 </button>
             </div>
@@ -108,7 +108,7 @@ $formatDoc = function($doc) {
             <div class="filters-group">
                 <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #94a3b8; background: <?= request('com_telefone') == '1' ? '#e2e8f0' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;" onclick="toggleTableFilter('com_telefone')">
                     <span style="width: 14px; height: 14px; border-radius: 3px; border: 1px solid #64748b; background-color: <?= request('com_telefone') == '1' ? '#3b82f6' : 'transparent' ?>; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px;">
-                        <?= request('com_telefone') == '1' ? '<x-icons.check width="10" height="10" />' : '' ?>
+                        @if(request('com_telefone') == '1') <x-icons.check width="10" height="10" /> @endif
                     </span>
                     Apenas com telefone
                 </button>
@@ -199,7 +199,7 @@ $formatDoc = function($doc) {
             <div class="filters-group">
                 <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #94a3b8; background: <?= request('com_telefone') == '1' ? '#e2e8f0' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;" onclick="toggleTableFilter('com_telefone')">
                     <span style="width: 14px; height: 14px; border-radius: 3px; border: 1px solid #64748b; background-color: <?= request('com_telefone') == '1' ? '#3b82f6' : 'transparent' ?>; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px;">
-                        <?= request('com_telefone') == '1' ? '<x-icons.check width="10" height="10" />' : '' ?>
+                        @if(request('com_telefone') == '1') <x-icons.check width="10" height="10" /> @endif
                     </span>
                     Apenas com telefone
                 </button>
@@ -330,7 +330,7 @@ $formatDoc = function($doc) {
                     </button>
                     <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #94a3b8; background: <?= request('com_telefone') == '1' ? '#e2e8f0' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;" onclick="toggleTableFilter('com_telefone')">
                         <span style="width: 14px; height: 14px; border-radius: 3px; border: 1px solid #64748b; background-color: <?= request('com_telefone') == '1' ? '#3b82f6' : 'transparent' ?>; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px;">
-                            <?= request('com_telefone') == '1' ? '<x-icons.check width="10" height="10" />' : '' ?>
+                            @if(request('com_telefone') == '1') <x-icons.check width="10" height="10" /> @endif
                         </span>
                         Apenas com telefone
                     </button>
