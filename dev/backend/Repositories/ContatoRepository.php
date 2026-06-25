@@ -528,9 +528,9 @@ class ContatoRepository {
         $contatosEncontrados = $this->buscarContatos($termoBusca);
         if (!empty($contatosEncontrados)) {
             $idContatoEncontrado = $contatosEncontrados[0]['ID_CONTATO_BLING'];
-            $acao_contato = 'Contato já existe (' . ($contatosEncontrados[0]['NUMERO_DOCUMENTO'] ?: 'Sem doc') . ')';
+            $acao_contato = 'Contato encontrado (' . ($contatosEncontrados[0]['NUMERO_DOCUMENTO'] ?: 'Sem doc') . ')';
         } else {
-            $acao_contato = 'Criar novo Cliente';
+            return ['status' => 'erro', 'mensagem' => 'Cliente não encontrado no sistema. Só é possível vincular telefones a clientes vindos do Bling.'];
         }
 
         // Verifica telefone
@@ -636,20 +636,11 @@ class ContatoRepository {
                 $idContatoBling = $contatosEncontrados[0]['ID_CONTATO_BLING'];
                 $entry['detalhes'][] = '✔ Contato encontrado no banco (ID: ' . $idContatoBling . ')';
             } else {
-                $idContatoBling = -abs(crc32($nome . $doc . microtime()));
-                $stmt = $this->pdo->prepare("INSERT INTO CONTATO_EXTERNO (ID_CONTATO_BLING, NOME_CONTATO, NUMERO_DOCUMENTO) VALUES (:id, :nome, :doc)");
-                try {
-                    $stmt->execute(['id' => $idContatoBling, 'nome' => $nome, 'doc' => $doc]);
-                    $this->pdo->prepare("INSERT INTO CLIENTE (ID_CONTATO_BLING) VALUES (:id)")
-                        ->execute(['id' => $idContatoBling]);
-                    $entry['detalhes'][] = '✔ Novo cliente criado (ID: ' . $idContatoBling . ')';
-                } catch (\Exception $e) {
-                    $erros++;
-                    $entry['resultado'] = 'erro';
-                    $entry['detalhes'][] = '✘ Erro ao criar contato: ' . $e->getMessage();
-                    $log[] = $entry;
-                    continue;
-                }
+                $erros++;
+                $entry['resultado'] = 'erro';
+                $entry['detalhes'][] = '✘ Erro: Cliente não existe no sistema.';
+                $log[] = $entry;
+                continue;
             }
 
             // Adiciona/Atualiza o telefone
