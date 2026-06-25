@@ -462,13 +462,15 @@ window.openManagePhonesModal = function(idContato, nomeContato, aba) {
                 <button type="button" class="badge ${badgeClass}" title="Alternar status" data-id="${t.id}">${badgeIcon}</button>
                 <span class="tel-num" style="font-weight: 500;">${formattedNum}</span>
                 <div class="tel-actions" style="margin-left: auto;">
-                    <button type="button" class="btn-icon btn-edit" data-id="${t.id}" data-num="${formattedNum}" data-aba="${aba}" title="Editar">✎</button>
+                    ${t.origem !== 'bling' ? `<button type="button" class="btn-icon btn-edit" data-id="${t.id}" data-num="${formattedNum}" data-aba="${aba}" title="Editar">✎</button>` : ''}
+                    ${t.origem !== 'bling' ? `
                     <form method="POST" action="${BASE}/contatos/excluir-telefone" class="inline-form" onsubmit="return confirm('Excluir?')">
                         <input type="hidden" name="_token" value="${document.querySelector('meta[name=csrf-token]')?.content || ''}">
                         <input type="hidden" name="id_tel" value="${t.id}">
                         <input type="hidden" name="aba" value="${aba}">
                         <button type="submit" class="btn-icon btn-delete" title="Excluir">✕</button>
                     </form>
+                    ` : ''}
                 </div>
             </div>
             ${trackHtml}
