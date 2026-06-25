@@ -19,7 +19,5 @@ USER www-data
 WORKDIR /var/www/html/framework
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Limpeza e otimização do Laravel
-RUN php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan view:cache
+# Evita rodar cache na build porque variáveis de ambiente não estão presentes ainda.
+# O cache deve ser evitado ou feito via entrypoint.
