@@ -33,14 +33,14 @@ $isPagos = request('status') === 'pagos';
         </div>
         <div class="actions-buttons">
             <button onclick="sincronizarPedidoPorId()" class="btn-sync btn-secondary btn-primary-override" title="Sincronizar pedido específico pelo ID do Bling">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                <x-icons.folder-open width="2" height="16" />
                 Sincronizar por ID
             </button>
             <a href="{{ route('sincronizar-contas-receber') }}?aba=<?= $aba ?>"
                id="btn-sincronizar"
                class="btn-sync"
                title="Baixar alterações recentes (Rápido)">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                <x-icons.folder-open width="2" height="16" />
                 Sinc. Rápida
             </a>
             <a href="{{ route('sincronizar-contas-receber') }}?full=1&aba=<?= $aba ?>"
@@ -48,14 +48,14 @@ $isPagos = request('status') === 'pagos';
                class="btn-sync btn-warning"
                title="Verificação Completa (Varre todas as contas para encontrar apagadas e pagas)"
                onclick="return confirm('A Verificação Completa analisa todas as contas em aberto no Bling. Isso pode demorar um pouco mais. Deseja continuar?');">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v6h6"/></svg>
+                <x-icons.icon-14 width="2" height="16" />
                 Verificação Completa
             </a>
             <a href="{{ route('vincular-reps-contas') }}?aba=<?= $aba ?>"
                class="btn-sync btn-secondary"
                title="Busca os vendedores no Bling para os pedidos que estão sem vendedor localmente"
                onclick="return confirm('Isso buscará detalhes de pedidos sem representante no Bling. Pode demorar alguns minutos. Deseja continuar?');">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="7" r="4"/><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><polyline points="16 11 18 13 22 9"/></svg>
+                <x-icons.users width="2" height="16" />
                 Vincular Vendedores
             </a>
         </div>
@@ -73,9 +73,7 @@ $isPagos = request('status') === 'pagos';
     <!-- Barra de Busca -->
     <div class="cr-search-bar cr-search-bar-row">
         <div class="search-input-wrapper">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" class="search-icon">
-                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
+            <x-icons.search width="18" height="18" class="search-icon" />
             <input type="text" id="cr-search" placeholder="Filtrar tabela por nome, documento ou valor..." autocomplete="off">
         </div>
         
@@ -89,7 +87,7 @@ $isPagos = request('status') === 'pagos';
                     <input type="date" name="exibir_a_partir_de" value="<?= $exibirAPartirDe ?: '' ?>" id="input-exibir-partir"
                            data-original="<?= $exibirAPartirDe ?: '' ?>" class="filter-date-input">
                     <button type="button" onclick="abrirModalExibirAte('salvar_partir', 'A partir de')" title="Salvar 'A partir de'" class="filter-date-btn-save">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <x-icons.check width="16" height="16" />
                     </button>
                     <?php if ($exibirAPartirDe): ?>
                         <button type="button" onclick="abrirModalExibirAte('limpar_partir', 'A partir de')" title="Limpar 'A partir de'" class="filter-date-btn-clear">✕</button>
@@ -102,7 +100,7 @@ $isPagos = request('status') === 'pagos';
                     <input type="date" name="exibir_ate" value="<?= $exibirAte ?: '' ?>" id="input-exibir-ate"
                            data-original="<?= $exibirAte ?: '' ?>" class="filter-date-input">
                     <button type="button" onclick="abrirModalExibirAte('salvar_ate', 'Exibir até')" title="Salvar 'Exibir até'" class="filter-date-btn-save">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        <x-icons.check width="16" height="16" />
                     </button>
                     <?php if ($exibirAte): ?>
                         <button type="button" onclick="abrirModalExibirAte('limpar_ate', 'Exibir até')" title="Limpar 'Exibir até'" class="filter-date-btn-clear">✕</button>
@@ -113,7 +111,7 @@ $isPagos = request('status') === 'pagos';
         <?php if ($aba !== 'pedidos'): ?>
         <div id="filtro-cobranca-toggle" class="filtro-cobranca-toggle">
             <button id="btn-filtro-sem-cobranca" class="filtro-cob-btn filtro-cob-btn--active" onclick="setFiltroCobranca('sem')">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>
+                <x-icons.check-1 width="2" height="13" />
                 Disponíveis
             </button>
             <button id="btn-filtro-todos" class="filtro-cob-btn" onclick="setFiltroCobranca('todos')">
@@ -305,7 +303,7 @@ $isPagos = request('status') === 'pagos';
                     <input type="checkbox" id="check-all-clientes" checked> Selecionar Todos
                 </label>
                 <button id="btn-confirmar-cobranca" class="btn-sync btn-modal-cobranca-confirm">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <x-icons.check width="2.5" height="14" />
                     Confirmar e Assumir
                 </button>
             </div>
@@ -342,7 +340,7 @@ $isPagos = request('status') === 'pagos';
                         Cancelar
                     </button>
                     <button class="btn-modal-confirm-blue" onclick="confirmarBaixa()">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M5 12l5 5l10 -10"></path></svg>
+                        <x-icons.check-heavy width="2.5" height="16" />
                         Confirmar Baixa
                     </button>
                 </div>

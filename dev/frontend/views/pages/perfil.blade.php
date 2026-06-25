@@ -35,9 +35,7 @@ if (!function_exists('formatarCpfCnpj')) {
     <!-- Barra de Busca -->
     <div class="cr-search-bar">
         <div class="search-input-wrapper">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18" class="search-icon">
-                <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
-            </svg>
+            <x-icons.search width="18" height="18" class="search-icon" />
             <input type="text" id="cr-search" placeholder="Filtrar tabela por nome, documento ou valor..." autocomplete="off">
         </div>
     </div>
@@ -107,9 +105,7 @@ if (!function_exists('formatarCpfCnpj')) {
                             <tr class="clickable-row" data-id="<?= $cob['ID_COBRANCA'] ?>" data-nome="<?= htmlspecialchars(addslashes($nomeAgrupamento)) ?>" data-tipo="<?= $tipoStr ?>">
                                 <td class="expand-col">
                                     <button class="btn-expand" onclick="toggleDetalhesPerfil(this, <?= $cob['ID_COBRANCA'] ?>, '<?= htmlspecialchars(addslashes($nomeAgrupamento)) ?>', '<?= $tipoStr ?>')">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
-                                            <polyline points="6 9 12 15 18 9"></polyline>
-                                        </svg>
+                                        <x-icons.icon-29 width="2" height="16" />
                                     </button>
                                 </td>
                                 <td><?= date('d/m/Y', strtotime($cob['DATA_INICIO'])) ?></td>
@@ -158,23 +154,15 @@ if (!function_exists('formatarCpfCnpj')) {
                                 <td class="cr-col-acoes">
                                     <div class="action-menu-wrapper">
                                         <button class="btn-options" onclick="toggleAcoesMenu(this, event)" title="Opções">
-                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
-                                                <line x1="3" y1="12" x2="21" y2="12"></line>
-                                                <line x1="3" y1="6" x2="21" y2="6"></line>
-                                                <line x1="3" y1="18" x2="21" y2="18"></line>
-                                            </svg>
+                                            <x-icons.icon-30 width="2" height="18" />
                                         </button>
                                         <div class="action-menu-dropdown">
                                             <button class="action-menu-item action-menu-item--default btn-atualizar-cob" data-id="<?= $cob['ID_COBRANCA'] ?>" title="Sincroniza os pedidos">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-                                                    <path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/>
-                                                </svg>
+                                                <x-icons.icon-31 width="2" height="14" />
                                                 Atualizar Pedidos
                                             </button>
                                             <button class="action-menu-item action-menu-item--danger btn-desistir-cob" data-id="<?= $cob['ID_COBRANCA'] ?>" title="Desistir desta cobrança">
-                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="14" height="14">
-                                                    <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
-                                                </svg>
+                                                <x-icons.icon-32 width="2" height="14" />
                                                 Desistir
                                             </button>
                                         </div>

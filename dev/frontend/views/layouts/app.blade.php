@@ -34,38 +34,28 @@
 
             <nav>
                 <a href="{{ url('/contatos') }}" class="header-icon-btn" title="Gerenciar Telefones">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                        <path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C11 21 3 13 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" />
-                    </svg>
+                    <x-icons.icon-7 width="20" height="20" />
                     <span>Telefones</span>
                 </a>
 
                 <a href="{{ url('/contas-receber') }}" class="header-icon-btn" title="Contas a Receber">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                        <path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>
-                    </svg>
+                    <x-icons.icon-8 width="20" height="20" />
                     <span>Contas</span>
                 </a>
 
                 <a href="{{ url('/divergencias') }}" class="header-icon-btn" title="Divergência Bling">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
-                        <path d="M12 2L1 21h22L12 2zm1 17h-2v-2h2v2zm0-4h-2V9h2v6z"/>
-                    </svg>
+                    <x-icons.icon-9 width="20" height="20" />
                     <span>Divergência Bling</span>
                 </a>
 
                 <a href="{{ url('/perfil') }}" class="header-icon-btn profile" title="Meu Perfil">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" />
-                    </svg>
+                    <x-icons.icon-10 />
                 </a>
 
                 <form method="POST" action="{{ route('logout') }}" style="display:inline;">
                     @csrf
                     <button type="submit" class="header-icon-btn" title="Sair" style="color: #d9534f; margin-left: 10px; background:none; border:none; cursor:pointer; padding:0;">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24">
-                            <path d="M16 17v-3H9v-4h7V7l5 5-5 5M14 2a2 2 0 012 2v2h-2V4H5v16h9v-2h2v2a2 2 0 01-2 2H5a2 2 0 01-2-2V4a2 2 0 012-2h9z"/>
-                        </svg>
+                        <x-icons.icon-11 width="24" height="24" />
                     </button>
                 </form>
             </nav>

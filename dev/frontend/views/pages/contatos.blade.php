@@ -41,15 +41,15 @@ $formatDoc = function($doc) {
         </div>
         <div class="actions-buttons">
             <a href="{{ route('importar-contatos-page') }}" id="btn-importar-contatos" class="btn-sync" title="Importar contatos">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <x-icons.upload width="2" height="16" />
                 Importar Contatos
             </a>
             <a href="{{ route('sincronizar-contatos-bling') }}?aba=<?= $aba ?>" class="btn-sync" title="Atualizar contatos no Bling">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                <x-icons.refresh width="2" height="16" />
                 Sincronizar Contatos
             </a>
             <a href="{{ route('sincronizar-vendedores-bling') }}?aba=<?= $aba ?>" class="btn-sync secondary" title="Atualizar vendedores no Bling">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><path d="M20 8v6M23 11h-6"/></svg>
+                <x-icons.user width="2" height="16" />
                 Sincronizar Vendedores
             </a>
             
@@ -58,7 +58,7 @@ $formatDoc = function($doc) {
                     Mostrar Todos
                 </button>
                 <button class="filtro-cob-btn <?= request('inadimplentes') == '1' ? 'filtro-cob-btn--active' : '' ?>" onclick="setInadimplentesFilter('1')">
-                    <?= request('inadimplentes') == '1' ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>' : '' ?>
+                    <?= request('inadimplentes') == '1' ? '<x-icons.check-1 width="2" height="13" />' : '' ?>
                     Apenas Inadimplentes
                 </button>
             </div>
@@ -101,14 +101,14 @@ $formatDoc = function($doc) {
     <div class="card">
         <div class="table-filters">
             <div class="search-box">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <x-icons.search-circle width="18" height="18" />
                 <input type="text" id="search-table" placeholder="Buscar por nome, documento ou telefone...">
             </div>
             
             <div class="filters-group">
                 <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #94a3b8; background: <?= request('com_telefone') == '1' ? '#e2e8f0' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;" onclick="toggleTableFilter('com_telefone')">
                     <span style="width: 14px; height: 14px; border-radius: 3px; border: 1px solid #64748b; background-color: <?= request('com_telefone') == '1' ? '#3b82f6' : 'transparent' ?>; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px;">
-                        <?= request('com_telefone') == '1' ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '' ?>
+                        <?= request('com_telefone') == '1' ? '<x-icons.check width="10" height="10" />' : '' ?>
                     </span>
                     Apenas com telefone
                 </button>
@@ -192,14 +192,14 @@ $formatDoc = function($doc) {
     <div class="card">
         <div class="table-filters">
             <div class="search-box">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <x-icons.search-circle width="18" height="18" />
                 <input type="text" id="search-table" placeholder="Buscar por nome, documento ou telefone...">
             </div>
             
             <div class="filters-group">
                 <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #94a3b8; background: <?= request('com_telefone') == '1' ? '#e2e8f0' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;" onclick="toggleTableFilter('com_telefone')">
                     <span style="width: 14px; height: 14px; border-radius: 3px; border: 1px solid #64748b; background-color: <?= request('com_telefone') == '1' ? '#3b82f6' : 'transparent' ?>; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px;">
-                        <?= request('com_telefone') == '1' ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '' ?>
+                        <?= request('com_telefone') == '1' ? '<x-icons.check width="10" height="10" />' : '' ?>
                     </span>
                     Apenas com telefone
                 </button>
@@ -283,7 +283,7 @@ $formatDoc = function($doc) {
     <div class="card">
         <div class="table-filters">
             <div class="search-box">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                <x-icons.search-circle width="18" height="18" />
                 <input type="text" id="search-table" placeholder="Buscar por nome ou documento...">
             </div>
         </div>
@@ -319,18 +319,18 @@ $formatDoc = function($doc) {
         <div class="card">
             <div class="table-filters">
                 <div class="search-box">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <x-icons.search-circle width="18" height="18" />
                     <input type="text" id="search-table" placeholder="Buscar por nome, documento ou telefone...">
                 </div>
                 
                 <div class="filters-group">
                     <button class="btn btn-primary" onclick="openNewCFModal()">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        <x-icons.plus width="16" height="16" />
                         Novo Contato
                     </button>
                     <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #94a3b8; background: <?= request('com_telefone') == '1' ? '#e2e8f0' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;" onclick="toggleTableFilter('com_telefone')">
                         <span style="width: 14px; height: 14px; border-radius: 3px; border: 1px solid #64748b; background-color: <?= request('com_telefone') == '1' ? '#3b82f6' : 'transparent' ?>; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px;">
-                            <?= request('com_telefone') == '1' ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '' ?>
+                            <?= request('com_telefone') == '1' ? '<x-icons.check width="10" height="10" />' : '' ?>
                         </span>
                         Apenas com telefone
                     </button>
@@ -370,11 +370,7 @@ $formatDoc = function($doc) {
                             <td class="actions-col">
                                 <div class="dropdown">
                                     <button type="button" class="btn-icon dropdown-toggle" onclick="toggleDropdown(event, this)" title="Opções">
-                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
-                                            <line x1="3" y1="12" x2="21" y2="12"></line>
-                                            <line x1="3" y1="6" x2="21" y2="6"></line>
-                                            <line x1="3" y1="18" x2="21" y2="18"></line>
-                                        </svg>
+                                        <x-icons.icon-23 width="2" height="16" />
                                     </button>
                                     <div class="dropdown-menu">
                                         <button class="dropdown-item btn-edit-cf" data-id="<?= $cf['ID_CONTATO'] ?>" data-nome="<?= htmlspecialchars($cf['NOME_CF'], ENT_QUOTES, 'UTF-8') ?>" data-tel="<?= htmlspecialchars(formatPhone($cf['NUM_TEL']), ENT_QUOTES, 'UTF-8') ?>" data-vinculos="<?= htmlspecialchars($cf['VINCULOS_RAW'] ?? '', ENT_QUOTES, 'UTF-8') ?>">

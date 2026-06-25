@@ -20,11 +20,11 @@
         </div>
         <div class="actions-buttons">
             <a href="{{ route('contatos-page') }}" class="btn-cancel">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <x-icons.arrow-left width="16" height="16" />
                 Voltar para Contatos
             </a>
             <a href="{{ route('baixar-template-importacao') }}" class="btn-sync secondary" title="Baixar planilha base">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <x-icons.download width="16" height="16" />
                 Baixar Planilha Base
             </a>
         </div>
@@ -43,7 +43,7 @@
             @csrf
             
             <div id="drop-zone" class="form-group" style="margin-bottom: 25px; text-align: center; padding: 40px; border: 2px dashed #ccc; border-radius: 8px; background: #f9f9f9; cursor: pointer; transition: all 0.3s ease;">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#888" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 15px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                <x-icons.upload-1 width="48" height="48" style="margin-bottom: 15px;" />
                 <h3 style="pointer-events: none;">Arraste o arquivo XLSX (Excel) aqui</h3>
                 <p style="color: #666; margin-bottom: 15px; pointer-events: none;">Ou clique para selecionar na sua máquina</p>
                 <input type="file" name="arquivo_xlsx" accept=".xlsx" required id="arquivo_xlsx" style="display: none;">
@@ -52,7 +52,7 @@
 
             <div style="text-align: right;">
                 <button type="submit" class="btn-sync" style="cursor:pointer; width: 100%; justify-content: center; padding: 15px; font-size: 16px;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <x-icons.check-circle width="18" height="18" />
                     Processar Importação
                 </button>
             </div>

@@ -39,7 +39,7 @@ foreach ($primeiraLinha as $idx => $valor) {
         </div>
         <div class="actions-buttons">
             <a href="{{ route('importar-contatos-page') }}" class="btn-cancel">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <x-icons.arrow-left width="16" height="16" />
                 Cancelar
             </a>
         </div>
@@ -127,7 +127,7 @@ foreach ($primeiraLinha as $idx => $valor) {
         <!-- Botão de avançar -->
         <div class="text-right">
             <button type="submit" class="btn-sync btn-sync-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                <x-icons.chevron-right width="16" height="16" />
                 Avançar para Pré-visualização
             </button>
         </div>

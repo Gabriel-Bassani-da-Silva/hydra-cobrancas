@@ -36,14 +36,14 @@ foreach ($linhasValidadas as $linha) {
         </div>
         <div class="actions-buttons">
             <a href="{{ route('importar-contatos-page') }}" class="btn-cancel" title="Cancelar e voltar">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                <x-icons.arrow-left width="16" height="16" />
                 Cancelar
             </a>
             <?php if ($prontos > 0): ?>
             <form action="{{ route('confirmar-importacao') }}" method="POST" class="form-no-margin">
                 @csrf
                 <button type="submit" class="btn-sync btn-sync-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <x-icons.check-circle width="16" height="16" />
                     Confirmar Importação (<?= $prontos ?>)
                 </button>
             </form>
