@@ -457,18 +457,32 @@ window.openManagePhonesModal = function(idContato, nomeContato, aba) {
         const formattedNum = formatPhoneJS(t.num);
         const nextOrigem = t.origem === 'bling' ? 'manual' : 'bling';
 
+        let trackHtml = '';
+        if (t.origem === 'manual') {
+            if (t.criado_por || t.alterado_por) {
+                trackHtml = '<div style="font-size: 0.75rem; color: #94a3b8; margin-top: 4px; padding-left: 28px;">';
+                if (t.criado_por) trackHtml += `Criado por: ${t.criado_por} `;
+                if (t.criado_por && t.alterado_por) trackHtml += '| ';
+                if (t.alterado_por) trackHtml += `Alterado por: ${t.alterado_por}`;
+                trackHtml += '</div>';
+            }
+        }
+
         div.innerHTML = `
-            <button type="button" class="badge ${badgeClass}" title="Alternar status" data-id="${t.id}">${badgeIcon}</button>
-            <span class="tel-num" style="font-weight: 500;">${formattedNum}</span>
-            <div class="tel-actions">
-                <button type="button" class="btn-icon btn-toggle" title="Mover para ${nextOrigem === 'manual' ? 'Manual' : 'Bling'}" data-id="${t.id}" data-origem="${nextOrigem}">⟳</button>
-                <button type="button" class="btn-icon btn-edit" data-id="${t.id}" data-num="${formattedNum}" data-aba="${aba}" title="Editar">✎</button>
-                <form method="POST" action="${BASE}/contatos/telefone/excluir" class="inline-form" onsubmit="return confirm('Excluir?')">
-                    <input type="hidden" name="id_tel" value="${t.id}">
-                    <input type="hidden" name="aba" value="${aba}">
-                    <button type="submit" class="btn-icon btn-delete" title="Excluir">✕</button>
-                </form>
+            <div style="display: flex; align-items: center; width: 100%;">
+                <button type="button" class="badge ${badgeClass}" title="Alternar status" data-id="${t.id}">${badgeIcon}</button>
+                <span class="tel-num" style="font-weight: 500;">${formattedNum}</span>
+                <div class="tel-actions" style="margin-left: auto;">
+                    <button type="button" class="btn-icon btn-toggle" title="Mover para ${nextOrigem === 'manual' ? 'Manual' : 'Bling'}" data-id="${t.id}" data-origem="${nextOrigem}">⟳</button>
+                    <button type="button" class="btn-icon btn-edit" data-id="${t.id}" data-num="${formattedNum}" data-aba="${aba}" title="Editar">✎</button>
+                    <form method="POST" action="${BASE}/contatos/telefone/excluir" class="inline-form" onsubmit="return confirm('Excluir?')">
+                        <input type="hidden" name="id_tel" value="${t.id}">
+                        <input type="hidden" name="aba" value="${aba}">
+                        <button type="submit" class="btn-icon btn-delete" title="Excluir">✕</button>
+                    </form>
+                </div>
             </div>
+            ${trackHtml}
         `;
         
         if (t.origem === 'bling') {

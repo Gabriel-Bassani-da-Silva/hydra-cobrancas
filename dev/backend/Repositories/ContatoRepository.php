@@ -147,10 +147,15 @@ class ContatoRepository {
         }
         $stmt = $this->pdo->query(
             "SELECT ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO,
-                    GROUP_CONCAT(DISTINCT CONCAT(t.ID_TEL, ':', t.NUM_TEL, ':', t.CONFIRMADO, ':', t.ORIGEM) SEPARATOR '|') AS telefones
+                    GROUP_CONCAT(DISTINCT CONCAT(t.ID_TEL, ':', t.NUM_TEL, ':', t.CONFIRMADO, ':', t.ORIGEM, ':', IFNULL(cc.NOME_COLABORADOR, ''), ':', IFNULL(ca.NOME_COLABORADOR, '')) SEPARATOR '|') AS telefones
              FROM CLIENTE c
              JOIN CONTATO_EXTERNO ce ON ce.ID_CONTATO_BLING = c.ID_CONTATO_BLING
-             $joinType (SELECT ct.ID_CONTATO_BLING, t.ID_TEL, t.NUM_TEL, t.CONFIRMADO, t.ORIGEM FROM CONTATO_TEL ct JOIN TEL t ON t.ID_TEL = ct.ID_TEL) t ON t.ID_CONTATO_BLING = ce.ID_CONTATO_BLING $whereConfirmado
+             $joinType (
+                 SELECT ct.ID_CONTATO_BLING, t.ID_TEL, t.NUM_TEL, t.CONFIRMADO, t.ORIGEM, t.ID_COLAB_CRIACAO, t.ID_COLAB_ALTERACAO 
+                 FROM CONTATO_TEL ct JOIN TEL t ON t.ID_TEL = ct.ID_TEL
+             ) t ON t.ID_CONTATO_BLING = ce.ID_CONTATO_BLING $whereConfirmado
+             LEFT JOIN COLABORADOR cc ON cc.ID_COLABORADOR = t.ID_COLAB_CRIACAO
+             LEFT JOIN COLABORADOR ca ON ca.ID_COLABORADOR = t.ID_COLAB_ALTERACAO
              WHERE c.EXIBIR = 1 $whereInadimplente
              GROUP BY ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO
              ORDER BY ce.NOME_CONTATO"
@@ -177,10 +182,15 @@ class ContatoRepository {
         }
         $stmt = $this->pdo->query(
             "SELECT ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO, r.ID_VENDEDOR,
-                    GROUP_CONCAT(DISTINCT CONCAT(t.ID_TEL, ':', t.NUM_TEL, ':', t.CONFIRMADO, ':', t.ORIGEM) SEPARATOR '|') AS telefones
+                    GROUP_CONCAT(DISTINCT CONCAT(t.ID_TEL, ':', t.NUM_TEL, ':', t.CONFIRMADO, ':', t.ORIGEM, ':', IFNULL(cc.NOME_COLABORADOR, ''), ':', IFNULL(ca.NOME_COLABORADOR, '')) SEPARATOR '|') AS telefones
              FROM REPRESENTANTE r
              JOIN CONTATO_EXTERNO ce ON ce.ID_CONTATO_BLING = r.ID_CONTATO_BLING
-             $joinType (SELECT ct.ID_CONTATO_BLING, t.ID_TEL, t.NUM_TEL, t.CONFIRMADO, t.ORIGEM FROM CONTATO_TEL ct JOIN TEL t ON t.ID_TEL = ct.ID_TEL) t ON t.ID_CONTATO_BLING = ce.ID_CONTATO_BLING $whereConfirmado
+             $joinType (
+                 SELECT ct.ID_CONTATO_BLING, t.ID_TEL, t.NUM_TEL, t.CONFIRMADO, t.ORIGEM, t.ID_COLAB_CRIACAO, t.ID_COLAB_ALTERACAO 
+                 FROM CONTATO_TEL ct JOIN TEL t ON t.ID_TEL = ct.ID_TEL
+             ) t ON t.ID_CONTATO_BLING = ce.ID_CONTATO_BLING $whereConfirmado
+             LEFT JOIN COLABORADOR cc ON cc.ID_COLABORADOR = t.ID_COLAB_CRIACAO
+             LEFT JOIN COLABORADOR ca ON ca.ID_COLABORADOR = t.ID_COLAB_ALTERACAO
              WHERE r.EXIBIR = 1 $whereInadimplente
              GROUP BY ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO, r.ID_VENDEDOR
              ORDER BY ce.NOME_CONTATO"
@@ -321,8 +331,8 @@ class ContatoRepository {
         $stmtRep->execute(['id' => $idContatoBling]);
         $confirmado = $stmtRep->fetch() ? 1 : 0;
 
-        $this->pdo->prepare("INSERT IGNORE INTO TEL (NUM_TEL, CONFIRMADO, ORIGEM) VALUES (:num, :conf, 'manual')")
-            ->execute(['num' => $numTel, 'conf' => $confirmado]);
+        $this->pdo->prepare("INSERT IGNORE INTO TEL (NUM_TEL, CONFIRMADO, ORIGEM, ID_COLAB_CRIACAO) VALUES (:num, :conf, 'manual', :id_colab)")
+            ->execute(['num' => $numTel, 'conf' => $confirmado, 'id_colab' => auth()->id()]);
 
         $stmtBusca = $this->pdo->prepare("SELECT ID_TEL FROM TEL WHERE NUM_TEL = :num");
         $stmtBusca->execute(['num' => $numTel]);
@@ -366,8 +376,8 @@ class ContatoRepository {
         }
 
         try {
-            $this->pdo->prepare("UPDATE TEL SET NUM_TEL = :num, ORIGEM = 'manual' WHERE ID_TEL = :id")
-                ->execute(['num' => $numTel, 'id' => $idTel]);
+            $this->pdo->prepare("UPDATE TEL SET NUM_TEL = :num, ORIGEM = 'manual', ID_COLAB_ALTERACAO = :id_colab WHERE ID_TEL = :id")
+                ->execute(['num' => $numTel, 'id' => $idTel, 'id_colab' => auth()->id()]);
             return ['ok' => true];
         } catch (\PDOException $e) {
             return ['ok' => false, 'msg' => 'Número já existe'];
@@ -386,14 +396,14 @@ class ContatoRepository {
     }
 
     public function toggleConfirmado($idTel): array {
-        $this->pdo->prepare("UPDATE TEL SET CONFIRMADO = NOT CONFIRMADO, ORIGEM = 'manual' WHERE ID_TEL = :id")
-            ->execute(['id' => $idTel]);
+        $this->pdo->prepare("UPDATE TEL SET CONFIRMADO = NOT CONFIRMADO, ORIGEM = 'manual', ID_COLAB_ALTERACAO = :id_colab WHERE ID_TEL = :id")
+            ->execute(['id' => $idTel, 'id_colab' => auth()->id()]);
         return ['ok' => true];
     }
 
     public function toggleOrigem($idTel): array {
-        $this->pdo->prepare("UPDATE TEL SET ORIGEM = IF(ORIGEM = 'bling', 'manual', 'bling') WHERE ID_TEL = :id")
-            ->execute(['id' => $idTel]);
+        $this->pdo->prepare("UPDATE TEL SET ORIGEM = IF(ORIGEM = 'bling', 'manual', 'bling'), ID_COLAB_ALTERACAO = :id_colab WHERE ID_TEL = :id")
+            ->execute(['id' => $idTel, 'id_colab' => auth()->id()]);
         return ['ok' => true];
     }
 
@@ -415,14 +425,14 @@ class ContatoRepository {
         }
 
         // Inserir telefone se não existe
-        $this->pdo->prepare("INSERT IGNORE INTO TEL (NUM_TEL) VALUES (:num)")->execute(['num' => $numTel]);
+        $this->pdo->prepare("INSERT IGNORE INTO TEL (NUM_TEL, ID_COLAB_CRIACAO) VALUES (:num, :id_colab)")->execute(['num' => $numTel, 'id_colab' => auth()->id()]);
         $stmtBusca = $this->pdo->prepare("SELECT ID_TEL FROM TEL WHERE NUM_TEL = :num");
         $stmtBusca->execute(['num' => $numTel]);
         $tel = $stmtBusca->fetch();
         if (!$tel) return ['ok' => false, 'msg' => 'Erro ao inserir telefone'];
 
         // Força CONFIRMADO = 1 e ORIGEM = 'manual' sempre
-        $this->pdo->prepare("UPDATE TEL SET CONFIRMADO = 1, ORIGEM = 'manual' WHERE ID_TEL = :id")->execute(['id' => $tel['ID_TEL']]);
+        $this->pdo->prepare("UPDATE TEL SET CONFIRMADO = 1, ORIGEM = 'manual', ID_COLAB_ALTERACAO = :id_colab WHERE ID_TEL = :id")->execute(['id' => $tel['ID_TEL'], 'id_colab' => auth()->id()]);
 
         // Inserir contato financeiro
         $this->pdo->prepare("INSERT INTO CONTATO_FINANCEIRO (NOME_CONTATO, ID_TEL) VALUES (:nome, :tel)")
@@ -537,9 +547,16 @@ class ContatoRepository {
             $tels = [];
             if (!empty($row['telefones'])) {
                 foreach (explode('|', $row['telefones']) as $item) {
-                    $parts = explode(':', $item, 4);
-                    if (count($parts) === 4) {
-                        $tels[] = ['id' => $parts[0], 'num' => $parts[1], 'confirmado' => $parts[2], 'origem' => $parts[3]];
+                    $parts = explode(':', $item, 6);
+                    if (count($parts) >= 4) {
+                        $tels[] = [
+                            'id' => $parts[0], 
+                            'num' => $parts[1], 
+                            'confirmado' => $parts[2], 
+                            'origem' => $parts[3],
+                            'criado_por' => $parts[4] ?? '',
+                            'alterado_por' => $parts[5] ?? ''
+                        ];
                     }
                 }
             }
