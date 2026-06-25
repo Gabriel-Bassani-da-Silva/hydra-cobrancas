@@ -1,7 +1,7 @@
 <?php
 namespace App\Controllers;
 
-use App\Http\Controllers\Controller;
+
 use App\Integrations\Bling\BlingService;
 
 class BlingController extends Controller {
