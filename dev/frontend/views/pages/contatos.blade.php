@@ -53,18 +53,15 @@ $formatDoc = function($doc) {
                 Sincronizar Vendedores
             </a>
             
-            <select class="btn-sync secondary" style="padding: 10px 15px; border-radius: 8px; background: #fff; border: 1px solid #ced4da; cursor: pointer; color: #495057; outline: none; font-weight: 500;" onchange="
-                const u = new URL(window.location.href);
-                if (this.value === '1') {
-                    u.searchParams.set('inadimplentes', '1');
-                } else {
-                    u.searchParams.delete('inadimplentes');
-                }
-                window.location.href = u.toString();
-            ">
-                <option value="0" <?= request('inadimplentes') != '1' ? 'selected' : '' ?>>Mostrar Todos</option>
-                <option value="1" <?= request('inadimplentes') == '1' ? 'selected' : '' ?>>Apenas Inadimplentes</option>
-            </select>
+            <div id="filtro-inadimplentes-toggle" class="filtro-cobranca-toggle" style="margin-left: 10px;">
+                <button class="filtro-cob-btn <?= request('inadimplentes') != '1' ? 'filtro-cob-btn--active' : '' ?>" onclick="setInadimplentesFilter('0')">
+                    Mostrar Todos
+                </button>
+                <button class="filtro-cob-btn <?= request('inadimplentes') == '1' ? 'filtro-cob-btn--active' : '' ?>" onclick="setInadimplentesFilter('1')">
+                    <?= request('inadimplentes') == '1' ? '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><polyline points="20 6 9 17 4 12"/></svg>' : '' ?>
+                    Apenas Inadimplentes
+                </button>
+            </div>
         </div>
     </div>
 
@@ -492,6 +489,15 @@ $formatDoc = function($doc) {
             if (paramToRemove) {
                 u.searchParams.delete(paramToRemove);
             }
+        }
+        window.location.href = u.toString();
+    }
+    function setInadimplentesFilter(val) {
+        var u = new URL(window.location.href);
+        if (val === '1') {
+            u.searchParams.set('inadimplentes', '1');
+        } else {
+            u.searchParams.delete('inadimplentes');
         }
         window.location.href = u.toString();
     }
