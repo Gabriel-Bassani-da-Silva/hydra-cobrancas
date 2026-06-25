@@ -19,5 +19,9 @@ USER www-data
 WORKDIR /var/www/html/framework
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
+# Criamos os links simbólicos do CSS e JS para a pasta public do framework, para o Nginx encontrá-los
+RUN ln -s /var/www/html/dev/frontend/css /var/www/html/framework/public/css && \
+    ln -s /var/www/html/dev/frontend/js /var/www/html/framework/public/js
+
 # Evita rodar cache na build porque variáveis de ambiente não estão presentes ainda.
 # O cache deve ser evitado ou feito via entrypoint.
