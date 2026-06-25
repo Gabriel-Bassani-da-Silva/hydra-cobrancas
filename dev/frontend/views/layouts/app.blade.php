@@ -78,17 +78,23 @@
 
     <!-- Inicialização do WebSockets -->
     <script>
-        // O Reverb precisa dessas variáveis que virão do .env / Railway
-        window.Pusher = Pusher;
-        window.Echo = new Echo({
-            broadcaster: 'reverb',
-            key: '{{ env("REVERB_APP_KEY", "hydra_key") }}',
-            wsHost: window.location.hostname,
-            wsPort: {{ env("REVERB_PORT", 80) }},
-            wssPort: {{ env("REVERB_PORT", 443) }},
-            forceTLS: (window.location.protocol === 'https:'),
-            enabledTransports: ['ws', 'wss'],
-        });
+        try {
+            // O Reverb precisa dessas variáveis que virão do .env / Railway
+            window.Pusher = window.Pusher || (typeof Pusher !== 'undefined' ? Pusher : null);
+            if (typeof Echo !== 'undefined') {
+                window.Echo = new Echo({
+                    broadcaster: 'reverb',
+                    key: '{{ env("REVERB_APP_KEY", "hydra_key") }}',
+                    wsHost: window.location.hostname,
+                    wsPort: {{ env("REVERB_PORT", 80) }},
+                    wssPort: {{ env("REVERB_PORT", 443) }},
+                    forceTLS: (window.location.protocol === 'https:'),
+                    enabledTransports: ['ws', 'wss'],
+                });
+            }
+        } catch(e) {
+            console.warn("WebSockets offline (talvez bloqueado por AdBlock). O sistema continuará funcionando.");
+        }
     </script>
 
     @stack('scripts')
