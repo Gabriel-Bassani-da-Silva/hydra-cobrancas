@@ -154,7 +154,7 @@ class ContatoRepository {
                     GROUP_CONCAT(DISTINCT CONCAT(t.ID_TEL, ':', t.NUM_TEL, ':', t.CONFIRMADO, ':', t.ORIGEM) SEPARATOR '|') AS telefones
              FROM REPRESENTANTE r
              JOIN CONTATO_EXTERNO ce ON ce.ID_CONTATO_BLING = r.ID_CONTATO_BLING
-             $joinType (SELECT ct.ID_CONTATO_BLING, t.ID_TEL, t.NUM_TEL, t.CONFIRMADO, t.ORIGEM FROM contato_tel ct JOIN tel t ON t.ID_TEL = ct.ID_TEL) t ON t.ID_CONTATO_BLING = ce.ID_CONTATO_BLING $whereConfirmado
+             $joinType (SELECT ct.ID_CONTATO_BLING, t.ID_TEL, t.NUM_TEL, t.CONFIRMADO, t.ORIGEM FROM CONTATO_TEL ct JOIN TEL t ON t.ID_TEL = ct.ID_TEL) t ON t.ID_CONTATO_BLING = ce.ID_CONTATO_BLING $whereConfirmado
              WHERE r.EXIBIR = 1
              GROUP BY ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO, r.ID_VENDEDOR
              ORDER BY ce.NOME_CONTATO"
