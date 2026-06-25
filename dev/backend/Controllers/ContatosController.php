@@ -265,6 +265,15 @@ class ContatosController extends Controller {
             $primeiraLinha = $allRows[0] ?? [];
             $amostra = array_slice($allRows, 0, 6); // Primeiras 6 linhas como amostra
 
+            // Garante que o total de colunas seja baseado na linha mais longa da amostra
+            $maxCols = 0;
+            foreach ($amostra as $row) {
+                if (is_array($row) && count($row) > $maxCols) {
+                    $maxCols = count($row);
+                }
+            }
+            $primeiraLinha = array_pad($primeiraLinha, $maxCols, '');
+
             return view('pages.importar_mapeamento', [
                 'amostra' => $amostra,
                 'primeiraLinha' => $primeiraLinha,
