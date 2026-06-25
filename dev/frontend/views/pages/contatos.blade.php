@@ -103,10 +103,12 @@ $formatDoc = function($doc) {
             </div>
             
             <div class="filters-group">
-                <label class="toggle-checkbox-wrapper">
-                    <input type="checkbox" id="filter-com-telefone" <?= request('com_telefone') == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) url.searchParams.set('com_telefone', '1'); else url.searchParams.delete('com_telefone'); window.location.href = url.toString();">
+                <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #94a3b8; background: <?= request('com_telefone') == '1' ? '#e2e8f0' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_telefone') ?>' === '1') { u.searchParams.delete('com_telefone'); } else { u.searchParams.set('com_telefone', '1'); } window.location.href = u.toString();">
+                    <span style="width: 14px; height: 14px; border-radius: 3px; border: 1px solid #64748b; background-color: <?= request('com_telefone') == '1' ? '#3b82f6' : 'transparent' ?>; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px;">
+                        <?= request('com_telefone') == '1' ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '' ?>
+                    </span>
                     Apenas com telefone
-                </label>
+                </button>
                 
                 <div style="display: flex; align-items: center; gap: 8px; margin-left: 10px; padding-left: 15px; border-left: 2px solid #e2e8f0;">
                     <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #16a34a; background: <?= request('com_confirmado') == '1' ? '#16a34a' : 'transparent' ?>; color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_confirmado') ?>' === '1') { u.searchParams.delete('com_confirmado'); } else { u.searchParams.set('com_confirmado', '1'); u.searchParams.delete('com_tentativa'); } window.location.href = u.toString();">
@@ -192,10 +194,12 @@ $formatDoc = function($doc) {
             </div>
             
             <div class="filters-group">
-                <label class="toggle-checkbox-wrapper">
-                    <input type="checkbox" id="filter-com-telefone" <?= request('com_telefone') == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) url.searchParams.set('com_telefone', '1'); else url.searchParams.delete('com_telefone'); window.location.href = url.toString();">
+                <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #94a3b8; background: <?= request('com_telefone') == '1' ? '#e2e8f0' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_telefone') ?>' === '1') { u.searchParams.delete('com_telefone'); } else { u.searchParams.set('com_telefone', '1'); } window.location.href = u.toString();">
+                    <span style="width: 14px; height: 14px; border-radius: 3px; border: 1px solid #64748b; background-color: <?= request('com_telefone') == '1' ? '#3b82f6' : 'transparent' ?>; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px;">
+                        <?= request('com_telefone') == '1' ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '' ?>
+                    </span>
                     Apenas com telefone
-                </label>
+                </button>
                 
                 <div style="display: flex; align-items: center; gap: 8px; margin-left: 10px; padding-left: 15px; border-left: 2px solid #e2e8f0;">
                     <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #16a34a; background: <?= request('com_confirmado') == '1' ? '#16a34a' : 'transparent' ?>; color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_confirmado') ?>' === '1') { u.searchParams.delete('com_confirmado'); } else { u.searchParams.set('com_confirmado', '1'); u.searchParams.delete('com_tentativa'); } window.location.href = u.toString();">
@@ -321,10 +325,12 @@ $formatDoc = function($doc) {
                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                         Novo Contato
                     </button>
-                    <label class="toggle-checkbox-wrapper">
-                        <input type="checkbox" id="filter-com-telefone" <?= request('com_telefone') == '1' ? 'checked' : '' ?> onchange="const url = new URL(window.location.href); if (this.checked) url.searchParams.set('com_telefone', '1'); else url.searchParams.delete('com_telefone'); window.location.href = url.toString();">
+                    <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #94a3b8; background: <?= request('com_telefone') == '1' ? '#e2e8f0' : 'transparent' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_telefone') ?>' === '1') { u.searchParams.delete('com_telefone'); } else { u.searchParams.set('com_telefone', '1'); } window.location.href = u.toString();">
+                        <span style="width: 14px; height: 14px; border-radius: 3px; border: 1px solid #64748b; background-color: <?= request('com_telefone') == '1' ? '#3b82f6' : 'transparent' ?>; display: inline-flex; align-items: center; justify-content: center; margin-right: 4px;">
+                            <?= request('com_telefone') == '1' ? '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : '' ?>
+                        </span>
                         Apenas com telefone
-                    </label>
+                    </button>
                     
                     <div style="display: flex; align-items: center; gap: 8px; margin-left: 10px; padding-left: 15px; border-left: 2px solid #e2e8f0;">
                         <button type="button" class="toggle-checkbox-wrapper" style="border: 1px solid #16a34a; background: <?= request('com_confirmado') == '1' ? '#16a34a' : 'transparent' ?>; color: <?= request('com_confirmado') == '1' ? '#fff' : '#16a34a' ?>; cursor: pointer; transition: all 0.2s;" onclick="var u = new URL(window.location.href); if ('<?= request('com_confirmado') ?>' === '1') { u.searchParams.delete('com_confirmado'); } else { u.searchParams.set('com_confirmado', '1'); u.searchParams.delete('com_tentativa'); } window.location.href = u.toString();">
