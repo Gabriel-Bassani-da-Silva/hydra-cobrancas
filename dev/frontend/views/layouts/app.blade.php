@@ -42,7 +42,7 @@
                     <span>Contas</span>
                 </a>
 
-                <a href="{{ url('/divergencia-baixa') }}" class="header-icon-btn" title="Divergência Bling">
+                <a href="{{ url('/divergencias') }}" class="header-icon-btn" title="Divergência Bling">
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
                         <path d="M12 2L1 21h22L12 2zm1 17h-2v-2h2v2zm0-4h-2V9h2v6z"/>
                     </svg>
