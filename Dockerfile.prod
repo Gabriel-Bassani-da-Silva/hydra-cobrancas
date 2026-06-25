@@ -35,13 +35,33 @@ USER root
 # Criar o serviço do Laravel Reverb no s6-overlay para rodar em background na porta 9080
 RUN mkdir -p /etc/s6-overlay/s6-rc.d/reverb && \
     echo "longrun" > /etc/s6-overlay/s6-rc.d/reverb/type && \
-    echo -e "#!/command/with-contenv sh\nexec s6-setuidgid www-data php /var/www/html/framework/artisan reverb:start --host=0.0.0.0 --port=9080" > /etc/s6-overlay/s6-rc.d/reverb/run && \
+    echo "#!/bin/sh" > /etc/s6-overlay/s6-rc.d/reverb/run && \
+    echo "exec s6-setuidgid www-data php /var/www/html/framework/artisan reverb:start --host=0.0.0.0 --port=9080" >> /etc/s6-overlay/s6-rc.d/reverb/run && \
     chmod +x /etc/s6-overlay/s6-rc.d/reverb/run && \
     touch /etc/s6-overlay/s6-rc.d/user/contents.d/reverb
 
 # Configurar o Nginx para redirecionar tráfego do WebSocket para o Reverb (porta 9080)
 RUN mkdir -p /etc/nginx/site-opts.d && \
-    echo -e "location /app/ {\n    proxy_pass http://127.0.0.1:9080;\n    proxy_http_version 1.1;\n    proxy_set_header Host \$http_host;\n    proxy_set_header Scheme \$scheme;\n    proxy_set_header SERVER_PORT \$server_port;\n    proxy_set_header REMOTE_ADDR \$remote_addr;\n    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\n    proxy_set_header Upgrade \$http_upgrade;\n    proxy_set_header Connection \"Upgrade\";\n}\n\nlocation /apps/ {\n    proxy_pass http://127.0.0.1:9080;\n    proxy_set_header Host \$http_host;\n    proxy_set_header Scheme \$scheme;\n    proxy_set_header SERVER_PORT \$server_port;\n    proxy_set_header REMOTE_ADDR \$remote_addr;\n    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;\n}" > /etc/nginx/site-opts.d/reverb.conf
+    echo "location /app/ {" > /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_pass http://127.0.0.1:9080;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_http_version 1.1;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header Host \$http_host;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header Scheme \$scheme;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header SERVER_PORT \$server_port;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header REMOTE_ADDR \$remote_addr;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header Upgrade \$http_upgrade;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header Connection \"Upgrade\";" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "}" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "location /apps/ {" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_pass http://127.0.0.1:9080;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header Host \$http_host;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header Scheme \$scheme;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header SERVER_PORT \$server_port;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header REMOTE_ADDR \$remote_addr;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "    proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;" >> /etc/nginx/site-opts.d/reverb.conf && \
+    echo "}" >> /etc/nginx/site-opts.d/reverb.conf
 
 # Criamos os links simbólicos do CSS e JS para a pasta public do framework, para o Nginx encontrá-los
 RUN ln -s /var/www/html/dev/frontend/css /var/www/html/framework/public/css && \

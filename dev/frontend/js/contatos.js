@@ -408,10 +408,15 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.innerHTML = '⏳';
             btn.disabled = true;
 
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+            
             fetch(form.action, {
                 method: form.method,
                 body: new FormData(form),
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                headers: { 
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': csrfToken
+                }
             })
             .then(r => r.json())
             .then(data => {
