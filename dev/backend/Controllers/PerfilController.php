@@ -177,6 +177,8 @@ class PerfilController extends Controller {
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
     public function apiBaixasColaborador() {
         $idCliente = request()->query('id');
         if (!$idCliente) {

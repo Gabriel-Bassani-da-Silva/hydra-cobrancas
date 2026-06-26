@@ -86,6 +86,8 @@ class DivergenciaController extends Controller {
             \Illuminate\Support\Facades\DB::rollBack();
             return response()->json(['success' => false, 'error' => 'Erro ao estornar baixa: ' . $e->getMessage()]);
         }
+    }
+
     public function apiDivergenciasCliente()
     {
         $idCliente = request()->query('id');
