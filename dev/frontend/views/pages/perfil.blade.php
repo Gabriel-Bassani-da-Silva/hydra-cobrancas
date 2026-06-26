@@ -105,7 +105,7 @@ if (!function_exists('formatarCpfCnpj')) {
                             <tr class="clickable-row" data-id="<?= $cob['ID_COBRANCA'] ?>" data-nome="<?= htmlspecialchars(addslashes($nomeAgrupamento)) ?>" data-tipo="<?= $tipoStr ?>">
                                 <td class="expand-col">
                                     <button class="btn-expand" onclick="toggleDetalhesPerfil(this, <?= $cob['ID_COBRANCA'] ?>, '<?= htmlspecialchars(addslashes($nomeAgrupamento)) ?>', '<?= $tipoStr ?>')">
-                                        <x-icons.icon-29 width="2" height="16" />
+                                        <x-icons.icon-29 width="16" height="16" />
                                     </button>
                                 </td>
                                 <td><?= date('d/m/Y', strtotime($cob['DATA_INICIO'])) ?></td>
@@ -154,15 +154,15 @@ if (!function_exists('formatarCpfCnpj')) {
                                 <td class="cr-col-acoes">
                                     <div class="action-menu-wrapper">
                                         <button class="btn-options" onclick="toggleAcoesMenu(this, event)" title="Opções">
-                                            <x-icons.icon-30 width="2" height="18" />
+                                            <x-icons.icon-30 width="18" height="18" />
                                         </button>
                                         <div class="action-menu-dropdown">
                                             <button class="action-menu-item action-menu-item--default btn-atualizar-cob" data-id="<?= $cob['ID_COBRANCA'] ?>" title="Sincroniza os pedidos">
-                                                <x-icons.icon-31 width="2" height="14" />
+                                                <x-icons.icon-31 width="14" height="14" />
                                                 Atualizar Pedidos
                                             </button>
                                             <button class="action-menu-item action-menu-item--danger btn-desistir-cob" data-id="<?= $cob['ID_COBRANCA'] ?>" title="Desistir desta cobrança">
-                                                <x-icons.icon-32 width="2" height="14" />
+                                                <x-icons.icon-32 width="14" height="14" />
                                                 Desistir
                                             </button>
                                         </div>
