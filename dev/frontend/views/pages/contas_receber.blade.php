@@ -33,14 +33,14 @@ $isPagos = request('status') === 'pagos';
         </div>
         <div class="actions-buttons">
             <button onclick="sincronizarPedidoPorId()" class="btn-sync btn-secondary btn-primary-override" title="Sincronizar pedido específico pelo ID do Bling">
-                <x-icons.folder-open width="2" height="16" />
+                <x-icons.folder-open width="16" height="16" />
                 Sincronizar por ID
             </button>
             <a href="{{ route('sincronizar-contas-receber') }}?aba=<?= $aba ?>"
                id="btn-sincronizar"
                class="btn-sync"
                title="Baixar alterações recentes (Rápido)">
-                <x-icons.folder-open width="2" height="16" />
+                <x-icons.folder-open width="16" height="16" />
                 Sinc. Rápida
             </a>
             <a href="{{ route('sincronizar-contas-receber') }}?full=1&aba=<?= $aba ?>"
@@ -48,14 +48,14 @@ $isPagos = request('status') === 'pagos';
                class="btn-sync btn-warning"
                title="Verificação Completa (Varre todas as contas para encontrar apagadas e pagas)"
                onclick="return confirm('A Verificação Completa analisa todas as contas em aberto no Bling. Isso pode demorar um pouco mais. Deseja continuar?');">
-                <x-icons.icon-14 width="2" height="16" />
+                <x-icons.icon-14 width="16" height="16" />
                 Verificação Completa
             </a>
             <a href="{{ route('vincular-reps-contas') }}?aba=<?= $aba ?>"
                class="btn-sync btn-secondary"
                title="Busca os vendedores no Bling para os pedidos que estão sem vendedor localmente"
                onclick="return confirm('Isso buscará detalhes de pedidos sem representante no Bling. Pode demorar alguns minutos. Deseja continuar?');">
-                <x-icons.users width="2" height="16" />
+                <x-icons.users width="16" height="16" />
                 Vincular Vendedores
             </a>
         </div>
@@ -111,7 +111,7 @@ $isPagos = request('status') === 'pagos';
         <?php if ($aba !== 'pedidos'): ?>
         <div id="filtro-cobranca-toggle" class="filtro-cobranca-toggle">
             <button id="btn-filtro-sem-cobranca" class="filtro-cob-btn filtro-cob-btn--active" onclick="setFiltroCobranca('sem')">
-                <x-icons.check-1 width="2" height="13" />
+                <x-icons.check-1 width="13" height="13" />
                 Disponíveis
             </button>
             <button id="btn-filtro-todos" class="filtro-cob-btn" onclick="setFiltroCobranca('todos')">

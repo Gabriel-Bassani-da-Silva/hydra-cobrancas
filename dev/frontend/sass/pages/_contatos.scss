@@ -197,7 +197,7 @@
     }
 
     .table-responsive {
-        overflow: auto;
+        overflow: visible !important;
         flex: 1;
         min-height: 0;
     }

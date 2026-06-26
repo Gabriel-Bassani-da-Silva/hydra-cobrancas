@@ -41,15 +41,15 @@ $formatDoc = function($doc) {
         </div>
         <div class="actions-buttons">
             <a href="{{ route('importar-contatos-page') }}" id="btn-importar-contatos" class="btn-sync" title="Importar contatos">
-                <x-icons.upload width="2" height="16" />
+                <x-icons.upload width="16" height="16" />
                 Importar Contatos
             </a>
             <a href="{{ route('sincronizar-contatos-bling') }}?aba=<?= $aba ?>" class="btn-sync" title="Atualizar contatos no Bling">
-                <x-icons.refresh width="2" height="16" />
+                <x-icons.refresh width="16" height="16" />
                 Sincronizar Contatos
             </a>
             <a href="{{ route('sincronizar-vendedores-bling') }}?aba=<?= $aba ?>" class="btn-sync secondary" title="Atualizar vendedores no Bling">
-                <x-icons.user width="2" height="16" />
+                <x-icons.user width="16" height="16" />
                 Sincronizar Vendedores
             </a>
             
@@ -58,7 +58,7 @@ $formatDoc = function($doc) {
                     Mostrar Todos
                 </button>
                 <button class="filtro-cob-btn <?= request('inadimplentes') == '1' ? 'filtro-cob-btn--active' : '' ?>" onclick="setInadimplentesFilter('1')">
-                    @if(request('inadimplentes') == '1') <x-icons.check-1 width="2" height="13" /> @endif
+                    @if(request('inadimplentes') == '1') <x-icons.check-1 width="13" height="13" /> @endif
                     Apenas Inadimplentes
                 </button>
             </div>
@@ -370,7 +370,7 @@ $formatDoc = function($doc) {
                             <td class="actions-col">
                                 <div class="dropdown">
                                     <button type="button" class="btn-icon dropdown-toggle" onclick="toggleDropdown(event, this)" title="Opções">
-                                        <x-icons.icon-23 width="2" height="16" />
+                                        <x-icons.icon-23 width="16" height="16" />
                                     </button>
                                     <div class="dropdown-menu">
                                         <button class="dropdown-item btn-edit-cf" data-id="<?= $cf['ID_CONTATO'] ?>" data-nome="<?= htmlspecialchars($cf['NOME_CF'], ENT_QUOTES, 'UTF-8') ?>" data-tel="<?= htmlspecialchars(formatPhone($cf['NUM_TEL']), ENT_QUOTES, 'UTF-8') ?>" data-vinculos="<?= htmlspecialchars($cf['VINCULOS_RAW'] ?? '', ENT_QUOTES, 'UTF-8') ?>">

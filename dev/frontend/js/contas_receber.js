@@ -886,12 +886,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCob = document.getElementById('modal-cobranca-clientes');
     if (!modalCob) return;
 
-    const closeCob = () => modalCob.classList.add('hidden');
+    const closeCob = () => modalCob.style.display = 'none';
     document.getElementById('modal-cobranca-close').addEventListener('click', closeCob);
     document.getElementById('modal-cobranca-overlay').addEventListener('click', closeCob);
     
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && !modalCob.classList.contains('hidden')) {
+        if (e.key === 'Escape' && modalCob.style.display !== 'none') {
             closeCob();
         }
     });
@@ -920,7 +920,7 @@ function iniciarCobranca(id, tipo) {
     }
     _cobPendente = { id, tipo };
     document.getElementById('modal-cobranca-tipo-texto').innerText = tipo === 'representantes' ? 'Representante' : 'Contato Financeiro';
-    document.getElementById('modal-cobranca-clientes').classList.remove('hidden');
+    document.getElementById('modal-cobranca-clientes').style.display = 'flex';
     carregarClientesCob(id, tipo);
 }
 
@@ -959,7 +959,7 @@ function confirmarCobranca() {
         .finally(() => {
             btn.disabled = false;
             btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg> Confirmar e Assumir';
-            document.getElementById('modal-cobranca-clientes').classList.add('hidden');
+            document.getElementById('modal-cobranca-clientes').style.display = 'none';
         });
 }
 
