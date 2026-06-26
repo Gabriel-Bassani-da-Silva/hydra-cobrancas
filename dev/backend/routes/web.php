@@ -23,6 +23,20 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/logout', [AuthController::class, 'logout']); // Fallback para get se necessário
 
+// Rotas de Debug (Sem Auth)
+Route::get('/debug-erro', function() {
+    ob_start();
+    try {
+        require_once __DIR__ . '/../Controllers/ContasReceberController.php';
+        echo "Controller OK. ";
+        $controller = new \App\Controllers\ContasReceberController();
+        echo "Instanciou OK. ";
+    } catch (\Throwable $e) {
+        echo "Erro Fatal: " . $e->getMessage() . " na linha " . $e->getLine() . " do arquivo " . $e->getFile();
+    }
+    return ob_get_clean();
+});
+
 // Bling Callbacks (Geralmente sem auth para receber webhook ou retorno OAuth)
 Route::get('/bling/callback', [BlingController::class, 'callback']);
 Route::post('/bling/webhook', [BlingWebhookController::class, 'handle']);
@@ -57,19 +71,6 @@ Route::middleware('auth')->group(function () {
     Route::any('/contas-receber/api/parcelas-por-ids', [ContasReceberController::class, 'apiParcelasPorIds'])->name('api-parcelas-contas');
     Route::get('/contas-receber/api/lista', [ContasReceberController::class, 'apiLista'])->name('api-lista-contas');
     Route::get('/contas-receber/api/detalhe', [ContasReceberController::class, 'apiDetalhe'])->name('api-detalhe-conta');
-
-    Route::get('/debug-erro', function() {
-        ob_start();
-        try {
-            require_once __DIR__ . '/../Controllers/ContasReceberController.php';
-            echo "Controller OK. ";
-            $controller = new \App\Controllers\ContasReceberController();
-            echo "Instanciou OK. ";
-        } catch (\Throwable $e) {
-            echo "Erro Fatal: " . $e->getMessage() . " na linha " . $e->getLine() . " do arquivo " . $e->getFile();
-        }
-        return ob_get_clean();
-    });
 
     // Contatos
     Route::get('/contatos', [ContatosController::class, 'index'])->name('contatos-page');

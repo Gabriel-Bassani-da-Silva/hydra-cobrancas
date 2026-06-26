@@ -431,12 +431,21 @@ class ContasReceberController extends Controller {
      * API: Busca detalhes de várias parcelas pelo ID para o modal de baixa local.
      */
     public function apiParcelasPorIds() {
-        $idsStr = request()->query('ids') ?? request()->post('ids') ?? '';
+        $req = request();
+        $idsStr = $req->input('ids', '');
+        
         if (empty($idsStr)) {
             return response()->json(['success' => false, 'error' => 'Nenhum ID fornecido.']);
         }
         
-        $ids = array_filter(explode(',', $idsStr), 'is_numeric');
+        $arrayBruto = explode(',', (string)$idsStr);
+        $ids = [];
+        foreach ($arrayBruto as $val) {
+            if (is_numeric($val)) {
+                $ids[] = $val;
+            }
+        }
+        
         if (empty($ids)) {
             return response()->json(['success' => false, 'error' => 'IDs inválidos.']);
         }
