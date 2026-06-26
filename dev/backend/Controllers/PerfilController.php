@@ -63,7 +63,9 @@ class PerfilController extends Controller {
                 'IS_CF_REPRESENTANTE' => $isCfRepresentante,
                 'CLIENTES' => $clientes
             ];
-        });
+        })->filter(function ($c) {
+            return $c['QTD_PEDIDOS'] > 0;
+        })->values();
 
         $aba = request()->query('aba', 'clientes');
         $grupo = request()->query('grupo', 'padrao');
