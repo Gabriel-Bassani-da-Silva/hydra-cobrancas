@@ -54,18 +54,25 @@ Route::middleware('auth')->group(function () {
     
     // Rotas de Teste Temporárias (Fake DB Test)
     Route::get('/teste-criar', function() {
-        // 1. Cria um Cliente Fake (ID 999999999)
-        \Illuminate\Support\Facades\DB::statement("INSERT IGNORE INTO CONTATO_EXTERNO (ID_CONTATO_BLING, NOME_CONTATO, NUMERO_DOCUMENTO) VALUES (999999999, 'CLIENTE TESTE WEBHOOK', '00000000000')");
-        \Illuminate\Support\Facades\DB::statement("INSERT IGNORE INTO CLIENTE (ID_CONTATO_BLING, EXIBIR, PEDRAS) VALUES (999999999, 1, 0)");
-        
-        // 2. Cria um Pedido Fake (ID 888888888) vinculado ao Cliente Fake
-        \Illuminate\Support\Facades\DB::statement("
-            INSERT INTO PEDIDO (ID_PEDIDO, NUM_PEDIDO, TOTAL_PEDIDO, DATA_VENCIMENTO, VALOR_PAGO_BLING, SITUACAO_PEDIDO, ID_CLIENTE, ID_FORMA_PAGAMENTO, EXIBIR)
-            VALUES (888888888, 'test-webhook', 100.00, CURDATE(), 0.00, 1, 999999999, 1, 1)
-            ON DUPLICATE KEY UPDATE SITUACAO_PEDIDO=1, EXIBIR=1, VALOR_PAGO_BLING=0;
-        ");
-        
-        return "Pedido Fake de R$ 100 criado com sucesso! Volte na tela de Contas a Receber e procure por 'CLIENTE TESTE WEBHOOK'.";
+        try {
+            \Illuminate\Support\Facades\DB::statement("SET FOREIGN_KEY_CHECKS = 0;");
+            
+            // 1. Cria um Cliente Fake (ID 999999999)
+            \Illuminate\Support\Facades\DB::statement("INSERT IGNORE INTO CONTATO_EXTERNO (ID_CONTATO_BLING, NOME_CONTATO, NUMERO_DOCUMENTO) VALUES (999999999, 'CLIENTE TESTE WEBHOOK', '00000000000')");
+            \Illuminate\Support\Facades\DB::statement("INSERT IGNORE INTO CLIENTE (ID_CONTATO_BLING, EXIBIR, PEDRAS) VALUES (999999999, 1, 0)");
+            
+            // 2. Cria um Pedido Fake (ID 888888888) vinculado ao Cliente Fake
+            \Illuminate\Support\Facades\DB::statement("
+                INSERT INTO PEDIDO (ID_PEDIDO, NUM_PEDIDO, TOTAL_PEDIDO, DATA_VENCIMENTO, VALOR_PAGO_BLING, SITUACAO_PEDIDO, ID_CLIENTE, ID_FORMA_PAGAMENTO, EXIBIR)
+                VALUES (888888888, 'test-webhook', 100.00, CURDATE(), 0.00, 1, 999999999, 1, 1)
+                ON DUPLICATE KEY UPDATE SITUACAO_PEDIDO=1, EXIBIR=1, VALOR_PAGO_BLING=0;
+            ");
+            
+            \Illuminate\Support\Facades\DB::statement("SET FOREIGN_KEY_CHECKS = 1;");
+            return "Pedido Fake de R$ 100 criado com sucesso! Volte na tela de Contas a Receber e procure por 'CLIENTE TESTE WEBHOOK'.";
+        } catch (\Exception $e) {
+            return "Erro ao criar: " . $e->getMessage();
+        }
     });
 
     Route::get('/teste-cancelar', function() {
