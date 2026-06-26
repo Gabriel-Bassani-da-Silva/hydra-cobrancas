@@ -428,6 +428,28 @@ class ContasReceberController extends Controller {
     }
 
     /**
+     * API: Busca detalhes de várias parcelas pelo ID para o modal de baixa local.
+     */
+    public function apiParcelasPorIds() {
+        $idsStr = request()->query('ids') ?? request()->post('ids') ?? '';
+        if (empty($idsStr)) {
+            return response()->json(['success' => false, 'error' => 'Nenhum ID fornecido.']);
+        }
+        
+        $ids = array_filter(explode(',', $idsStr), 'is_numeric');
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'error' => 'IDs inválidos.']);
+        }
+
+        try {
+            $parcelas = $this->model->getPedidosByIds($ids);
+            return response()->json(['success' => true, 'data' => $parcelas]);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
+    /**
      * Recuperação: Re-verifica no Bling todas as contas que foram marcadas
      * como pagas localmente (sit=2, valor_pago=total) para restaurar as que
      * ainda estão em aberto. Corrige dados corrompidos pela heurística de bulk.
