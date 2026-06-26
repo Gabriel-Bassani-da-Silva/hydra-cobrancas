@@ -101,6 +101,7 @@ Route::middleware('auth')->group(function () {
     Route::any('/contas-receber/api/parcelas-por-ids', [ContasReceberController::class, 'apiParcelasPorIds'])->name('api-parcelas-contas');
     Route::get('/contas-receber/api/lista', [ContasReceberController::class, 'apiLista'])->name('api-lista-contas');
     Route::get('/contas-receber/api/detalhe', [ContasReceberController::class, 'apiDetalhe'])->name('api-detalhe-conta');
+    Route::get('/contas-receber/api-baixas-cliente', [ContasReceberController::class, 'apiBaixasCliente'])->name('api-baixas-cliente');
 
     // Contatos
     Route::get('/contatos', [ContatosController::class, 'index'])->name('contatos-page');

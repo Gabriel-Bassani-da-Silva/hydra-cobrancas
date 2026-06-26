@@ -279,11 +279,11 @@ $isPagos = request('status') === 'pagos';
             <table class="cr-table" id="table-baixas">
                 <thead>
                     <tr>
-                        <th class="date-col">Data da Baixa</th>
-                        <th class="center-col">Documento</th>
+                        <th class="date-col">Última Baixa</th>
                         <th>Cliente</th>
-                        <th>Colaborador</th>
-                        <th class="valor-col">Valor Baixado</th>
+                        <th class="center-col">Qtd. Baixas</th>
+                        <th class="valor-col">Total Baixado</th>
+                        <th class="cr-col-acoes">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -292,11 +292,15 @@ $isPagos = request('status') === 'pagos';
                     <?php else: ?>
                         <?php foreach($todasBaixas as $b): ?>
                             <tr>
-                                <td><?= date('d/m/Y H:i', strtotime($b->DATA_REGISTRO)) ?></td>
-                                <td class="center-col"><?= htmlspecialchars($b->NUM_PEDIDO) ?></td>
+                                <td><?= date('d/m/Y H:i', strtotime($b->ULTIMA_BAIXA)) ?></td>
                                 <td><?= htmlspecialchars($b->NOME_CONTATO) ?></td>
-                                <td><?= htmlspecialchars($b->NOME_COLABORADOR) ?></td>
-                                <td class="valor-col" style="font-weight: 600; color: #059669;">R$ <?= number_format($b->VALOR_PAGO_PEDIDO, 2, ',', '.') ?></td>
+                                <td class="center-col"><?= $b->QTD_BAIXAS ?></td>
+                                <td class="valor-col" style="font-weight: 600; color: #059669;">R$ <?= number_format($b->TOTAL_BAIXADO, 2, ',', '.') ?></td>
+                                <td class="cr-col-acoes text-center">
+                                    <button class="btn-action-icon" onclick="abrirModalBaixas(<?= $b->ID_CLIENTE ?>)" title="Ver Baixas do Cliente">
+                                        <x-icons.eye width="16" height="16" />
+                                    </button>
+                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>

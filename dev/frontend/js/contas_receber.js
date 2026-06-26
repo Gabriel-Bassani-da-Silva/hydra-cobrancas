@@ -1013,3 +1013,52 @@ function sincronizarPedidoPorId() {
         window.location.href = BASE + `/contas-receber/sincronizar-unico?aba=pedidos&id=` + id;
     }
 }
+
+// ── Funções de Baixas do Modal ─────────────────────────────────────────────
+function abrirModalBaixas(idCliente) {
+    const modalBody = document.getElementById('modal-detalhes-body');
+    const modalTitle = document.getElementById('modal-detalhes-title');
+    modalTitle.innerText = 'Baixas do Cliente';
+    modalBody.innerHTML = '<div class="text-center" style="padding: 20px;">Carregando baixas...</div>';
+    
+    document.getElementById('modal-detalhes').style.display = 'flex';
+    
+    fetch(`${BASE}/contas-receber/api-baixas-cliente?id=${idCliente}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.html) {
+                modalBody.innerHTML = data.html;
+            } else {
+                modalBody.innerHTML = '<div class="text-center" style="padding: 20px; color: red;">' + (data.error || 'Erro ao carregar') + '</div>';
+            }
+        })
+        .catch(err => {
+            modalBody.innerHTML = '<div class="text-center" style="padding: 20px; color: red;">Erro na requisição.</div>';
+        });
+}
+
+function estornarBaixa(idDetalhe) {
+    if (!confirm('Tem certeza que deseja estornar esta baixa? O valor será removido localmente.')) {
+        return;
+    }
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    
+    fetch(`${BASE}/perfil/baixa/estornar`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({ id_detalhe: idDetalhe })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            alert('Baixa estornada com sucesso!');
+            location.reload();
+        } else {
+            alert('Erro: ' + (data.error || 'Falha ao estornar baixa.'));
+        }
+    })
+    .catch(() => alert('Erro de comunicação.'));
+}

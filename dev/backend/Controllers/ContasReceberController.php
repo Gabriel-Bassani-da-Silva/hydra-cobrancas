@@ -155,18 +155,15 @@ class ContasReceberController extends Controller {
                 ->join('REGISTRO_PAGAMENTO as rp', 'rp.ID_REGISTRO', '=', 'dp.ID_REGISTRO')
                 ->join('PEDIDO as p', 'p.ID_PEDIDO', '=', 'dp.ID_PEDIDO')
                 ->leftJoin('CONTATO_EXTERNO as c', 'c.ID_CONTATO_BLING', '=', 'p.ID_CLIENTE')
-                ->leftJoin('COLABORADOR as col', 'col.ID_COLABORADOR', '=', 'rp.ID_COLABORADOR')
                 ->select(
-                    'dp.ID_DETALHE', 
-                    'dp.VALOR_PAGO_PEDIDO', 
-                    'rp.DATA_REGISTRO', 
-                    'p.NUM_PEDIDO', 
-                    'p.ID_PEDIDO', 
-                    'p.TOTAL_PEDIDO', 
+                    'p.ID_CLIENTE',
                     'c.NOME_CONTATO',
-                    'col.NOME_COLABORADOR'
+                    \Illuminate\Support\Facades\DB::raw('COUNT(dp.ID_DETALHE) as QTD_BAIXAS'),
+                    \Illuminate\Support\Facades\DB::raw('SUM(dp.VALOR_PAGO_PEDIDO) as TOTAL_BAIXADO'),
+                    \Illuminate\Support\Facades\DB::raw('MAX(rp.DATA_REGISTRO) as ULTIMA_BAIXA')
                 )
-                ->orderBy('rp.DATA_REGISTRO', 'desc')
+                ->groupBy('p.ID_CLIENTE', 'c.NOME_CONTATO')
+                ->orderBy('ULTIMA_BAIXA', 'desc')
                 ->get();
         }
 
@@ -429,6 +426,32 @@ class ContasReceberController extends Controller {
         } else {
             return response()->json(['error' => 'Conta não encontrada no Bling']);
         }
+    }
+
+    public function apiBaixasCliente() {
+        $idCliente = request()->query()['id'] ?? null;
+        if (!$idCliente) {
+            return response()->json(['error' => 'ID do cliente não informado']);
+        }
+
+        $baixas = \Illuminate\Support\Facades\DB::table('DETALHE_PAGAMENTO as dp')
+            ->join('REGISTRO_PAGAMENTO as rp', 'rp.ID_REGISTRO', '=', 'dp.ID_REGISTRO')
+            ->join('PEDIDO as p', 'p.ID_PEDIDO', '=', 'dp.ID_PEDIDO')
+            ->leftJoin('COLABORADOR as col', 'col.ID_COLABORADOR', '=', 'rp.ID_COLABORADOR')
+            ->where('p.ID_CLIENTE', $idCliente)
+            ->select(
+                'dp.ID_DETALHE', 
+                'dp.VALOR_PAGO_PEDIDO', 
+                'rp.DATA_REGISTRO', 
+                'p.NUM_PEDIDO', 
+                'p.ID_PEDIDO', 
+                'col.NOME_COLABORADOR'
+            )
+            ->orderBy('rp.DATA_REGISTRO', 'desc')
+            ->get();
+
+        $html = view('components.modal_baixas_cliente', ['baixas' => $baixas])->render();
+        return response()->json(['data' => $baixas, 'html' => $html]);
     }
 
     /**
