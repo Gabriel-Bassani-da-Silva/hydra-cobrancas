@@ -143,7 +143,7 @@ $grupo = request('grupo', 'padrao');
                     <input type="checkbox" id="check-all-clientes" checked> Selecionar Todos
                 </label>
                 <button id="btn-confirmar-cobranca" class="btn-cobrar">
-                    <x-icons.check width="2.5" height="15" />
+                    <x-icons.check width="15" height="15" />
                     Confirmar e Assumir
                 </button>
             </div>

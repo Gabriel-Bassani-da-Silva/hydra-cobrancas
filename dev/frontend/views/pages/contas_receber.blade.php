@@ -303,7 +303,7 @@ $isPagos = request('status') === 'pagos';
                     <input type="checkbox" id="check-all-clientes" checked> Selecionar Todos
                 </label>
                 <button id="btn-confirmar-cobranca" class="btn-sync btn-modal-cobranca-confirm">
-                    <x-icons.check width="2.5" height="14" />
+                    <x-icons.check width="14" height="14" />
                     Confirmar e Assumir
                 </button>
             </div>
@@ -340,7 +340,7 @@ $isPagos = request('status') === 'pagos';
                         Cancelar
                     </button>
                     <button class="btn-modal-confirm-blue" onclick="confirmarBaixa()">
-                        <x-icons.check-heavy width="2.5" height="16" />
+                        <x-icons.check-heavy width="16" height="16" />
                         Confirmar Baixa
                     </button>
                 </div>
