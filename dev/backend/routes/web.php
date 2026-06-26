@@ -51,46 +51,10 @@ Route::middleware('auth')->group(function () {
     Route::any('/contas-receber/sincronizar-unico', [ContasReceberController::class, 'sincronizarUnico'])->name('sincronizar-conta-unica');
     Route::any('/contas-receber/sincronizar', [ContasReceberController::class, 'sincronizar'])->name('sincronizar-contas-receber');
     Route::post('/contas-receber/atualizar', [ContasReceberController::class, 'atualizar'])->name('atualizar-contas-receber');
-    
-    // Rotas de Teste Temporárias (Fake DB Test)
-    Route::get('/teste-criar', function() {
-        try {
-            \Illuminate\Support\Facades\DB::statement("SET FOREIGN_KEY_CHECKS = 0;");
-            
-            // 1. Cria um Cliente Fake (ID 999999999)
-            \Illuminate\Support\Facades\DB::statement("INSERT IGNORE INTO CONTATO_EXTERNO (ID_CONTATO_BLING, NOME_CONTATO, NUMERO_DOCUMENTO) VALUES (999999999, 'CLIENTE TESTE WEBHOOK', '00000000000')");
-            \Illuminate\Support\Facades\DB::statement("INSERT IGNORE INTO CLIENTE (ID_CONTATO_BLING, EXIBIR, PEDRAS) VALUES (999999999, 1, 0)");
-            
-            // 2. Cria um Pedido Fake (ID 888888888) vinculado ao Cliente Fake e já vencido (para aparecer em Inadimplentes)
-            \Illuminate\Support\Facades\DB::statement("
-                INSERT INTO PEDIDO (ID_PEDIDO, NUM_PEDIDO, TOTAL_PEDIDO, DATA_VENCIMENTO, VALOR_PAGO_BLING, SITUACAO_PEDIDO, ID_CLIENTE, ID_FORMA_PAGAMENTO, EXIBIR)
-                VALUES (888888888, 'test-webhook', 100.00, DATE_SUB(CURDATE(), INTERVAL 5 DAY), 0.00, 1, 999999999, 1, 1)
-                ON DUPLICATE KEY UPDATE SITUACAO_PEDIDO=1, EXIBIR=1, VALOR_PAGO_BLING=0, DATA_VENCIMENTO=DATE_SUB(CURDATE(), INTERVAL 5 DAY);
-            ");
-            
-            \Illuminate\Support\Facades\DB::statement("SET FOREIGN_KEY_CHECKS = 1;");
-            return "Pedido Fake de R$ 100 criado com sucesso! Volte na tela de Contas a Receber e procure por 'CLIENTE TESTE WEBHOOK'.";
-        } catch (\Exception $e) {
-            return "Erro ao criar: " . $e->getMessage();
-        }
-    });
-
-    Route::get('/teste-cancelar', function() {
-        // Simula o que o importarPedidos faz quando recebe situação 4 ou 5
-        \Illuminate\Support\Facades\DB::statement("UPDATE PEDIDO SET SITUACAO_PEDIDO = 4, EXIBIR = 0 WHERE ID_PEDIDO = 888888888");
-        return "Pedido Fake Cancelado (EXIBIR = 0)! Volte na tela de Contas a Receber, atualize a página e veja que ele sumiu.";
-    });
-
-    Route::get('/teste-deletar', function() {
-        // Deleta fisicamente apenas o pedido de teste do banco
-        \Illuminate\Support\Facades\DB::statement("DELETE FROM PEDIDO WHERE ID_PEDIDO = 888888888");
-        return "Pedido deletado fisicamente! O cliente ainda existe no banco, mas como ele não tem mais parcelas a receber, ele também deve sumir da tela de Contas a Receber.";
-    });
-
     Route::any('/contas-receber/vincular-representantes', [ContasReceberController::class, 'vincularRepresentantes'])->name('vincular-reps-contas');
     Route::post('/contas-receber/baixar', [ContasReceberController::class, 'baixar'])->name('baixar-parcelas');
     Route::post('/contas-receber/recuperar', [ContasReceberController::class, 'recuperar'])->name('recuperar-parcelas');
-    Route::post('/contas-receber/api/parcelas-por-ids', [ContasReceberController::class, 'apiParcelasPorIds'])->name('api-parcelas-contas');
+    Route::any('/contas-receber/api/parcelas-por-ids', [ContasReceberController::class, 'apiParcelasPorIds'])->name('api-parcelas-contas');
     Route::get('/contas-receber/api/lista', [ContasReceberController::class, 'apiLista'])->name('api-lista-contas');
     Route::get('/contas-receber/api/detalhe', [ContasReceberController::class, 'apiDetalhe'])->name('api-detalhe-conta');
 
