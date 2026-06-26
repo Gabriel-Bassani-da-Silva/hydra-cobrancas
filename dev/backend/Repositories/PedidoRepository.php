@@ -907,4 +907,36 @@ class PedidoRepository {
             throw $e;
         }
     }
+
+    /**
+     * Busca os detalhes de vários pedidos pelo ID.
+     * Utilizado para o modal de baixa local agrupado.
+     */
+    public function getPedidosByIds(array $ids): array {
+        if (empty($ids)) return [];
+        
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        
+        $sql = "
+            SELECT 
+                p.ID_PEDIDO, 
+                p.NUM_PEDIDO, 
+                p.DATA_VENCIMENTO,
+                p.TOTAL_PEDIDO, 
+                p.VALOR_PAGO_BLING AS VALOR_PAGO,
+                p.SITUACAO_PEDIDO,
+                p.ID_CLIENTE,
+                c.NOME_CONTATO AS NOME_CLIENTE,
+                c.FANTASIA_CONTATO
+            FROM PEDIDO p
+            LEFT JOIN CONTATO_EXTERNO c ON p.ID_CLIENTE = c.ID_CONTATO_BLING
+            WHERE p.ID_PEDIDO IN ($placeholders)
+            ORDER BY p.DATA_VENCIMENTO ASC
+        ";
+
+        $stmt = DB::connection()->getPdo()->prepare($sql);
+        $stmt->execute(array_values($ids));
+        
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }
