@@ -1023,7 +1023,7 @@ function abrirModalBaixa(idsPedidos) {
             }
 
             renderParcelasModalBaixa();
-            document.getElementById('modal-baixa-manual').classList.remove('hidden');
+            document.getElementById('modal-baixa-manual').style.display = 'block';
         })
         .catch(err => {
             alert('Erro de conexão ao buscar parcelas.');
@@ -1031,7 +1031,7 @@ function abrirModalBaixa(idsPedidos) {
 }
 
 function fecharModalBaixa() {
-    document.getElementById('modal-baixa-manual').classList.add('hidden');
+    document.getElementById('modal-baixa-manual').style.display = 'none';
 }
 
 function renderParcelasModalBaixa() {
