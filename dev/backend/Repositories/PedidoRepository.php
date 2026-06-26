@@ -433,9 +433,10 @@ class PedidoRepository {
 
     public function getDivergencias(): array {
         $stmt = DB::connection()->getPdo()->query("
-            SELECT v.*, p.DATA_VENCIMENTO 
+            SELECT v.*, p.DATA_VENCIMENTO, p.ID_CLIENTE, c_ext.NUMERO_DOCUMENTO AS CPF_CNPJ
             FROM vw_divergencias_pagamento v
             JOIN PEDIDO p ON p.ID_PEDIDO = v.ID_PEDIDO
+            LEFT JOIN CONTATO_EXTERNO c_ext ON c_ext.ID_CONTATO_BLING = p.ID_CLIENTE
         ");
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
