@@ -109,11 +109,32 @@ class PerfilController extends Controller {
             }
         }
 
+        $minhasBaixas = [];
+        if ($aba === 'baixas') {
+            $minhasBaixas = \Illuminate\Support\Facades\DB::table('DETALHE_PAGAMENTO as dp')
+                ->join('REGISTRO_PAGAMENTO as rp', 'rp.ID_REGISTRO', '=', 'dp.ID_REGISTRO')
+                ->join('PEDIDO as p', 'p.ID_PEDIDO', '=', 'dp.ID_PEDIDO')
+                ->leftJoin('CONTATO_EXTERNO as c', 'c.ID_CONTATO_BLING', '=', 'p.ID_CLIENTE')
+                ->where('rp.ID_COLABORADOR', $idColaborador)
+                ->select(
+                    'dp.ID_DETALHE', 
+                    'dp.VALOR_PAGO_PEDIDO', 
+                    'rp.DATA_REGISTRO', 
+                    'p.NUM_PEDIDO', 
+                    'p.ID_PEDIDO', 
+                    'p.TOTAL_PEDIDO', 
+                    'c.NOME_CONTATO'
+                )
+                ->orderBy('rp.DATA_REGISTRO', 'desc')
+                ->get();
+        }
+
         return view('pages.perfil', [
             'aba' => $aba,
             'grupo' => $grupo,
             'minhasCobrancas' => $minhasCobrancas,
-            'cobrancasFinanceiros' => $cobrancasFinanceiros
+            'cobrancasFinanceiros' => $cobrancasFinanceiros,
+            'minhasBaixas' => $minhasBaixas
         ]);
     }
 

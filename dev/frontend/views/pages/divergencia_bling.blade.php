@@ -149,9 +149,12 @@ $formatMoney = function($value) {
                         <td class="valor-col" style="color: #64748b; font-weight: 500;"><?= $formatMoney($local) ?></td>
                         <td class="valor-col" style="color: #059669; font-weight: 600;"><?= $formatMoney($bling) ?></td>
                         <td class="valor-col" style="color: <?= $diffColor ?>; font-weight: 600;"><?= $diffSignal . $formatMoney($diferenca) ?></td>
-                        <td class="text-center">
+                        <td class="text-center" style="white-space: nowrap;">
                             <button onclick="abrirModalCorrigir(<?= $div['ID_PEDIDO'] ?>, <?= $local ?>)" title="Corrigir Baixa" class="btn-action-icon" style="border:none; background:transparent; cursor:pointer;">
                                 <x-icons.check width="16" height="16" />
+                            </button>
+                            <button onclick="estornarBaixaPedido(<?= $div['ID_PEDIDO'] ?>)" title="Estornar Baixas Locais" class="btn-action-icon" style="border:none; background:transparent; cursor:pointer; color: #64748b; margin-left: 4px;">
+                                <x-icons.trash width="16" height="16" />
                             </button>
                         </td>
                     </tr>
@@ -175,9 +178,12 @@ $formatMoney = function($value) {
                         <td class="valor-col" style="color: #64748b; font-weight: 500;"><?= $formatMoney($local) ?></td>
                         <td class="valor-col" style="color: #059669; font-weight: 600;"><?= $formatMoney($bling) ?></td>
                         <td class="valor-col" style="color: <?= $diffColor ?>; font-weight: 600;"><?= $diffSignal . $formatMoney($diferenca) ?></td>
-                        <td class="text-center">
+                        <td class="text-center" style="white-space: nowrap;">
                             <button onclick="abrirModalCorrigir(<?= $div['ID_PEDIDO'] ?>, <?= $local ?>)" title="Corrigir Baixa" class="btn-action-icon" style="border:none; background:transparent; cursor:pointer;">
                                 <x-icons.check width="16" height="16" />
+                            </button>
+                            <button onclick="estornarBaixaPedido(<?= $div['ID_PEDIDO'] ?>)" title="Estornar Baixas Locais" class="btn-action-icon" style="border:none; background:transparent; cursor:pointer; color: #64748b; margin-left: 4px;">
+                                <x-icons.trash width="16" height="16" />
                             </button>
                         </td>
                     </tr>
@@ -270,6 +276,30 @@ $formatMoney = function($value) {
                 window.location.reload();
             } else {
                 alert(res.error || 'Erro ao corrigir a baixa.');
+            }
+        })
+        .catch(err => {
+            alert('Erro de comunicação.');
+            console.error(err);
+        });
+    }
+
+    function estornarBaixaPedido(idPedido) {
+        if (!confirm('Deseja realmente estornar todas as baixas locais deste pedido? O valor voltará a ser o do Bling.')) {
+            return;
+        }
+
+        fetch('{{ url("/divergencias/estornar") }}', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_pedido: idPedido })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                window.location.reload();
+            } else {
+                alert(res.error || 'Erro ao estornar a baixa.');
             }
         })
         .catch(err => {

@@ -48,7 +48,59 @@ if (!function_exists('formatarCpfCnpj')) {
         <a href="{{ route('perfil-page') }}?aba=representantes" class="tab <?= $aba === 'representantes' ? 'active' : '' ?>">
             Representantes <span class="tab-count"><?= count($cobrancasRepresentantes ?? []) ?></span>
         </a>
+        <a href="{{ route('perfil-page') }}?aba=baixas" class="tab <?= $aba === 'baixas' ? 'active' : '' ?>">
+            Minhas Baixas <span class="tab-count"><?= count($minhasBaixas ?? []) ?></span>
+        </a>
     </div>
+
+    <?php if ($aba === 'baixas'): ?>
+    <div class="card" style="margin-top: 1.5rem;">
+        <div class="table-responsive">
+            <table class="cr-table" id="table-minhas-baixas">
+                <thead>
+                    <tr>
+                        <th>Data do Registro</th>
+                        <th>Pedido</th>
+                        <th>Cliente</th>
+                        <th class="valor-col">Valor Baixado</th>
+                        <th class="cr-col-acoes">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($minhasBaixas)): ?>
+                        <tr><td colspan="5" class="text-center">Você não possui nenhuma baixa manual.</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($minhasBaixas as $b): ?>
+                            <tr>
+                                <td><?= date('d/m/Y H:i', strtotime($b->DATA_REGISTRO)) ?></td>
+                                <td><?= htmlspecialchars($b->NUM_PEDIDO) ?></td>
+                                <td><?= htmlspecialchars($b->NOME_CONTATO) ?></td>
+                                <td class="valor-col">
+                                    <span class="valor-baixa-display" id="valor-display-<?= $b->ID_DETALHE ?>">R$ <?= number_format($b->VALOR_PAGO_PEDIDO, 2, ',', '.') ?></span>
+                                    <input type="number" step="0.01" min="0" class="input-edit-baixa" id="input-baixa-<?= $b->ID_DETALHE ?>" value="<?= number_format($b->VALOR_PAGO_PEDIDO, 2, '.', '') ?>" style="display:none; width: 100px; padding: 4px; text-align:right;">
+                                </td>
+                                <td class="cr-col-acoes">
+                                    <button class="btn-acao btn-edit" id="btn-edit-<?= $b->ID_DETALHE ?>" onclick="editarBaixa(<?= $b->ID_DETALHE ?>)" title="Editar Baixa">
+                                        <x-icons.pencil width="16" height="16" />
+                                    </button>
+                                    <button class="btn-acao btn-save" id="btn-save-<?= $b->ID_DETALHE ?>" onclick="salvarBaixa(<?= $b->ID_DETALHE ?>)" title="Salvar" style="display:none; color: #16a34a;">
+                                        <x-icons.check width="16" height="16" />
+                                    </button>
+                                    <button class="btn-acao btn-cancel" id="btn-cancel-<?= $b->ID_DETALHE ?>" onclick="cancelarEdicaoBaixa(<?= $b->ID_DETALHE ?>)" title="Cancelar" style="display:none; color: #64748b;">
+                                        <x-icons.x width="16" height="16" />
+                                    </button>
+                                    <button class="btn-acao btn-delete" onclick="estornarBaixa(<?= $b->ID_DETALHE ?>)" title="Estornar Baixa">
+                                        <x-icons.trash width="16" height="16" />
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <?php else: ?>
 
     <!-- Sub-Abas para Clientes e Representantes -->
     <div class="cr-sub-tabs">
@@ -175,6 +227,7 @@ if (!function_exists('formatarCpfCnpj')) {
             </table>
         </div>
     </div>
+    <?php endif; ?>
 </div>
 
 <!-- MODAL DE DETALHES -->

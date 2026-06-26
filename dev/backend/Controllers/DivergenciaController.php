@@ -43,12 +43,48 @@ class DivergenciaController extends Controller {
             ], $idColaborador);
             
             if ($sucesso) {
-                return response()->json(['success' => true]);
+                return response()->json(['success' => $sucesso]);
             } else {
                 return response()->json(['success' => false, 'error' => 'Falha ao registrar correção no banco de dados.']);
             }
         }
         
         return response()->json(['success' => true, 'msg' => 'Nenhuma alteração necessária.']);
+    }
+
+    public function estornarBaixa()
+    {
+        $idPedido = request()->input('id_pedido');
+
+        if (!$idPedido) {
+            return response()->json(['success' => false, 'error' => 'ID não informado.']);
+        }
+
+        try {
+            \Illuminate\Support\Facades\DB::beginTransaction();
+
+            $detalhes = \App\Models\DetalhePagamento::where('ID_PEDIDO', $idPedido)->get();
+            $registrosAfetados = $detalhes->pluck('ID_REGISTRO')->unique();
+
+            \App\Models\DetalhePagamento::where('ID_PEDIDO', $idPedido)->delete();
+
+            foreach ($registrosAfetados as $idRegistro) {
+                $count = \App\Models\DetalhePagamento::where('ID_REGISTRO', $idRegistro)->count();
+                if ($count == 0) {
+                    \Illuminate\Support\Facades\DB::table('REGISTRO_PAGAMENTO')->where('ID_REGISTRO', $idRegistro)->delete();
+                } else {
+                    $total = \App\Models\DetalhePagamento::where('ID_REGISTRO', $idRegistro)->sum('VALOR_PAGO_PEDIDO');
+                    \Illuminate\Support\Facades\DB::table('REGISTRO_PAGAMENTO')
+                        ->where('ID_REGISTRO', $idRegistro)
+                        ->update(['VALOR_REGISTRO' => $total]);
+                }
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            return response()->json(['success' => false, 'error' => 'Erro ao estornar baixa: ' . $e->getMessage()]);
+        }
     }
 }

@@ -228,3 +228,87 @@ window.toggleDetalhesPerfil = function(btnEl, id, nome, tipo) {
             body.innerHTML = `<p style="text-align:center;padding:24px;color:#ef4444;">Erro ao carregar detalhes.</p>`;
         });
 }
+
+// ── FUNÇÕES PARA EDIÇÃO E ESTORNO DE BAIXAS LOCAIS ────────────────────────────────────────
+
+function editarBaixa(idDetalhe) {
+    document.getElementById('valor-display-' + idDetalhe).style.display = 'none';
+    document.getElementById('input-baixa-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('input-baixa-' + idDetalhe).focus();
+    
+    document.getElementById('btn-edit-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-save-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('btn-cancel-' + idDetalhe).style.display = 'inline-block';
+}
+
+function cancelarEdicaoBaixa(idDetalhe) {
+    document.getElementById('valor-display-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('input-baixa-' + idDetalhe).style.display = 'none';
+    
+    document.getElementById('btn-edit-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('btn-save-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-cancel-' + idDetalhe).style.display = 'none';
+}
+
+function salvarBaixa(idDetalhe) {
+    const input = document.getElementById('input-baixa-' + idDetalhe);
+    const novoValor = parseFloat(input.value);
+
+    if (isNaN(novoValor) || novoValor < 0) {
+        alert("Valor inválido.");
+        return;
+    }
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    fetch((typeof BASE_URL !== 'undefined' ? BASE_URL : '') + '/baixas/editar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({
+            id_detalhe: idDetalhe,
+            valor: novoValor
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Erro: ' + (data.error || 'Falha ao editar baixa.'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Erro ao editar baixa.');
+    });
+}
+
+function estornarBaixa(idDetalhe) {
+    if (!confirm("Deseja estornar (apagar) este registro de baixa local?")) return;
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    fetch((typeof BASE_URL !== 'undefined' ? BASE_URL : '') + '/baixas/estornar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify({
+            id_detalhe: idDetalhe
+        })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Erro: ' + (data.error || 'Falha ao estornar baixa.'));
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Erro ao estornar baixa.');
+    });
+}

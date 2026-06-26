@@ -124,9 +124,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/contatos/importar/confirmar', [ContatosController::class, 'confirmarImportacao'])->name('confirmar-importacao');
     Route::get('/contatos/importar/log', [ContatosController::class, 'logImportacao'])->name('log-importacao-page');
 
+    Route::post('/cobrancas/marcar-pago', [ContasReceberController::class, 'marcarPagoLocal']);
+    Route::post('/contas-receber/baixar', [ContasReceberController::class, 'baixarManual']);
+
+    Route::post('/baixas/editar', [\App\Controllers\BaixaController::class, 'editar']);
+    Route::post('/baixas/estornar', [\App\Controllers\BaixaController::class, 'estornar']);
+
     // Divergências
     Route::get('/divergencias', [DivergenciaController::class, 'index'])->name('divergencias-page');
     Route::post('/divergencias/corrigir-baixa', [DivergenciaController::class, 'corrigirBaixa'])->name('corrigir-baixa');
+    Route::post('/divergencias/estornar', [DivergenciaController::class, 'estornarBaixa']);
 
     // Perfil
     Route::get('/perfil', [PerfilController::class, 'index'])->name('perfil-page');
