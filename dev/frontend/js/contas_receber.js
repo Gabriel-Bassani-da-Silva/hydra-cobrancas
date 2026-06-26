@@ -1043,7 +1043,7 @@ function estornarBaixa(idDetalhe) {
     }
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     
-    fetch(`${BASE}/perfil/baixa/estornar`, {
+    fetch(`${BASE}/baixas/estornar`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
