@@ -108,6 +108,20 @@ $formatMoney = function($value) {
 
 @include('components.modal_baixa_manual')
 
+<!-- Modal Detalhes (usado por abrirModalDivergencias) -->
+<div id="modal-detalhes" class="cr-modal" style="display: none;">
+    <div class="cr-modal-overlay"></div>
+    <div class="cr-modal-container cr-modal-container--wide">
+        <div class="cr-modal-header">
+            <h3 class="cr-modal-title" id="modal-detalhes-title">Detalhes</h3>
+            <button class="cr-modal-close" id="modal-detalhes-close">&times;</button>
+        </div>
+        <div class="cr-modal-body" id="modal-detalhes-body">
+            <!-- Conteúdo carregado via JS -->
+        </div>
+    </div>
+</div>
+
 <!-- Modal Corrigir Baixa -->
 <div id="modal-corrigir-baixa" class="cr-modal" style="display: none;">
     <div class="cr-modal-overlay"></div>
@@ -239,7 +253,59 @@ $formatMoney = function($value) {
             });
     }
 </script>
-@include('components.modal_detalhes_contas')
+<script>
+function estornarBaixa(idDetalhe) {
+    if (!confirm('Deseja realmente estornar esta baixa local?')) return;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    fetch(BASE_URL + '/baixas/estornar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({ id_detalhe: idDetalhe })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) { alert('Baixa estornada!'); location.reload(); }
+        else { alert('Erro: ' + (data.error || 'Falha ao estornar.')); }
+    })
+    .catch(() => alert('Erro de comunicação.'));
+}
+function editarBaixa(idDetalhe) {
+    document.getElementById('valor-display-' + idDetalhe).style.display = 'none';
+    document.getElementById('input-baixa-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('input-baixa-' + idDetalhe).focus();
+    document.getElementById('btn-edit-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-save-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('btn-cancel-' + idDetalhe).style.display = 'inline-block';
+}
+function cancelarEdicaoBaixa(idDetalhe) {
+    document.getElementById('valor-display-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('input-baixa-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-edit-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('btn-save-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-cancel-' + idDetalhe).style.display = 'none';
+}
+function salvarBaixa(idDetalhe) {
+    const input = document.getElementById('input-baixa-' + idDetalhe);
+    const novoValor = parseFloat(input.value);
+    if (isNaN(novoValor) || novoValor < 0) { alert('Valor inválido.'); return; }
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    fetch(BASE_URL + '/baixas/editar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({ id_detalhe: idDetalhe, valor: novoValor })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) { location.reload(); }
+        else { alert('Erro: ' + (data.error || 'Falha ao editar.')); }
+    })
+    .catch(() => alert('Erro de comunicação.'));
+}
+document.addEventListener('DOMContentLoaded', function() {
+    const btnClose = document.getElementById('modal-detalhes-close');
+    if (btnClose) { btnClose.addEventListener('click', () => { document.getElementById('modal-detalhes').style.display = 'none'; }); }
+});
+</script>
 <script src="{{ asset('js/baixa_manual.js') }}?v=<?= time() ?>"></script>
 
 @endsection

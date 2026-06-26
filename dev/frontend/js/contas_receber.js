@@ -1062,3 +1062,38 @@ function estornarBaixa(idDetalhe) {
     })
     .catch(() => alert('Erro de comunicação.'));
 }
+
+function editarBaixa(idDetalhe) {
+    document.getElementById('valor-display-' + idDetalhe).style.display = 'none';
+    document.getElementById('input-baixa-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('input-baixa-' + idDetalhe).focus();
+    document.getElementById('btn-edit-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-save-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('btn-cancel-' + idDetalhe).style.display = 'inline-block';
+}
+
+function cancelarEdicaoBaixa(idDetalhe) {
+    document.getElementById('valor-display-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('input-baixa-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-edit-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('btn-save-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-cancel-' + idDetalhe).style.display = 'none';
+}
+
+function salvarBaixa(idDetalhe) {
+    const input = document.getElementById('input-baixa-' + idDetalhe);
+    const novoValor = parseFloat(input.value);
+    if (isNaN(novoValor) || novoValor < 0) { alert('Valor inv\u00e1lido.'); return; }
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    fetch(`${BASE}/baixas/editar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({ id_detalhe: idDetalhe, valor: novoValor })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) { location.reload(); }
+        else { alert('Erro: ' + (data.error || 'Falha ao editar baixa.')); }
+    })
+    .catch(() => alert('Erro de comunica\u00e7\u00e3o.'));
+}
