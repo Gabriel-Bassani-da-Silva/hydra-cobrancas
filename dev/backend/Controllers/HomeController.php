@@ -11,8 +11,13 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Aqui teremos a lógica migrada do HomeController.php antigo.
-        // Temporariamente, vou retornar a view dashboard para manter a tela inicial funcionando.
-        return view('dashboard');
+        $ranking = \Illuminate\Support\Facades\DB::table('REGISTRO_PAGAMENTO as rp')
+            ->join('COLABORADOR as c', 'rp.ID_COLABORADOR', '=', 'c.ID_COLABORADOR')
+            ->select('c.NOME_COLABORADOR', \Illuminate\Support\Facades\DB::raw('SUM(rp.VALOR_REGISTRO) as TOTAL_RECEBIDO'), \Illuminate\Support\Facades\DB::raw('COUNT(rp.ID_REGISTRO) as QTD_BAIXAS'))
+            ->groupBy('c.ID_COLABORADOR', 'c.NOME_COLABORADOR')
+            ->orderByDesc('TOTAL_RECEBIDO')
+            ->get();
+
+        return view('dashboard', ['ranking' => $ranking]);
     }
 }
