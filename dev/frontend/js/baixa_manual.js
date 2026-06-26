@@ -7,6 +7,24 @@ function getBaseUrl() {
     return '';
 }
 
+// ── Funções Auxiliares ──────────────────────────────────────────────────────────
+if (typeof formatCurrency !== 'function') {
+    window.formatCurrency = function(value) {
+        return new Intl.NumberFormat('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        }).format(value || 0);
+    };
+}
+
+if (typeof formatDate !== 'function') {
+    window.formatDate = function(dateStr) {
+        if (!dateStr || dateStr === '0000-00-00') return '—';
+        const [y, m, d] = dateStr.split(' ')[0].split('-');
+        return `${d}/${m}/${y}`;
+    };
+}
+
 function abrirModalBaixa(idsPedidos) {
     if (!idsPedidos) return;
     
