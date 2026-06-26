@@ -175,9 +175,14 @@ $formatMoney = function($value) {
             return;
         }
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
         fetch(BASE_URL + '/divergencias/corrigir-baixa', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
             body: JSON.stringify({ id_pedido: idPedido, novo_valor: novoValor })
         })
         .then(r => r.json())
@@ -199,9 +204,14 @@ $formatMoney = function($value) {
             return;
         }
 
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
         fetch('{{ url("/divergencias/estornar") }}', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
             body: JSON.stringify({ id_pedido: idPedido })
         })
         .then(r => r.json())
