@@ -52,7 +52,7 @@ class BlingWebhookController extends Controller {
             }
 
             try {
-                if (strpos($evento, 'conta.receber') !== false) {
+                if (strpos($evento, 'conta.receber') !== false || strpos($evento, 'contas.receber') !== false) {
                     $conta = $this->blingService->getContaReceber($idBling);
                     if ($conta) {
                         $this->pedidoRepository->importarPedidos([$conta], $this->blingService, 'upsert');
