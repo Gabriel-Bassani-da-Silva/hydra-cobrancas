@@ -379,7 +379,6 @@ class PedidoRepository {
                 p.SITUACAO_EFETIVA AS SITUACAO_PEDIDO,
                 p.ID_CLIENTE,
                 c_ext.NOME_CONTATO AS NOME_CLIENTE,
-                c_ext.FANTASIA_CONTATO,
                 r_ext.NOME_CONTATO AS NOME_REPRESENTANTE
             FROM " . $this->getPedidoBaseSql() . " p
             LEFT JOIN CONTATO_EXTERNO c_ext ON c_ext.ID_CONTATO_BLING = p.ID_CLIENTE
