@@ -159,7 +159,7 @@ function renderParcelasModalBaixa() {
                             <div style="display:flex; align-items:center; gap: 8px; width: 220px;">
                                 <div style="position:relative; flex:1;">
                                     <span style="position:absolute; left:8px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:0.85rem;">R$</span>
-                                    <input type="number" step="0.01" min="0" max="${p._devendo.toFixed(2)}" class="input-baixa-valor grupo-input-${gIdx}" id="input-baixa-${p._idx}" data-id="${p.ID_PEDIDO}" data-idx="${p._idx}" value="0.00" style="width:100%; padding:6px 6px 6px 26px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.9rem; text-align:right; font-weight: 500;" oninput="atualizarTotalBaixa()">
+                                    <input type="number" step="0.01" min="0" data-max="${p._devendo.toFixed(2)}" class="input-baixa-valor grupo-input-${gIdx}" id="input-baixa-${p._idx}" data-id="${p.ID_PEDIDO}" data-idx="${p._idx}" value="0.00" style="width:100%; padding:6px 6px 6px 26px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.9rem; text-align:right; font-weight: 500;" oninput="atualizarTotalBaixa()">
                                 </div>
                                 <label style="display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding: 4px; border-radius: 4px;">
                                     <input type="checkbox" id="check-parcela-${p._idx}" class="checkbox-parcela-${gIdx}" onchange="toggleBaixaParcela(${p._idx}, ${p._devendo.toFixed(2)}, this.checked)" style="width:16px; height:16px; cursor:pointer; accent-color: #2563eb; margin:0;" title="Preencher Total">
@@ -191,7 +191,7 @@ function toggleBaixarTudoCheckbox(isChecked) {
     });
     document.querySelectorAll('.input-baixa-valor').forEach(input => {
         if (isChecked) {
-            input.value = parseFloat(input.getAttribute('max')).toFixed(2);
+            input.value = parseFloat(input.getAttribute('data-max')).toFixed(2);
         } else {
             input.value = '0.00';
         }
@@ -202,7 +202,7 @@ function toggleBaixarTudoCheckbox(isChecked) {
 function toggleBaixaGrupo(gIdx, isChecked) {
     document.querySelectorAll(`.grupo-input-${gIdx}`).forEach(input => {
         if (isChecked) {
-            input.value = parseFloat(input.getAttribute('max')).toFixed(2);
+            input.value = parseFloat(input.getAttribute('data-max')).toFixed(2);
         } else {
             input.value = '0.00';
         }
@@ -227,7 +227,7 @@ function toggleBaixaParcela(idx, maxValor, isChecked) {
 
 function baixarTodasParcelas() {
     document.querySelectorAll('.input-baixa-valor').forEach(input => {
-        input.value = parseFloat(input.getAttribute('max')).toFixed(2);
+        input.value = parseFloat(input.getAttribute('data-max')).toFixed(2);
     });
     atualizarTotalBaixa();
 }
@@ -247,8 +247,8 @@ function confirmarBaixa() {
     
     inputs.forEach(input => {
         const val = parseFloat(input.value || 0);
-        const max = parseFloat(input.getAttribute('max'));
-        if (val < 0 || val > max) {
+        
+        if (val < 0) {
             hasInvalid = true;
             input.style.borderColor = 'red';
         } else {
@@ -264,7 +264,7 @@ function confirmarBaixa() {
     });
 
     if (hasInvalid) {
-        alert("Alguns valores são maiores que o valor pendente ou inválidos. Corrija-os.");
+        alert("Valor inválido. Não é possível inserir valores negativos.");
         return;
     }
 

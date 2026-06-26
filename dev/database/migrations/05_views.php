@@ -117,7 +117,8 @@ return new class extends Migration
             LEFT JOIN `CONTATO_EXTERNO` `c_ext` ON `c_ext`.`ID_CONTATO_BLING` = `p`.`ID_CLIENTE`
             LEFT JOIN `REGISTRO_PAGAMENTO` `rp` ON `rp`.`ID_REGISTRO` = `dp`.`ULTIMO_REGISTRO`
             LEFT JOIN `COLABORADOR` `colab` ON `colab`.`ID_COLABORADOR` = `rp`.`ID_COLABORADOR` 
-            WHERE `p`.`VALOR_PAGO_BLING` <> `dp`.`PAGO_LOCAL`;
+            WHERE `p`.`VALOR_PAGO_BLING` <> `dp`.`PAGO_LOCAL` 
+            AND `p`.`VALOR_PAGO_BLING` < `p`.`TOTAL_PEDIDO`;
         ");
 
         DB::unprepared("

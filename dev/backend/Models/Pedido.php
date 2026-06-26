@@ -38,4 +38,13 @@ class Pedido extends Model
             'ID_COBRANCA'
         );
     }
+
+    public function detalhesPagamento()
+    {
+        return $this->hasMany(
+            \App\Models\DetalhePagamento::class,
+            'ID_PEDIDO',
+            'ID_PEDIDO'
+        );
+    }
 }

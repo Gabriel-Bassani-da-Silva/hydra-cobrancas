@@ -77,13 +77,15 @@ class CobrancaService {
         $clientesIds = $cobranca->clientes()->pluck('CLIENTE.ID_CONTATO_BLING')->toArray();
         if (empty($clientesIds)) return;
 
-        // Pega pedidos elegíveis
-        $pedidosIds = DB::table('PEDIDO')
-            ->whereIn('ID_CLIENTE', $clientesIds)
-            ->whereIn('SITUACAO_PEDIDO', [1, 3])
-            ->where('DATA_VENCIMENTO', '<', DB::raw('CURDATE()'))
-            ->where('EXIBIR', 1)
-            ->pluck('ID_PEDIDO')
+        // Pega pedidos elegíveis considerando pagamento efetivo (Bling ou Local)
+        $pedidosIds = DB::table('PEDIDO as p')
+            ->leftJoin(DB::raw('(SELECT ID_PEDIDO, SUM(VALOR_PAGO_PEDIDO) AS PAGO_LOCAL FROM DETALHE_PAGAMENTO GROUP BY ID_PEDIDO) as dp'), 'dp.ID_PEDIDO', '=', 'p.ID_PEDIDO')
+            ->whereIn('p.ID_CLIENTE', $clientesIds)
+            ->whereIn('p.SITUACAO_PEDIDO', [1, 3])
+            ->where('p.DATA_VENCIMENTO', '<', DB::raw('CURDATE()'))
+            ->where('p.EXIBIR', 1)
+            ->where(DB::raw('GREATEST(p.VALOR_PAGO_BLING, COALESCE(dp.PAGO_LOCAL, 0))'), '<', DB::raw('p.TOTAL_PEDIDO'))
+            ->pluck('p.ID_PEDIDO')
             ->toArray();
 
         if (!empty($pedidosIds)) {

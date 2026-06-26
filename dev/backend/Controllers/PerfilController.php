@@ -27,9 +27,18 @@ class PerfilController extends Controller {
                 $isCfRepresentante = $c->contatoFinanceiro->representantes->isNotEmpty();
             }
 
-            $totalDivida = $c->pedidos->sum(function ($p) {
-                return $p->TOTAL_PEDIDO - $p->VALOR_PAGO_BLING;
-            });
+            $totalDivida = 0;
+            $qtdPedidos = 0;
+
+            foreach ($c->pedidos as $p) {
+                $pagoLocal = $p->detalhesPagamento->sum('VALOR_PAGO_PEDIDO');
+                $pagoEfetivo = max((float)$p->VALOR_PAGO_BLING, (float)$pagoLocal);
+                
+                if ($pagoEfetivo < (float)$p->TOTAL_PEDIDO) {
+                    $totalDivida += ((float)$p->TOTAL_PEDIDO - $pagoEfetivo);
+                    $qtdPedidos++;
+                }
+            }
 
             $clientes = $c->clientes->map(function ($cliente) {
                 return [
@@ -50,7 +59,7 @@ class PerfilController extends Controller {
                 'NOME_FINANCEIRO' => $c->contatoFinanceiro->NOME_CONTATO ?? null,
                 'NOME_REPRESENTANTE' => $c->representante->contatoExterno->NOME_CONTATO ?? null,
                 'TOTAL_DIVIDA' => $totalDivida,
-                'QTD_PEDIDOS' => $c->pedidos->count(),
+                'QTD_PEDIDOS' => $qtdPedidos,
                 'IS_CF_REPRESENTANTE' => $isCfRepresentante,
                 'CLIENTES' => $clientes
             ];
