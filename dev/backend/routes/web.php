@@ -58,6 +58,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/contas-receber/api/lista', [ContasReceberController::class, 'apiLista'])->name('api-lista-contas');
     Route::get('/contas-receber/api/detalhe', [ContasReceberController::class, 'apiDetalhe'])->name('api-detalhe-conta');
 
+    Route::get('/debug-erro', function() {
+        ob_start();
+        try {
+            require_once __DIR__ . '/../Controllers/ContasReceberController.php';
+            echo "Controller OK. ";
+            $controller = new \App\Controllers\ContasReceberController();
+            echo "Instanciou OK. ";
+        } catch (\Throwable $e) {
+            echo "Erro Fatal: " . $e->getMessage() . " na linha " . $e->getLine() . " do arquivo " . $e->getFile();
+        }
+        return ob_get_clean();
+    });
+
     // Contatos
     Route::get('/contatos', [ContatosController::class, 'index'])->name('contatos-page');
     Route::post('/contatos/salvar-telefone', [ContatosController::class, 'salvarTelefone'])->name('salvar-telefone-contato');
