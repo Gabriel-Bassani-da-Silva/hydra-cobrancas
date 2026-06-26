@@ -131,8 +131,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/baixas/editar', [\App\Controllers\BaixaController::class, 'editar']);
     Route::post('/baixas/estornar', [\App\Controllers\BaixaController::class, 'estornar']);
 
-    // Divergências
-    Route::get('/divergencias', [DivergenciaController::class, 'index'])->name('divergencia-bling');
+    // Divergências (ações, sem página própria — integrado na aba Baixas do Contas a Receber)
     Route::get('/divergencias/api-divergencias-cliente', [DivergenciaController::class, 'apiDivergenciasCliente']);
     Route::post('/divergencias/corrigir-baixa', [DivergenciaController::class, 'corrigirBaixa'])->name('corrigir-baixa');
     Route::post('/divergencias/estornar', [DivergenciaController::class, 'estornarBaixa']);

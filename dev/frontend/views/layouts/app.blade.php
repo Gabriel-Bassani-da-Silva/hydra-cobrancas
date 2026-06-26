@@ -43,10 +43,6 @@
                     <span>Contas</span>
                 </a>
 
-                <a href="{{ url('/divergencias') }}" class="header-icon-btn" title="Divergência Bling">
-                    <x-icons.icon-9 width="20" height="20" />
-                    <span>Divergência Bling</span>
-                </a>
 
                 <a href="{{ url('/perfil') }}" class="header-icon-btn profile" title="Meu Perfil">
                     <x-icons.icon-10 />

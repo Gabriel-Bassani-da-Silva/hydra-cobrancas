@@ -150,6 +150,7 @@ class ContasReceberController extends Controller {
         }
         
         $todasBaixas = [];
+        $divergencias = [];
         if ($aba === 'baixas') {
             $todasBaixas = \Illuminate\Support\Facades\DB::table('DETALHE_PAGAMENTO as dp')
                 ->join('REGISTRO_PAGAMENTO as rp', 'rp.ID_REGISTRO', '=', 'dp.ID_REGISTRO')
@@ -165,6 +166,10 @@ class ContasReceberController extends Controller {
                 ->groupBy('p.ID_CLIENTE', 'c.NOME_CONTATO')
                 ->orderBy('ULTIMA_BAIXA', 'desc')
                 ->get();
+
+            // Carregar divergências para filtro inline
+            $pedidoModel = new PedidoRepository();
+            $divergencias = $pedidoModel->getDivergencias();
         }
 
         $totalInadimplenteFiltrado = $totalBannerVermelho;
@@ -184,7 +189,8 @@ class ContasReceberController extends Controller {
             'cobrancasAtivas' => $cobrancasAtivas,
             'exibirAte' => $exibirAte,
             'exibirAPartirDe' => $exibirAPartirDe,
-            'todasBaixas' => $todasBaixas
+            'todasBaixas' => $todasBaixas,
+            'divergencias' => $divergencias
         ]);
     }
 

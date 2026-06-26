@@ -274,7 +274,48 @@ $isPagos = request('status') === 'pagos';
 
     <!-- ABA: BAIXAS -->
     <?php if ($aba === 'baixas'): ?>
-    <div class="card">
+    <?php
+        // Agrupar divergências por cliente
+        $gruposDivergencias = [];
+        $totalDivergencia = 0;
+        foreach ($divergencias ?? [] as $div) {
+            $nomeCli = !empty($div['NOME_CLIENTE']) ? $div['NOME_CLIENTE'] : 'Não Informado';
+            $idCliKey = !empty($div['ID_CLIENTE']) ? $div['ID_CLIENTE'] : $nomeCli;
+            if (!isset($gruposDivergencias[$idCliKey])) {
+                $gruposDivergencias[$idCliKey] = ['id' => $idCliKey, 'nomeCli' => $nomeCli, 'total_diferenca' => 0, 'total_local' => 0, 'total_bling' => 0, 'qtd_pedidos' => 0, 'pedidos_unicos' => []];
+            }
+            $keyPed = !empty($div['NUM_PEDIDO']) && $div['NUM_PEDIDO'] !== '—' ? $div['NUM_PEDIDO'] : 'SEM_NUM_' . $div['ID_PEDIDO'];
+            if (!isset($gruposDivergencias[$idCliKey]['pedidos_unicos'][$keyPed])) {
+                $gruposDivergencias[$idCliKey]['pedidos_unicos'][$keyPed] = true;
+                $gruposDivergencias[$idCliKey]['qtd_pedidos']++;
+            }
+            $local = (float)$div['VALOR_PAGO_LOCAL']; $bling = (float)$div['VALOR_PAGO_BLING']; $diferenca = abs($local - $bling);
+            $totalDivergencia += $diferenca;
+            $gruposDivergencias[$idCliKey]['total_diferenca'] += $diferenca;
+            $gruposDivergencias[$idCliKey]['total_local'] += $local;
+            $gruposDivergencias[$idCliKey]['total_bling'] += $bling;
+        }
+        $temDivergencias = !empty($gruposDivergencias);
+    ?>
+    <!-- Sub-abas das Baixas: Todas / Divergentes -->
+    <div class="cr-sub-tabs">
+        <div class="cr-sub-tabs-group">
+            <button id="btn-baixas-todas" class="sub-tab-btn active" onclick="setBaixasFiltro('todas')">
+                Todas <span class="tab-count"><?= count($todasBaixas ?? []) ?></span>
+            </button>
+            <button id="btn-baixas-divergentes" class="sub-tab-btn <?= $temDivergencias ? 'sub-tab-warning' : '' ?>" onclick="setBaixasFiltro('divergentes')">
+                ⚠ Divergentes <span class="tab-count"><?= count($gruposDivergencias) ?></span>
+            </button>
+        </div>
+        <?php if ($temDivergencias): ?>
+        <div class="cr-total-inadimplente" style="color: #ef4444;">
+            Total de Divergências:&nbsp;<span>R$ <?= number_format($totalDivergencia, 2, ',', '.') ?></span>
+        </div>
+        <?php endif; ?>
+    </div>
+
+    <!-- PAINEL: Todas as Baixas -->
+    <div id="painel-baixas-todas" class="card">
         <div class="table-responsive">
             <table class="cr-table" id="table-baixas">
                 <thead>
@@ -299,6 +340,46 @@ $isPagos = request('status') === 'pagos';
                         <?php endforeach; ?>
                     <?php endif; ?>
                 </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- PAINEL: Apenas Divergentes -->
+    <div id="painel-baixas-divergentes" class="card" style="display: none;">
+        <div class="table-responsive">
+            <table class="cr-table" id="table-divergencias">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Qtd. Pedidos</th>
+                        <th class="valor-col" style="color: #64748b;">Pago Local (Hydra)</th>
+                        <th class="valor-col" style="color: #059669;">Pago API (Bling)</th>
+                        <th class="valor-col">Divergência</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if (empty($gruposDivergencias)): ?>
+                        <tr><td colspan="5" class="text-center" style="padding: 2rem; color: #64748b;">Nenhuma divergência encontrada. Tudo sincronizado! ✓</td></tr>
+                    <?php else: ?>
+                        <?php foreach ($gruposDivergencias as $grupo): ?>
+                        <tr onclick="abrirModalDivergencias('<?= $grupo['id'] ?>')" style="cursor:pointer;" class="hover-row">
+                            <td><?= htmlspecialchars($grupo['nomeCli']) ?></td>
+                            <td><?= $grupo['qtd_pedidos'] ?></td>
+                            <td class="valor-col">R$ <?= number_format($grupo['total_local'], 2, ',', '.') ?></td>
+                            <td class="valor-col">R$ <?= number_format($grupo['total_bling'], 2, ',', '.') ?></td>
+                            <td class="valor-col" style="color: #ef4444; font-weight: 600;">R$ <?= number_format($grupo['total_diferenca'], 2, ',', '.') ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+                <?php if (!empty($gruposDivergencias)): ?>
+                <tfoot>
+                    <tr style="background-color: #f8fafc; font-weight: bold; border-top: 2px solid #e2e8f0;">
+                        <td colspan="4" style="text-align: right; padding-right: 1rem; color: #475569;">Somatório Total das Diferenças:</td>
+                        <td class="valor-col" style="color: #ef4444; font-weight: 700;">R$ <?= number_format($totalDivergencia, 2, ',', '.') ?></td>
+                    </tr>
+                </tfoot>
+                <?php endif; ?>
             </table>
         </div>
     </div>
@@ -370,8 +451,156 @@ $isPagos = request('status') === 'pagos';
     </div>
 </div>
 
+<!-- Modal Corrigir Baixa (Divergências) -->
+<div id="modal-corrigir-baixa" class="cr-modal" style="display: none;">
+    <div class="cr-modal-overlay"></div>
+    <div class="cr-modal-container modal-container-md" style="max-width: 400px; padding: 20px;">
+        <div class="cr-modal-header">
+            <h3 class="cr-modal-title">Corrigir Baixa Local</h3>
+            <button class="cr-modal-close" onclick="fecharModalCorrigirBaixa()">&times;</button>
+        </div>
+        <div class="cr-modal-body">
+            <p>Digite o <strong>novo valor total</strong> que deveria constar como pago localmente para este pedido.</p>
+            <input type="hidden" id="corrigir-id-pedido" value="">
+            <div style="margin-top: 15px;">
+                <label for="corrigir-novo-valor" style="font-weight:600; display:block; margin-bottom:5px;">Novo Valor (R$)</label>
+                <input type="number" id="corrigir-novo-valor" step="0.01" min="0" class="cr-input" style="width:100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
+            </div>
+            <div class="modal-actions-between" style="margin-top: 20px; justify-content: flex-end;">
+                <div class="modal-actions">
+                    <button class="btn-modal-cancel" onclick="fecharModalCorrigirBaixa()">Cancelar</button>
+                    <button class="btn-modal-confirm-blue" onclick="confirmarCorrecaoBaixa()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Salvar Correção
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{ asset('js/baixa_manual.js') }}?v=<?= time() ?>"></script>
 <script src="{{ asset('js/contas_receber.js') }}?v=<?= time() ?>"></script>
+
+<script>
+const BASE_URL = "{{ url('/') }}";
+
+// Toggle sub-painéis das Baixas
+function setBaixasFiltro(filtro) {
+    const btnTodas = document.getElementById('btn-baixas-todas');
+    const btnDiv   = document.getElementById('btn-baixas-divergentes');
+    const painelTodas = document.getElementById('painel-baixas-todas');
+    const painelDiv   = document.getElementById('painel-baixas-divergentes');
+    if (!btnTodas) return;
+    if (filtro === 'todas') {
+        btnTodas.classList.add('active'); btnDiv.classList.remove('active');
+        painelTodas.style.display = ''; painelDiv.style.display = 'none';
+    } else {
+        btnDiv.classList.add('active'); btnTodas.classList.remove('active');
+        painelDiv.style.display = ''; painelTodas.style.display = 'none';
+    }
+}
+
+// Modal divergências — abre detalhes por cliente
+function abrirModalDivergencias(idCliente) {
+    const modal = document.getElementById('modal-detalhes');
+    if (!modal) return;
+    const title = document.getElementById('modal-detalhes-title');
+    const body  = document.getElementById('modal-detalhes-body');
+    title.innerText = 'Divergências do Cliente';
+    body.innerHTML  = '<div class="text-center" style="padding: 20px;">Carregando divergências...</div>';
+    modal.style.display = 'flex';
+    fetch(`${BASE_URL}/divergencias/api-divergencias-cliente?id=${idCliente}`)
+        .then(res => res.json())
+        .then(data => {
+            if (data.html) { body.innerHTML = data.html; }
+            else { body.innerHTML = '<div class="text-center" style="padding:20px;color:red;">' + (data.error || 'Erro ao carregar') + '</div>'; }
+        })
+        .catch(() => { body.innerHTML = '<div class="text-center" style="padding:20px;color:red;">Erro na requisição.</div>'; });
+}
+
+// Corrigir baixa local
+function abrirModalCorrigir(idPedido, atualPago) {
+    document.getElementById('corrigir-id-pedido').value = idPedido;
+    document.getElementById('corrigir-novo-valor').value = atualPago;
+    document.getElementById('modal-corrigir-baixa').style.display = 'flex';
+}
+function fecharModalCorrigirBaixa() {
+    document.getElementById('modal-corrigir-baixa').style.display = 'none';
+}
+function confirmarCorrecaoBaixa() {
+    const idPedido  = document.getElementById('corrigir-id-pedido').value;
+    const novoValor = document.getElementById('corrigir-novo-valor').value;
+    if (!idPedido || novoValor === '') { alert('Por favor, informe o novo valor.'); return; }
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    fetch(BASE_URL + '/divergencias/corrigir-baixa', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({ id_pedido: idPedido, novo_valor: novoValor })
+    })
+    .then(r => r.json())
+    .then(res => { if (res.success) { window.location.reload(); } else { alert(res.error || 'Erro ao corrigir a baixa.'); } })
+    .catch(() => alert('Erro de comunicação.'));
+}
+
+// Estornar baixas de um pedido inteiro
+function estornarBaixaPedido(idPedido) {
+    if (!confirm('Deseja realmente estornar todas as baixas locais deste pedido?')) return;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    fetch(BASE_URL + '/divergencias/estornar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({ id_pedido: idPedido })
+    })
+    .then(r => r.json())
+    .then(res => { if (res.success) { window.location.reload(); } else { alert(res.error || 'Erro ao estornar.'); } })
+    .catch(() => alert('Erro de comunicação.'));
+}
+
+// Estornar detalhe individual
+function estornarBaixa(idDetalhe) {
+    if (!confirm('Deseja realmente estornar esta baixa local?')) return;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    fetch(BASE_URL + '/baixas/estornar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({ id_detalhe: idDetalhe })
+    })
+    .then(r => r.json())
+    .then(data => { if (data.success) { alert('Baixa estornada!'); location.reload(); } else { alert('Erro: ' + (data.error || 'Falha ao estornar.')); } })
+    .catch(() => alert('Erro de comunicação.'));
+}
+
+// Editar baixa inline
+function editarBaixa(idDetalhe) {
+    document.getElementById('valor-display-' + idDetalhe).style.display = 'none';
+    document.getElementById('input-baixa-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('input-baixa-' + idDetalhe).focus();
+    document.getElementById('btn-edit-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-save-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('btn-cancel-' + idDetalhe).style.display = 'inline-block';
+}
+function cancelarEdicaoBaixa(idDetalhe) {
+    document.getElementById('valor-display-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('input-baixa-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-edit-' + idDetalhe).style.display = 'inline-block';
+    document.getElementById('btn-save-' + idDetalhe).style.display = 'none';
+    document.getElementById('btn-cancel-' + idDetalhe).style.display = 'none';
+}
+function salvarBaixa(idDetalhe) {
+    const novoValor = parseFloat(document.getElementById('input-baixa-' + idDetalhe).value);
+    if (isNaN(novoValor) || novoValor < 0) { alert('Valor inválido.'); return; }
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    fetch(BASE_URL + '/baixas/editar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+        body: JSON.stringify({ id_detalhe: idDetalhe, valor: novoValor })
+    })
+    .then(r => r.json())
+    .then(data => { if (data.success) { location.reload(); } else { alert('Erro: ' + (data.error || 'Falha ao editar.')); } })
+    .catch(() => alert('Erro de comunicação.'));
+}
+</script>
 
 @include('components.templates_js')
 
