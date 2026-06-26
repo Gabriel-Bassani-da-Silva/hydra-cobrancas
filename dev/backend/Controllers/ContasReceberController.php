@@ -348,24 +348,6 @@ class ContasReceberController extends Controller {
         }
     }
 
-    /**
-     * JSON API: retorna parcelas específicas pelos IDs (usado no modal de Baixa Manual)
-     */
-    public function apiParcelasPorIds() {
-        
-        $idsRaw = request()->query()['ids'] ?? '';
-        if (empty($idsRaw)) {
-            return response()->json(['success' => false, 'error' => 'Nenhum ID informado']);
-        }
-
-        $ids = array_filter(array_map('intval', explode(',', $idsRaw)));
-        if (empty($ids)) {
-            return response()->json(['success' => false, 'error' => 'IDs inválidos']);
-        }
-
-        $parcelas = $this->model->getPedidosByIds($ids);
-        return response()->json(['success' => true, 'data' => $parcelas]);
-    }
 
     /**
      * JSON API: lista contas a receber com filtros.
