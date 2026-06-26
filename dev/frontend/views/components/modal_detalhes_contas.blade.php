@@ -22,7 +22,7 @@ function getSyncBtnHtml($url, $title, $isSmall = false) {
     $className = $isSmall ? 'btn-action-icon-sm' : 'btn-action-icon';
     $svgSize = $isSmall ? '14' : '16';
     return '<a href="'.htmlspecialchars($url).'" title="'.htmlspecialchars($title).'" class="'.$className.'">
-                ' . \Illuminate\Support\Facades\Blade::render('<x-'.'icons.refresh width="2" height="'.$svgSize.'" />') . '
+                ' . \Illuminate\Support\Facades\Blade::render('<x-'.'icons.refresh width="'.$svgSize.'" height="'.$svgSize.'" />') . '
             </a>';
 }
 
