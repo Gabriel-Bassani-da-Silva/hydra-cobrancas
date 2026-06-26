@@ -432,8 +432,12 @@ class PedidoRepository {
     }
 
     public function getDivergencias(): array {
-        $stmt = DB::connection()->getPdo()->query("SELECT * FROM vw_divergencias_pagamento");
-        return $stmt->fetchAll();
+        $stmt = DB::connection()->getPdo()->query("
+            SELECT v.*, p.DATA_VENCIMENTO 
+            FROM vw_divergencias_pagamento v
+            JOIN PEDIDO p ON p.ID_PEDIDO = v.ID_PEDIDO
+        ");
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     private function getPedidoBaseSql(): string { return "(             SELECT                  p.ID_PEDIDO, p.NUM_PEDIDO, p.TOTAL_PEDIDO, p.DATA_VENCIMENTO, p.VALOR_PAGO_BLING,                  p.SITUACAO_PEDIDO, p.ID_REPRESENTANTE, p.ID_CLIENTE, p.ID_FORMA_PAGAMENTO, p.EXIBIR,                 COALESCE(dp.PAGO_LOCAL, 0) AS PAGO_LOCAL,                 GREATEST(p.VALOR_PAGO_BLING, COALESCE(dp.PAGO_LOCAL, 0)) AS VALOR_PAGO_EFETIVO,                 CASE                      WHEN p.SITUACAO_PEDIDO IN (4,5) THEN p.SITUACAO_PEDIDO                      WHEN GREATEST(p.VALOR_PAGO_BLING, COALESCE(dp.PAGO_LOCAL, 0)) >= p.TOTAL_PEDIDO THEN 2                      WHEN GREATEST(p.VALOR_PAGO_BLING, COALESCE(dp.PAGO_LOCAL, 0)) > 0 THEN 3                      ELSE 1                  END AS SITUACAO_EFETIVA              FROM PEDIDO p              LEFT JOIN (                 SELECT ID_PEDIDO, SUM(VALOR_PAGO_PEDIDO) AS PAGO_LOCAL                  FROM DETALHE_PAGAMENTO                  GROUP BY ID_PEDIDO             ) dp ON dp.ID_PEDIDO = p.ID_PEDIDO         )"; }
