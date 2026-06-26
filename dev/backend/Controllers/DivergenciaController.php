@@ -38,14 +38,14 @@ class DivergenciaController extends Controller {
         
         if (abs($diferenca) > 0.001) {
             $idColaborador = auth()->user()->ID_COLABORADOR ?? 0;
-            $sucesso = $pedidoModel->registrarBaixaManual([
-                ['id' => $idPedido, 'valor' => $diferenca]
-            ], $idColaborador);
-            
-            if ($sucesso) {
-                return response()->json(['success' => $sucesso]);
-            } else {
-                return response()->json(['success' => false, 'error' => 'Falha ao registrar correção no banco de dados.']);
+            try {
+                $sucesso = $pedidoModel->registrarBaixaManual([
+                    ['id' => $idPedido, 'valor' => $diferenca]
+                ], $idColaborador, true);
+                
+                return response()->json(['success' => true]);
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'error' => $e->getMessage()]);
             }
         }
         

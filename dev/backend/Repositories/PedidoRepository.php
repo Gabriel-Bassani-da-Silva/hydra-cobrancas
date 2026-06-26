@@ -392,14 +392,26 @@ class PedidoRepository {
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    public function registrarBaixaManual(array $baixas, int $idColaborador): bool {
+    public function registrarBaixaManual(array $baixas, int $idColaborador, bool $ignorarLimite = false): bool {
         if (empty($baixas)) return false;
 
         try {
             DB::connection()->getPdo()->beginTransaction();
 
             $totalBaixa = 0;
+            
             foreach ($baixas as $b) {
+                if (!$ignorarLimite && (float)$b['valor'] > 0) {
+                    $pedido = DB::table('PEDIDO')->where('ID_PEDIDO', (int)$b['id'])->first();
+                    if ($pedido) {
+                        $localSum = DB::table('DETALHE_PAGAMENTO')->where('ID_PEDIDO', $pedido->ID_PEDIDO)->sum('VALOR_PAGO_PEDIDO');
+                        $pagoAtual = max((float)$pedido->VALOR_PAGO_BLING, (float)$localSum);
+                        if ($pagoAtual >= (float)$pedido->TOTAL_PEDIDO && (float)$pedido->TOTAL_PEDIDO > 0) {
+                            $num = $pedido->NUM_PEDIDO ?: $pedido->ID_PEDIDO;
+                            throw new \Exception("O pedido $num já está totalmente baixado (100% ou mais). Não é possível adicionar novas baixas. Para ajustar o valor, edite a baixa existente no Meu Perfil > Minhas Baixas.");
+                        }
+                    }
+                }
                 $totalBaixa += (float)$b['valor'];
             }
 
@@ -426,8 +438,8 @@ class PedidoRepository {
             return true;
         } catch (\Exception $e) {
             DB::connection()->getPdo()->rollBack();
-            Log::error('Erro em registrarBaixaManual.', ['exception' => $e->getMessage()]);
-            return false;
+            \Illuminate\Support\Facades\Log::error('Erro em registrarBaixaManual.', ['exception' => $e->getMessage()]);
+            throw $e; // Bubble up para o controller tratar a mensagem
         }
     }
 

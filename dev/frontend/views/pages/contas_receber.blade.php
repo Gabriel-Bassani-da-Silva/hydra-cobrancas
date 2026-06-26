@@ -135,6 +135,9 @@ $isPagos = request('status') === 'pagos';
         <a href="{{ route('contas-receber-page') }}?aba=pedras" class="tab <?= $aba === 'pedras' ? 'active' : '' ?>">
             Pedras <span class="tab-count"><?= $contagensAbas['pedras'] ?? 0 ?></span>
         </a>
+        <a href="{{ route('contas-receber-page') }}?aba=baixas" class="tab <?= $aba === 'baixas' ? 'active' : '' ?>">
+            Baixas <span class="tab-count"><?= count($todasBaixas ?? []) ?></span>
+        </a>
     </div>
 
     <!-- Sub-Abas para Clientes, Representantes e Pedras -->
@@ -263,6 +266,40 @@ $isPagos = request('status') === 'pagos';
                 </thead>
                 <tbody id="tbody-pedidos">
                     <!-- JS vai preencher -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @endif
+
+    <!-- ABA: BAIXAS -->
+    <?php if ($aba === 'baixas'): ?>
+    <div class="card">
+        <div class="table-responsive">
+            <table class="cr-table" id="table-baixas">
+                <thead>
+                    <tr>
+                        <th class="date-col">Data da Baixa</th>
+                        <th class="center-col">Documento</th>
+                        <th>Cliente</th>
+                        <th>Colaborador</th>
+                        <th class="valor-col">Valor Baixado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php if(empty($todasBaixas)): ?>
+                        <tr><td colspan="5" class="text-center">Nenhuma baixa manual encontrada.</td></tr>
+                    <?php else: ?>
+                        <?php foreach($todasBaixas as $b): ?>
+                            <tr>
+                                <td><?= date('d/m/Y H:i', strtotime($b->DATA_REGISTRO)) ?></td>
+                                <td class="center-col"><?= htmlspecialchars($b->NUM_PEDIDO) ?></td>
+                                <td><?= htmlspecialchars($b->NOME_CONTATO) ?></td>
+                                <td><?= htmlspecialchars($b->NOME_COLABORADOR) ?></td>
+                                <td class="valor-col" style="font-weight: 600; color: #059669;">R$ <?= number_format($b->VALOR_PAGO_PEDIDO, 2, ',', '.') ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>

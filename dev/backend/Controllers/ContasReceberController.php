@@ -148,6 +148,28 @@ class ContasReceberController extends Controller {
                 }
             }
         }
+        
+        $todasBaixas = [];
+        if ($aba === 'baixas') {
+            $todasBaixas = \Illuminate\Support\Facades\DB::table('DETALHE_PAGAMENTO as dp')
+                ->join('REGISTRO_PAGAMENTO as rp', 'rp.ID_REGISTRO', '=', 'dp.ID_REGISTRO')
+                ->join('PEDIDO as p', 'p.ID_PEDIDO', '=', 'dp.ID_PEDIDO')
+                ->leftJoin('CONTATO_EXTERNO as c', 'c.ID_CONTATO_BLING', '=', 'p.ID_CLIENTE')
+                ->leftJoin('COLABORADOR as col', 'col.ID_COLABORADOR', '=', 'rp.ID_COLABORADOR')
+                ->select(
+                    'dp.ID_DETALHE', 
+                    'dp.VALOR_PAGO_PEDIDO', 
+                    'rp.DATA_REGISTRO', 
+                    'p.NUM_PEDIDO', 
+                    'p.ID_PEDIDO', 
+                    'p.TOTAL_PEDIDO', 
+                    'c.NOME_CONTATO',
+                    'col.NOME_COLABORADOR'
+                )
+                ->orderBy('rp.DATA_REGISTRO', 'desc')
+                ->get();
+        }
+
         $totalInadimplenteFiltrado = $totalBannerVermelho;
 
         return view('pages.contas_receber', [
@@ -164,7 +186,8 @@ class ContasReceberController extends Controller {
             'contagensAbas' => $contagensAbas,
             'cobrancasAtivas' => $cobrancasAtivas,
             'exibirAte' => $exibirAte,
-            'exibirAPartirDe' => $exibirAPartirDe
+            'exibirAPartirDe' => $exibirAPartirDe,
+            'todasBaixas' => $todasBaixas
         ]);
     }
 
@@ -339,12 +362,11 @@ class ContasReceberController extends Controller {
 
         $idColaborador = auth()->user()->ID_COLABORADOR ?? 0;
 
-        $sucesso = $this->model->registrarBaixaManual($data['baixas'], $idColaborador);
-
-        if ($sucesso) {
+        try {
+            $sucesso = $this->model->registrarBaixaManual($data['baixas'], $idColaborador);
             return response()->json(['success' => true]);
-        } else {
-            return response()->json(['success' => false, 'error' => 'Erro ao registrar baixa manual no banco de dados.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()]);
         }
     }
 
