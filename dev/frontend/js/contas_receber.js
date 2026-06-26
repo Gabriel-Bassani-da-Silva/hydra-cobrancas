@@ -1023,7 +1023,7 @@ function abrirModalBaixa(idsPedidos) {
             }
 
             renderParcelasModalBaixa();
-            document.getElementById('modal-baixa-manual').style.display = 'block';
+            document.getElementById('modal-baixa-manual').style.display = 'flex';
         })
         .catch(err => {
             alert('Erro de conexão ao buscar parcelas.');
@@ -1251,7 +1251,7 @@ function confirmarBaixa() {
         return;
     }
 
-    const btnConfirma = document.querySelector('#modal-baixa-manual .btn-sync[style*="background: #16a34a"]');
+    const btnConfirma = document.querySelector('#modal-baixa-manual .btn-modal-confirm-blue');
     const oldText = btnConfirma.innerHTML;
     btnConfirma.innerHTML = 'Baixando...';
     btnConfirma.disabled = true;
