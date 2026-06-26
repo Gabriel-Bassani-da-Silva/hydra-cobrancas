@@ -81,6 +81,12 @@ Route::middleware('auth')->group(function () {
         return "Pedido Fake Cancelado (EXIBIR = 0)! Volte na tela de Contas a Receber, atualize a página e veja que ele sumiu.";
     });
 
+    Route::get('/teste-deletar', function() {
+        // Deleta fisicamente apenas o pedido de teste do banco
+        \Illuminate\Support\Facades\DB::statement("DELETE FROM PEDIDO WHERE ID_PEDIDO = 888888888");
+        return "Pedido deletado fisicamente! O cliente ainda existe no banco, mas como ele não tem mais parcelas a receber, ele também deve sumir da tela de Contas a Receber.";
+    });
+
     Route::any('/contas-receber/vincular-representantes', [ContasReceberController::class, 'vincularRepresentantes'])->name('vincular-reps-contas');
     Route::post('/contas-receber/baixar', [ContasReceberController::class, 'baixar'])->name('baixar-parcelas');
     Route::post('/contas-receber/recuperar', [ContasReceberController::class, 'recuperar'])->name('recuperar-parcelas');
