@@ -191,7 +191,10 @@ if (!function_exists('formatarCpfCnpj')) {
     </div>
 </div>
 
+@include('components.modal_baixa_manual')
+
 <script>const BASE_URL = "{{ url('/') }}";</script>
+<script src="{{ asset('js/baixa_manual.js') }}?v=<?= time() ?>"></script>
 <script src="{{ asset('js/perfil.js') }}?v=<?= time() ?>"></script>
 
 @endsection

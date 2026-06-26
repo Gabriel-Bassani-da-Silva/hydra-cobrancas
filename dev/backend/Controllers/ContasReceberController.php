@@ -433,6 +433,21 @@ class ContasReceberController extends Controller {
         }
 
         try {
+            // Sincronizar as contas no Bling antes de buscar localmente
+            $blingService = new BlingService();
+            if ($blingService->isConnected()) {
+                $contasEncontradas = [];
+                foreach ($ids as $id) {
+                    $conta = $blingService->getContaReceber((int)$id);
+                    if ($conta) {
+                        $contasEncontradas[] = $conta;
+                    }
+                }
+                if (!empty($contasEncontradas)) {
+                    $this->model->importarPedidos($contasEncontradas, $blingService, 'upsert');
+                }
+            }
+
             $parcelas = $this->model->getPedidosByIds($ids);
             return response()->json(['success' => true, 'data' => $parcelas]);
         } catch (\Throwable $e) {

@@ -26,6 +26,15 @@ function getSyncBtnHtml($url, $title, $isSmall = false) {
             </a>';
 }
 
+function getBaixaBtnHtml($ids, $title, $isSmall = false) {
+    $className = $isSmall ? 'btn-action-icon-sm' : 'btn-action-icon';
+    $svgSize = $isSmall ? '14' : '16';
+    $idsJson = htmlspecialchars(json_encode(is_array($ids) ? $ids : [$ids]));
+    return '<button onclick="abrirModalBaixa('.$idsJson.')" title="'.htmlspecialchars($title).'" class="'.$className.'" style="margin-left:4px; border:none; background:transparent; cursor:pointer;">
+                ' . \Illuminate\Support\Facades\Blade::render('<x-'.'icons.check width="'.$svgSize.'" height="'.$svgSize.'" />') . '
+            </button>';
+}
+
 function getSmallBadgeHtml($situacao) {
     $s = (int)$situacao;
     if ($s === 1) return '<span class="status-badge badge-warning" style="font-size:0.65rem;">Em Aberto</span>';
@@ -95,7 +104,8 @@ if ($tipo === 'financeiros' || $tipo === 'representantes') {
         }
         
         $nomeDisplay = htmlspecialchars($grupo['nomeCli']) . $docCli;
-        $syncBtn = getSyncBtnHtml("{$BASE}/contas-receber/sincronizar-unico?aba={$syncAba}&id=" . implode(',', $grupo['ids']), 'Sincronizar cliente', true);
+        $syncBtn = getSyncBtnHtml("{$BASE}/contas-receber/sincronizar-unico?aba={$syncAba}&id=" . implode(',', $grupo['ids']), 'Sincronizar cliente', true) . 
+                   getBaixaBtnHtml($grupo['ids'], 'Baixar cliente', true);
         
         $tbodyHTML .= '<tr class="expandable-row" style="cursor:pointer;">
             <td class="expand-col">'.$expandBtnCli.'</td>
@@ -123,7 +133,8 @@ if ($tipo === 'financeiros' || $tipo === 'representantes') {
             $numPedStr = !empty($ped['numPedido']) && $ped['numPedido'] !== '—' ? htmlspecialchars($ped['numPedido']) : 'Sem Nº';
             
             $syncTxt = $qtdParc > 1 ? 'Sincronizar todas as parcelas' : 'Sincronizar';
-            $syncBtnPed = getSyncBtnHtml("{$BASE}/contas-receber/sincronizar-unico?aba={$syncAba}&id=" . implode(',', $ped['ids']), $syncTxt, true);
+            $syncBtnPed = getSyncBtnHtml("{$BASE}/contas-receber/sincronizar-unico?aba={$syncAba}&id=" . implode(',', $ped['ids']), $syncTxt, true) . 
+                          getBaixaBtnHtml($ped['ids'], $qtdParc > 1 ? 'Baixar todas as parcelas' : 'Baixar', true);
             
             $rowCls = $qtdParc > 1 ? 'expandable-row' : '';
             $cursorStyle = $qtdParc > 1 ? 'cursor:pointer;' : '';
@@ -140,7 +151,8 @@ if ($tipo === 'financeiros' || $tipo === 'representantes') {
                 $parcelasHtml = '';
                 foreach ($ped['parcelas'] as $p) {
                     $valorP = ((float)($p['VALOR'] ?? 0)) - ((float)($p['VALOR_PAGO'] ?? 0));
-                    $syncBtnP = getSyncBtnHtml("{$BASE}/contas-receber/sincronizar-unico?aba={$syncAba}&id=".$p['ID_CONTA_RECEBER'], 'Sincronizar esta parcela', true);
+                    $syncBtnP = getSyncBtnHtml("{$BASE}/contas-receber/sincronizar-unico?aba={$syncAba}&id=".$p['ID_CONTA_RECEBER'], 'Sincronizar esta parcela', true) . 
+                                getBaixaBtnHtml($p['ID_CONTA_RECEBER'], 'Baixar esta parcela', true);
                     $badgeP = getSmallBadgeHtml($p['SITUACAO'] ?? 1);
                     
                     $parcelasHtml .= '<tr style="background-color: #fff;">
@@ -255,7 +267,8 @@ if ($tipo === 'financeiros' || $tipo === 'representantes') {
         $numPedStr = !empty($grupo['numPedido']) && $grupo['numPedido'] !== '—' ? htmlspecialchars($grupo['numPedido']) : 'Sem Nº';
         
         $syncTxt = $qtd > 1 ? 'Sincronizar todas as parcelas' : 'Sincronizar';
-        $syncBtn = getSyncBtnHtml("{$BASE}/contas-receber/sincronizar-unico?aba={$tipo}&id=" . implode(',', $grupo['ids']), $syncTxt, true);
+        $syncBtn = getSyncBtnHtml("{$BASE}/contas-receber/sincronizar-unico?aba={$tipo}&id=" . implode(',', $grupo['ids']), $syncTxt, true) . 
+                   getBaixaBtnHtml($grupo['ids'], $qtd > 1 ? 'Baixar todas as parcelas' : 'Baixar', true);
 
         $rowCls = $qtd > 1 ? 'expandable-row' : '';
         $cursorStyle = $qtd > 1 ? 'cursor:pointer;' : '';
@@ -272,7 +285,8 @@ if ($tipo === 'financeiros' || $tipo === 'representantes') {
             $parcelasHtml = '';
             foreach ($grupo['parcelas'] as $p) {
                 $valorP = ((float)($p['VALOR'] ?? 0)) - ((float)($p['VALOR_PAGO'] ?? 0));
-                $syncBtnP = getSyncBtnHtml("{$BASE}/contas-receber/sincronizar-unico?aba={$tipo}&id=".$p['ID_CONTA_RECEBER'], 'Sincronizar esta parcela', true);
+                $syncBtnP = getSyncBtnHtml("{$BASE}/contas-receber/sincronizar-unico?aba={$tipo}&id=".$p['ID_CONTA_RECEBER'], 'Sincronizar esta parcela', true) . 
+                            getBaixaBtnHtml($p['ID_CONTA_RECEBER'], 'Baixar esta parcela', true);
                 $badgeP = getSmallBadgeHtml($p['SITUACAO'] ?? 1);
                 
                 $parcelasHtml .= '<tr>
