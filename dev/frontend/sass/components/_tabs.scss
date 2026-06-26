@@ -1,0 +1,115 @@
+@use '../abstracts' as mx;
+@use "sass:color";
+
+/* ═══════════════════════════════════════════════════════════════════════
+   MAIN TABS
+   ═══════════════════════════════════════════════════════════════════ */
+.tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: 20px;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    padding: 6px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    flex-shrink: 0;
+
+    .tab {
+        flex: 1;
+        text-align: center;
+        padding: 14px 20px;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #64748b;
+        text-decoration: none;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+
+        &:hover {
+            color: #334155;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        &.active {
+            background: linear-gradient(135deg, mx.$laranja-poran, color.adjust(mx.$laranja-poran, $lightness: -8%));
+            color: #fff;
+            box-shadow: 0 6px 16px rgba(mx.$laranja-poran, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .tab-count {
+            background: rgba(255, 255, 255, 0.8);
+            color: #334155;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 800;
+        }
+
+        &.active .tab-count {
+            background: #fff;
+            color: mx.$laranja-poran;
+        }
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SUB-ABAS (SEGMENTED CONTROL)
+   ═══════════════════════════════════════════════════════════════════ */
+.cr-sub-tabs {
+    display: inline-flex;
+    background: #e2e8f0;
+    padding: 6px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    gap: 4px;
+    position: relative;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+
+    .sub-tab-btn {
+        padding: 10px 20px;
+        font-size: 0.88rem;
+        font-weight: 600;
+        border-radius: 8px;
+        text-decoration: none;
+        color: #64748b;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        z-index: 1;
+
+        &:hover {
+            color: #334155;
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        &.active {
+            background: #ffffff;
+            color: mx.$laranja-poran;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+            transform: translateY(-1px);
+        }
+
+        &.sub-tab-warning {
+            color: #dc2626;
+
+            &:hover {
+                background: rgba(254, 226, 226, 0.6);
+                color: #b91c1c;
+            }
+
+            &.active {
+                background: #fef2f2;
+                color: #dc2626;
+                box-shadow: 0 4px 12px rgba(220, 38, 38, 0.12), 0 1px 2px rgba(220, 38, 38, 0.06);
+                border: 1px solid rgba(220, 38, 38, 0.2);
+            }
+        }
+    }
+}
