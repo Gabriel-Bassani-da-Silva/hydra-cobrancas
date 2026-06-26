@@ -28,7 +28,7 @@ class BlingWebhookController extends Controller {
      */
     public function handle() {
         // O Bling envia o payload em JSON no corpo da requisição
-        $payload = request()->json();
+        $payload = request()->all();
 
         // Se o Bling enviar um array de dados, normalmente vem dentro de 'data'
         $data = $payload['data'] ?? [];
