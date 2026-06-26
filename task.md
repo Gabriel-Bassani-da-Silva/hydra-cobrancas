@@ -1,0 +1,9 @@
+- `[ ]` Atualizar PerfilController.php para agrupar baixas por cliente
+- `[ ]` Atualizar perfil.blade.php para exibir tabela agrupada
+- `[ ]` Criar rota/função `apiBaixasColaborador` em PerfilController
+- `[ ]` Atualizar `modal_baixas_cliente.blade.php` para incluir opções de Editar e Salvar/Cancelar (além do Estornar)
+- `[ ]` Garantir que o JS de edição funcione no modal
+- `[ ]` Atualizar DivergenciaController.php (se necessário para API de modal)
+- `[ ]` Atualizar divergencia_bling.blade.php para agrupar tabela por cliente com link para modal
+- `[ ]` Criar `modal_divergencias_cliente.blade.php` com opções de corrigir e estornar
+- `[ ]` Testar e verificar fluxos

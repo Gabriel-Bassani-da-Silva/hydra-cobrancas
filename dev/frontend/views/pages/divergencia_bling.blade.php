@@ -25,17 +25,14 @@ $formatMoney = function($value) {
 
     <div class="card">
         <div class="table-responsive">
-            <table class="cr-table">
+            <table class="cr-table" id="table-divergencias">
                 <thead>
                     <tr>
-                        <th>Pedido</th>
                         <th>Cliente</th>
-                        <th>Vencimento</th>
-                        <th class="valor-col">Total Pedido</th>
+                        <th>Qtd. Pedidos</th>
                         <th class="valor-col" style="color: #64748b;">Pago Local (Hydra)</th>
                         <th class="valor-col" style="color: #059669;">Pago API (Bling)</th>
                         <th class="valor-col">Divergência</th>
-                        <th class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,7 +41,7 @@ $formatMoney = function($value) {
                     if (empty($divergencias)): 
                     ?>
                         <tr>
-                            <td colspan="8" class="text-center" style="padding: 2rem; color: #64748b;">Nenhuma divergência encontrada. Tudo sincronizado!</td>
+                            <td colspan="5" class="text-center" style="padding: 2rem; color: #64748b;">Nenhuma divergência encontrada. Tudo sincronizado!</td>
                         </tr>
                     <?php 
                     else: 
@@ -52,146 +49,46 @@ $formatMoney = function($value) {
                         foreach ($divergencias as $div) {
                             $nomeCli = !empty($div['NOME_CLIENTE']) ? $div['NOME_CLIENTE'] : 'Não Informado';
                             $idCliKey = !empty($div['ID_CLIENTE']) ? $div['ID_CLIENTE'] : $nomeCli;
+                            
                             if (!isset($gruposCli[$idCliKey])) {
                                 $gruposCli[$idCliKey] = [
+                                    'id' => $idCliKey,
                                     'nomeCli' => $nomeCli,
-                                    'doc' => $div['CPF_CNPJ'] ?? '',
-                                    'total' => 0,
-                                    'ids' => [],
-                                    'pedidos' => []
+                                    'total_diferenca' => 0,
+                                    'total_local' => 0,
+                                    'total_bling' => 0,
+                                    'qtd_pedidos' => 0,
+                                    'pedidos_unicos' => []
                                 ];
                             }
                             
                             $keyPed = !empty($div['NUM_PEDIDO']) && $div['NUM_PEDIDO'] !== '—' ? $div['NUM_PEDIDO'] : 'SEM_NUM_' . $div['ID_PEDIDO'];
                             
-                            if (!isset($gruposCli[$idCliKey]['pedidos'][$keyPed])) {
-                                $gruposCli[$idCliKey]['pedidos'][$keyPed] = [
-                                    'numPedido' => $div['NUM_PEDIDO'],
-                                    'divergencias' => [],
-                                    'total_diferenca' => 0,
-                                    'ids' => []
-                                ];
+                            if (!isset($gruposCli[$idCliKey]['pedidos_unicos'][$keyPed])) {
+                                $gruposCli[$idCliKey]['pedidos_unicos'][$keyPed] = true;
+                                $gruposCli[$idCliKey]['qtd_pedidos']++;
                             }
 
                             $local = (float)$div['VALOR_PAGO_LOCAL'];
                             $bling = (float)$div['VALOR_PAGO_BLING'];
                             $diferenca = abs($local - $bling);
-                            
-                            $div['diferenca_calc'] = $diferenca;
-                            $div['local_calc'] = $local;
-                            $div['bling_calc'] = $bling;
 
                             $totalDivergencia += $diferenca;
-                            $gruposCli[$idCliKey]['total'] += $diferenca;
-                            $gruposCli[$idCliKey]['pedidos'][$keyPed]['total_diferenca'] += $diferenca;
-
-                            $gruposCli[$idCliKey]['pedidos'][$keyPed]['divergencias'][] = $div;
-                            $gruposCli[$idCliKey]['pedidos'][$keyPed]['ids'][] = $div['ID_PEDIDO'];
-                            $gruposCli[$idCliKey]['ids'][] = $div['ID_PEDIDO'];
+                            $gruposCli[$idCliKey]['total_diferenca'] += $diferenca;
+                            $gruposCli[$idCliKey]['total_local'] += $local;
+                            $gruposCli[$idCliKey]['total_bling'] += $bling;
                         }
 
-                        $groupIndex = 0;
                         foreach ($gruposCli as $idCliKey => $grupo):
-                            $docCli = $grupo['doc'] ? '<br><small class="text-xs">'.htmlspecialchars($grupo['doc']).'</small>' : '';
-                            $subGroupIdCli = "div_cli_{$groupIndex}";
-                            $expandBtnCli = '<button class="btn-expand" data-toggle-parcelas="'.$subGroupIdCli.'" title="Ver pedidos"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M7 10l5 5 5-5z"/></svg></button>';
                     ?>
-                    <tr class="expandable-row" style="cursor:pointer;">
-                        <td class="expand-col"><?= $expandBtnCli ?></td>
-                        <td><?= htmlspecialchars($grupo['nomeCli']) . $docCli ?></td>
-                        <td class="text-center"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="valor-col font-semibold" style="color: #ef4444;"><?= $formatMoney($grupo['total']) ?></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    
-                    <?php
-                            $pedIndex = 0;
-                            foreach ($grupo['pedidos'] as $keyPed => $ped):
-                                $qtdParc = count($ped['divergencias']);
-                                $subGroupIdPed = "div_ped_{$groupIndex}_{$pedIndex}";
-                                $expandBtnPed = '';
-                                if ($qtdParc > 1) {
-                                    $expandBtnPed = '<button class="btn-expand" data-toggle-parcelas="'.$subGroupIdPed.'" title="Ver parcelas"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M7 10l5 5 5-5z"/></svg></button>';
-                                }
-                                $numPedStr = !empty($ped['numPedido']) && $ped['numPedido'] !== '—' ? htmlspecialchars($ped['numPedido']) : 'Sem Nº';
-                                $rowCls = $qtdParc > 1 ? 'expandable-row' : '';
-                                $cursorStyle = $qtdParc > 1 ? 'cursor:pointer;' : '';
-                    ?>
-                    <tr class="<?= $rowCls ?> sub-parcelas <?= $subGroupIdCli ?>" style="background-color: #fcfcfc; <?= $cursorStyle ?> display:none;">
-                        <td class="expand-col" style="padding-left: 15px;"><?= $expandBtnPed ?></td>
-                        <td><strong><?= $numPedStr ?></strong></td>
-                        <td class="text-center"></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td class="valor-col font-semibold" style="color: #ef4444;"><?= $formatMoney($ped['total_diferenca']) ?></td>
-                        <td class="text-center"></td>
-                    </tr>
-                    
-                    <?php 
-                                if ($qtdParc > 1):
-                                    foreach ($ped['divergencias'] as $div):
-                                        $local = $div['local_calc'];
-                                        $bling = $div['bling_calc'];
-                                        $diferenca = $div['diferenca_calc'];
-                                        $isLocalMaior = $local > $bling;
-                                        $diffColor = $isLocalMaior ? '#ef4444' : '#eab308';
-                                        $diffSignal = $isLocalMaior ? 'Local + ' : 'Bling + ';
-                    ?>
-                    <tr class="sub-parcelas <?= $subGroupIdPed ?> <?= $subGroupIdCli ?>" style="background-color: #fafafa; display:none;">
-                        <td style="padding-left: 45px;"><small class="text-xs" style="color: #64748b;">(Detalhe)</small></td>
-                        <td class="nome-col"><?= htmlspecialchars($div['NOME_CLIENTE']) ?></td>
-                        <td class="date-col"><?= date('d/m/Y', strtotime($div['DATA_VENCIMENTO'])) ?></td>
-                        <td class="valor-col font-semibold"><?= $formatMoney($div['TOTAL_PEDIDO']) ?></td>
-                        <td class="valor-col" style="color: #64748b; font-weight: 500;"><?= $formatMoney($local) ?></td>
-                        <td class="valor-col" style="color: #059669; font-weight: 600;"><?= $formatMoney($bling) ?></td>
-                        <td class="valor-col" style="color: <?= $diffColor ?>; font-weight: 600;"><?= $diffSignal . $formatMoney($diferenca) ?></td>
-                        <td class="text-center" style="white-space: nowrap;">
-                            <button onclick="abrirModalCorrigir(<?= $div['ID_PEDIDO'] ?>, <?= $local ?>)" title="Corrigir Baixa" class="btn-action-icon" style="border:none; background:transparent; cursor:pointer;">
-                                <x-icons.check width="16" height="16" />
-                            </button>
-                            <button onclick="estornarBaixaPedido(<?= $div['ID_PEDIDO'] ?>)" title="Estornar Baixas Locais" class="btn-action-icon" style="border:none; background:transparent; cursor:pointer; color: #64748b; margin-left: 4px;">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                            </button>
-                        </td>
-                    </tr>
-                    <?php 
-                                    endforeach;
-                                else:
-                                    // Se tem apenas 1 parcela (divergência) no pedido, exibe diretamente os detalhes na própria linha do pedido
-                                    $div = $ped['divergencias'][0];
-                                    $local = $div['local_calc'];
-                                    $bling = $div['bling_calc'];
-                                    $diferenca = $div['diferenca_calc'];
-                                    $isLocalMaior = $local > $bling;
-                                    $diffColor = $isLocalMaior ? '#ef4444' : '#eab308';
-                                    $diffSignal = $isLocalMaior ? 'Local + ' : 'Bling + ';
-                    ?>
-                    <tr class="sub-parcelas <?= $subGroupIdCli ?>" style="background-color: #fafafa; display:none;">
-                        <td style="padding-left: 25px;"><small class="text-xs" style="color: #64748b;">↳ <?= $numPedStr ?></small></td>
-                        <td class="nome-col"><?= htmlspecialchars($div['NOME_CLIENTE']) ?></td>
-                        <td class="date-col"><?= date('d/m/Y', strtotime($div['DATA_VENCIMENTO'])) ?></td>
-                        <td class="valor-col font-semibold"><?= $formatMoney($div['TOTAL_PEDIDO']) ?></td>
-                        <td class="valor-col" style="color: #64748b; font-weight: 500;"><?= $formatMoney($local) ?></td>
-                        <td class="valor-col" style="color: #059669; font-weight: 600;"><?= $formatMoney($bling) ?></td>
-                        <td class="valor-col" style="color: <?= $diffColor ?>; font-weight: 600;"><?= $diffSignal . $formatMoney($diferenca) ?></td>
-                        <td class="text-center cr-col-acoes" style="white-space: nowrap;">
-                            <button onclick="abrirModalCorrigir(<?= $div['ID_PEDIDO'] ?>, <?= $local ?>)" title="Corrigir Baixa" class="btn-acao btn-edit">
-                                <x-icons.check width="16" height="16" />
-                            </button>
-                            <button onclick="estornarBaixaPedido(<?= $div['ID_PEDIDO'] ?>)" title="Estornar Baixas Locais" class="btn-acao btn-delete">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
-                            </button>
-                        </td>
+                    <tr onclick="abrirModalDivergencias('<?= $grupo['id'] ?>')" style="cursor:pointer;" class="hover-row">
+                        <td><?= htmlspecialchars($grupo['nomeCli']) ?></td>
+                        <td><?= $grupo['qtd_pedidos'] ?></td>
+                        <td class="valor-col"><?= $formatMoney($grupo['total_local']) ?></td>
+                        <td class="valor-col"><?= $formatMoney($grupo['total_bling']) ?></td>
+                        <td class="valor-col" style="color: #ef4444; font-weight: 600;"><?= $formatMoney($grupo['total_diferenca']) ?></td>
                     </tr>
                     <?php
-                                endif;
-                                $pedIndex++;
-                            endforeach;
-                            $groupIndex++;
                         endforeach; 
                     endif; 
                     ?>
@@ -199,9 +96,8 @@ $formatMoney = function($value) {
                 <?php if (!empty($divergencias)): ?>
                 <tfoot>
                     <tr style="background-color: #f8fafc; font-weight: bold; border-top: 2px solid #e2e8f0;">
-                        <td colspan="6" style="text-align: right; padding-right: 1rem; color: #475569;">Somatório Total das Diferenças:</td>
+                        <td colspan="4" style="text-align: right; padding-right: 1rem; color: #475569;">Somatório Total das Diferenças:</td>
                         <td class="valor-col" style="color: #ef4444; font-weight: 700; font-size: 1.1em;"><?= $formatMoney($totalDivergencia) ?></td>
-                        <td></td>
                     </tr>
                 </tfoot>
                 <?php endif; ?>
@@ -309,33 +205,41 @@ $formatMoney = function($value) {
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        document.body.addEventListener('click', function(e) {
-            const btn = e.target.closest('.btn-expand');
-            if (btn) {
-                const targetClass = btn.getAttribute('data-toggle-parcelas');
-                const rows = document.querySelectorAll('.' + targetClass);
-                
-                btn.classList.toggle('expanded');
-                const isExpanded = btn.classList.contains('expanded');
-                
-                rows.forEach(row => {
-                    if (isExpanded) {
-                        row.style.display = 'table-row';
-                    } else {
-                        row.style.display = 'none';
-                        // if collapsing, also collapse children
-                        const childBtns = row.querySelectorAll('.btn-expand');
-                        childBtns.forEach(cBtn => {
-                            cBtn.classList.remove('expanded');
-                            const cTarget = cBtn.getAttribute('data-toggle-parcelas');
-                            document.querySelectorAll('.' + cTarget).forEach(cRow => cRow.style.display = 'none');
-                        });
-                    }
-                });
-            }
-        });
+        const btnClose = document.getElementById('modal-detalhes-close');
+        if (btnClose) {
+            btnClose.addEventListener('click', () => {
+                document.getElementById('modal-detalhes').style.display = 'none';
+            });
+        }
     });
+
+    function abrirModalDivergencias(idCliente) {
+        const modal = document.getElementById('modal-detalhes');
+        if (!modal) return;
+        
+        const title = document.getElementById('modal-detalhes-title');
+        const body = document.getElementById('modal-detalhes-body');
+
+        title.innerText = 'Divergências do Cliente';
+        body.innerHTML = '<div class="text-center" style="padding: 20px;">Carregando divergências...</div>';
+        
+        modal.style.display = 'flex';
+        
+        fetch(`${BASE_URL}/divergencias/api-divergencias-cliente?id=${idCliente}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.html) {
+                    body.innerHTML = data.html;
+                } else {
+                    body.innerHTML = '<div class="text-center" style="padding: 20px; color: red;">' + (data.error || 'Erro ao carregar') + '</div>';
+                }
+            })
+            .catch(err => {
+                body.innerHTML = '<div class="text-center" style="padding: 20px; color: red;">Erro na requisição.</div>';
+            });
+    }
 </script>
+@include('components.modal_detalhes_contas')
 <script src="{{ asset('js/baixa_manual.js') }}?v=<?= time() ?>"></script>
 
 @endsection

@@ -132,13 +132,15 @@ Route::middleware('auth')->group(function () {
     Route::post('/baixas/estornar', [\App\Controllers\BaixaController::class, 'estornar']);
 
     // Divergências
-    Route::get('/divergencias', [DivergenciaController::class, 'index'])->name('divergencias-page');
+    Route::get('/divergencias', [DivergenciaController::class, 'index'])->name('divergencia-bling');
+    Route::get('/divergencias/api-divergencias-cliente', [DivergenciaController::class, 'apiDivergenciasCliente']);
     Route::post('/divergencias/corrigir-baixa', [DivergenciaController::class, 'corrigirBaixa'])->name('corrigir-baixa');
     Route::post('/divergencias/estornar', [DivergenciaController::class, 'estornarBaixa']);
 
     // Perfil
     Route::get('/perfil', [PerfilController::class, 'index'])->name('perfil-page');
     Route::get('/perfil/api/pedidos', [PerfilController::class, 'apiPedidos'])->name('api-pedidos-perfil');
+    Route::get('/perfil/api-baixas-colaborador', [PerfilController::class, 'apiBaixasColaborador']);
     // Exportação
     Route::get('/exportar/tudo', [ExportController::class, 'exportarTudo'])->name('exportar-tudo');
     Route::get('/exportar/{tabela}', [ExportController::class, 'exportarTabela'])->name('exportar-tabela');

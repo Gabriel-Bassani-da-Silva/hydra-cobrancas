@@ -86,5 +86,34 @@ class DivergenciaController extends Controller {
             \Illuminate\Support\Facades\DB::rollBack();
             return response()->json(['success' => false, 'error' => 'Erro ao estornar baixa: ' . $e->getMessage()]);
         }
+    public function apiDivergenciasCliente()
+    {
+        $idCliente = request()->query('id');
+        if (!$idCliente) {
+            return response()->json(['error' => 'ID não informado']);
+        }
+
+        $pedidoModel = new PedidoRepository();
+        $todasDivergencias = $pedidoModel->getDivergencias();
+
+        // Filtrar apenas as divergências do cliente e formatar
+        $divergenciasCliente = [];
+        foreach ($todasDivergencias as $div) {
+            $idCliKey = !empty($div['ID_CLIENTE']) ? $div['ID_CLIENTE'] : (!empty($div['NOME_CLIENTE']) ? $div['NOME_CLIENTE'] : 'Não Informado');
+            if ($idCliKey == $idCliente) {
+                $local = (float)$div['VALOR_PAGO_LOCAL'];
+                $bling = (float)$div['VALOR_PAGO_BLING'];
+                $diferenca = abs($local - $bling);
+                
+                $div['diferenca_calc'] = $diferenca;
+                $div['local_calc'] = $local;
+                $div['bling_calc'] = $bling;
+
+                $divergenciasCliente[] = $div;
+            }
+        }
+
+        $html = view('components.modal_divergencias_cliente', ['divergencias' => $divergenciasCliente])->render();
+        return response()->json(['html' => $html]);
     }
 }

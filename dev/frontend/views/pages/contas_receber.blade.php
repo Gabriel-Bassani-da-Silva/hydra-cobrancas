@@ -279,9 +279,9 @@ $isPagos = request('status') === 'pagos';
             <table class="cr-table" id="table-baixas">
                 <thead>
                     <tr>
-                        <th class="date-col">Última Baixa</th>
+                        <th>Última Baixa</th>
                         <th>Cliente</th>
-                        <th class="center-col">Qtd. Baixas</th>
+                        <th>Qtd. Baixas</th>
                         <th class="valor-col">Total Baixado</th>
                     </tr>
                 </thead>
@@ -293,8 +293,8 @@ $isPagos = request('status') === 'pagos';
                             <tr onclick="abrirModalBaixas(<?= $b->ID_CLIENTE ?>)" style="cursor: pointer;" class="hover-row">
                                 <td><?= date('d/m/Y H:i', strtotime($b->ULTIMA_BAIXA)) ?></td>
                                 <td><?= htmlspecialchars($b->NOME_CONTATO) ?></td>
-                                <td class="center-col"><?= $b->QTD_BAIXAS ?></td>
-                                <td class="valor-col" style="font-weight: 600; color: #059669;">R$ <?= number_format($b->TOTAL_BAIXADO, 2, ',', '.') ?></td>
+                                <td><?= $b->QTD_BAIXAS ?></td>
+                                <td class="valor-col">R$ <?= number_format($b->TOTAL_BAIXADO, 2, ',', '.') ?></td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>

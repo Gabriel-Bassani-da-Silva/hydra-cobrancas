@@ -312,3 +312,29 @@ function estornarBaixa(idDetalhe) {
         alert('Erro ao estornar baixa.');
     });
 }
+
+function abrirModalBaixas(idCliente) {
+    const modal = document.getElementById('modal-detalhes');
+    if (!modal) return;
+    
+    const title = document.getElementById('modal-detalhes-title');
+    const body = document.getElementById('modal-detalhes-body');
+
+    title.innerText = 'Minhas Baixas do Cliente';
+    body.innerHTML = '<div class="text-center" style="padding: 20px;">Carregando baixas...</div>';
+    
+    modal.style.display = 'flex';
+    
+    fetch(`${(typeof BASE_URL !== 'undefined' ? BASE_URL : '')}/perfil/api-baixas-colaborador?id=${idCliente}`)
+        .then(res => res.json())
+        .then(data => {
+            if(data.html) {
+                body.innerHTML = data.html;
+            } else {
+                body.innerHTML = '<div class="text-center" style="padding: 20px; color: red;">' + (data.error || 'Erro ao carregar') + '</div>';
+            }
+        })
+        .catch(err => {
+            body.innerHTML = '<div class="text-center" style="padding: 20px; color: red;">Erro na requisição.</div>';
+        });
+}
