@@ -96,6 +96,7 @@ Route::middleware('auth')->group(function () {
 
     // Divergências
     Route::get('/divergencias', [DivergenciaController::class, 'index'])->name('divergencias-page');
+    Route::post('/divergencias/corrigir-baixa', [DivergenciaController::class, 'corrigirBaixa'])->name('corrigir-baixa');
 
     // Perfil
     Route::get('/perfil', [PerfilController::class, 'index'])->name('perfil-page');
