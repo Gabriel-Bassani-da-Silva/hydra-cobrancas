@@ -178,11 +178,11 @@ $formatMoney = function($value) {
                         <td class="valor-col" style="color: #64748b; font-weight: 500;"><?= $formatMoney($local) ?></td>
                         <td class="valor-col" style="color: #059669; font-weight: 600;"><?= $formatMoney($bling) ?></td>
                         <td class="valor-col" style="color: <?= $diffColor ?>; font-weight: 600;"><?= $diffSignal . $formatMoney($diferenca) ?></td>
-                        <td class="text-center" style="white-space: nowrap;">
-                            <button onclick="abrirModalCorrigir(<?= $div['ID_PEDIDO'] ?>, <?= $local ?>)" title="Corrigir Baixa" class="btn-action-icon" style="border:none; background:transparent; cursor:pointer;">
+                        <td class="text-center cr-col-acoes" style="white-space: nowrap;">
+                            <button onclick="abrirModalCorrigir(<?= $div['ID_PEDIDO'] ?>, <?= $local ?>)" title="Corrigir Baixa" class="btn-acao btn-edit">
                                 <x-icons.check width="16" height="16" />
                             </button>
-                            <button onclick="estornarBaixaPedido(<?= $div['ID_PEDIDO'] ?>)" title="Estornar Baixas Locais" class="btn-action-icon" style="border:none; background:transparent; cursor:pointer; color: #64748b; margin-left: 4px;">
+                            <button onclick="estornarBaixaPedido(<?= $div['ID_PEDIDO'] ?>)" title="Estornar Baixas Locais" class="btn-acao btn-delete">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                             </button>
                         </td>

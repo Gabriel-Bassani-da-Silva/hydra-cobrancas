@@ -283,24 +283,18 @@ $isPagos = request('status') === 'pagos';
                         <th>Cliente</th>
                         <th class="center-col">Qtd. Baixas</th>
                         <th class="valor-col">Total Baixado</th>
-                        <th class="cr-col-acoes">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php if(empty($todasBaixas)): ?>
-                        <tr><td colspan="5" class="text-center">Nenhuma baixa manual encontrada.</td></tr>
+                        <tr><td colspan="4" class="text-center">Nenhuma baixa manual encontrada.</td></tr>
                     <?php else: ?>
                         <?php foreach($todasBaixas as $b): ?>
-                            <tr>
+                            <tr onclick="abrirModalBaixas(<?= $b->ID_CLIENTE ?>)" style="cursor: pointer;" class="hover-row">
                                 <td><?= date('d/m/Y H:i', strtotime($b->ULTIMA_BAIXA)) ?></td>
                                 <td><?= htmlspecialchars($b->NOME_CONTATO) ?></td>
                                 <td class="center-col"><?= $b->QTD_BAIXAS ?></td>
                                 <td class="valor-col" style="font-weight: 600; color: #059669;">R$ <?= number_format($b->TOTAL_BAIXADO, 2, ',', '.') ?></td>
-                                <td class="cr-col-acoes text-center">
-                                    <button class="btn-action-icon" onclick="abrirModalBaixas(<?= $b->ID_CLIENTE ?>)" title="Ver Baixas do Cliente">
-                                        <x-icons.eye width="16" height="16" />
-                                    </button>
-                                </td>
                             </tr>
                         <?php endforeach; ?>
                     <?php endif; ?>
