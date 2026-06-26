@@ -57,6 +57,25 @@ class BlingWebhookController extends Controller {
                     if ($conta) {
                         $this->pedidoRepository->importarPedidos([$conta], $this->blingService, 'upsert');
                     }
+                } elseif (strpos($evento, 'pedidos.vendas') !== false) {
+                    // Contorno para a falta de webhook de "Contas a Receber" no Bling v3:
+                    // Quando um Pedido de Venda for alterado ou cancelado, buscamos as parcelas (contas) dele.
+                    $pedido = $this->blingService->getPedidoVenda($idBling);
+                    if ($pedido && !empty($pedido['parcelas'])) {
+                        $contasParaAtualizar = [];
+                        foreach ($pedido['parcelas'] as $parcela) {
+                            $idConta = $parcela['contaReceber']['id'] ?? null;
+                            if ($idConta) {
+                                $conta = $this->blingService->getContaReceber($idConta);
+                                if ($conta) {
+                                    $contasParaAtualizar[] = $conta;
+                                }
+                            }
+                        }
+                        if (!empty($contasParaAtualizar)) {
+                            $this->pedidoRepository->importarPedidos($contasParaAtualizar, $this->blingService, 'upsert');
+                        }
+                    }
                 } elseif (strpos($evento, 'contato') !== false) {
                     $contato = $this->blingService->getContato($idBling);
                     if ($contato) {

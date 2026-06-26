@@ -561,6 +561,26 @@ class BlingService {
     }
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // PEDIDOS DE VENDA
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    /**
+     * Busca um pedido de venda específico pelo ID do Bling.
+     *
+     * @param int $idPedidoVenda ID do pedido no Bling
+     * @return array|null Dados do pedido ou null se não encontrado
+     */
+    public function getPedidoVenda(int $idPedidoVenda): ?array {
+        $result = $this->apiGet("pedidos/vendas/{$idPedidoVenda}");
+
+        if ($result['httpCode'] === 200 && isset($result['data']['data'])) {
+            return $result['data']['data'];
+        }
+
+        return null;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // UTILIDADES
     // ═══════════════════════════════════════════════════════════════════════════
 
