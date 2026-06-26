@@ -36,6 +36,7 @@ $formatMoney = function($value) {
                         <th class="valor-col" style="color: #64748b;">Pago Local (Hydra)</th>
                         <th class="valor-col" style="color: #059669;">Pago API (Bling)</th>
                         <th class="valor-col">Divergência</th>
+                        <th class="text-center">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -44,7 +45,7 @@ $formatMoney = function($value) {
                     if (empty($divergencias)): 
                     ?>
                         <tr>
-                            <td colspan="7" class="text-center" style="padding: 2rem; color: #64748b;">Nenhuma divergência encontrada. Tudo sincronizado!</td>
+                            <td colspan="8" class="text-center" style="padding: 2rem; color: #64748b;">Nenhuma divergência encontrada. Tudo sincronizado!</td>
                         </tr>
                     <?php 
                     else: 
@@ -66,6 +67,11 @@ $formatMoney = function($value) {
                         <td class="valor-col" style="color: #64748b; font-weight: 500;"><?= $formatMoney($local) ?></td>
                         <td class="valor-col" style="color: #059669; font-weight: 600;"><?= $formatMoney($bling) ?></td>
                         <td class="valor-col" style="color: <?= $diffColor ?>; font-weight: 600;"><?= $diffSignal . $formatMoney($diferenca) ?></td>
+                        <td class="text-center">
+                            <button onclick="abrirModalBaixa(<?= $div['ID_PEDIDO'] ?>)" title="Corrigir Baixa" class="btn-action-icon" style="border:none; background:transparent; cursor:pointer;">
+                                <x-icons.check width="16" height="16" />
+                            </button>
+                        </td>
                     </tr>
                     <?php 
                         endforeach; 
@@ -77,6 +83,7 @@ $formatMoney = function($value) {
                     <tr style="background-color: #f8fafc; font-weight: bold; border-top: 2px solid #e2e8f0;">
                         <td colspan="6" style="text-align: right; padding-right: 1rem; color: #475569;">Somatório Total das Diferenças:</td>
                         <td class="valor-col" style="color: #ef4444; font-weight: 700; font-size: 1.1em;"><?= $formatMoney($totalDivergencia) ?></td>
+                        <td></td>
                     </tr>
                 </tfoot>
                 @endif
@@ -84,4 +91,10 @@ $formatMoney = function($value) {
         </div>
     </div>
 </div>
+
+@include('components.modal_baixa_manual')
+
+<script>const BASE_URL = "{{ url('/') }}";</script>
+<script src="{{ asset('js/baixa_manual.js') }}?v=<?= time() ?>"></script>
+
 @endsection
