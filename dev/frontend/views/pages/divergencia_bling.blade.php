@@ -94,10 +94,11 @@ $formatMoney = function($value) {
 @include('components.modal_baixa_manual')
 
 <!-- Modal Corrigir Baixa -->
-<div id="modal-corrigir-baixa" class="cr-modal-overlay" style="display:none; z-index:9999;">
-    <div class="cr-modal-content" style="max-width: 400px;">
+<div id="modal-corrigir-baixa" class="cr-modal" style="display: none;">
+    <div class="cr-modal-overlay"></div>
+    <div class="cr-modal-container modal-container-md" style="max-width: 400px; padding: 20px;">
         <div class="cr-modal-header">
-            <h3>Corrigir Baixa Local</h3>
+            <h3 class="cr-modal-title">Corrigir Baixa Local</h3>
             <button class="cr-modal-close" onclick="fecharModalCorrigirBaixa()">&times;</button>
         </div>
         <div class="cr-modal-body">
@@ -105,12 +106,20 @@ $formatMoney = function($value) {
             <input type="hidden" id="corrigir-id-pedido" value="">
             <div style="margin-top: 15px;">
                 <label for="corrigir-novo-valor" style="font-weight:600; display:block; margin-bottom:5px;">Novo Valor (R$)</label>
-                <input type="number" id="corrigir-novo-valor" step="0.01" min="0" class="cr-input" style="width:100%;">
+                <input type="number" id="corrigir-novo-valor" step="0.01" min="0" class="cr-input" style="width:100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 10px;">
             </div>
-        </div>
-        <div class="cr-modal-footer">
-            <button class="btn-cancel" onclick="fecharModalCorrigirBaixa()">Cancelar</button>
-            <button class="btn-primary" onclick="confirmarCorrecaoBaixa()">Salvar Correção</button>
+            
+            <div class="modal-actions-between" style="margin-top: 20px; justify-content: flex-end;">
+                <div class="modal-actions">
+                    <button class="btn-modal-cancel" onclick="fecharModalCorrigirBaixa()">
+                        Cancelar
+                    </button>
+                    <button class="btn-modal-confirm-blue" onclick="confirmarCorrecaoBaixa()">
+                        <x-icons.check-heavy width="16" height="16" />
+                        Salvar Correção
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
