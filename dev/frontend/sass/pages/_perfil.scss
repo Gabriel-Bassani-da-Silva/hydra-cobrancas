@@ -105,9 +105,14 @@
   border: 1px solid #e2e8f0;
   border-radius: 6px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 100;
+  z-index: 9999;
   min-width: 170px;
   overflow: hidden;
+}
+
+// Override para evitar que o menu seja cortado
+.table-responsive {
+  overflow: visible !important;
 }
 
 // Itens do menu de ações
