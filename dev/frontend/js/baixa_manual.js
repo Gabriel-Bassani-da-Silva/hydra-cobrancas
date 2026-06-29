@@ -39,6 +39,7 @@ function abrirModalBaixa(idsPedidos) {
 
     if (idsArray.length === 0) return;
 
+    // 🌟 PROTEÇÃO: Limpa a lista global ANTES do fetch para não acumular dados anteriores
     parcelasBaixaAtual = [];
 
     fetch(`${getBaseUrl()}/contas-receber/api/parcelas-por-ids?ids=${idsArray.join(',')}`)
@@ -51,8 +52,13 @@ function abrirModalBaixa(idsPedidos) {
 
             const parcelasApi = res.data || [];
 
+            // Usado para evitar IDs duplicados vindos diretamente da API
+            const idsProcessados = new Set();
+
             parcelasApi.forEach(p => {
-                if (parseInt(p.SITUACAO_PEDIDO) !== 2) {
+                const idUnico = p.ID_PARCELA || p.ID || p.ID_PEDIDO;
+                if (parseInt(p.SITUACAO_PEDIDO) !== 2 && !idsProcessados.has(idUnico)) {
+                    idsProcessados.add(idUnico);
                     parcelasBaixaAtual.push(p);
                 }
             });
@@ -66,17 +72,24 @@ function abrirModalBaixa(idsPedidos) {
             document.getElementById('modal-baixa-manual').style.display = 'flex';
         })
         .catch(err => {
+            console.error(err);
             alert('Erro de conexão ao buscar parcelas.');
         });
 }
 
 function fecharModalBaixa() {
     document.getElementById('modal-baixa-manual').style.display = 'none';
+    // Limpa o ecrã ao fechar para evitar que pisque informação antiga na próxima abertura
+    const container = document.getElementById('baixa-parcelas-container');
+    if (container) container.innerHTML = '';
 }
 
 function renderParcelasModalBaixa() {
     const container = document.getElementById('baixa-parcelas-container');
     if (!container) return;
+
+    // 🌟 CORREÇÃO CRÍTICA: Limpa completamente o HTML antigo do contentor antes de renderizar
+    container.innerHTML = '';
     container.classList.remove('hidden');
 
     // Agrupar parcelas
@@ -247,7 +260,6 @@ function atualizarTotalBaixa() {
         total += parseFloat(input.value || 0);
     });
 
-    // Suporte aos dois IDs possíveis usados nos seus modais
     const display = document.getElementById('baixa-total-display') || document.getElementById('modal-baixa-total-label');
     if (display) display.textContent = formatCurrency(total);
 }
