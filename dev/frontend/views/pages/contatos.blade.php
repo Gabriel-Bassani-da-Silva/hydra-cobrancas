@@ -134,7 +134,6 @@ $formatDoc = function($doc) {
                         <th>CPF/CNPJ</th>
                         <th>Telefones (Bling)</th>
                         <th>Telefone Manual</th>
-                        <th style="width: 50px; text-align: center;">Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -180,13 +179,7 @@ $formatDoc = function($doc) {
                                 </div>
                             @endif
                         </td>
-                        <td onclick="event.stopPropagation();" style="text-align: center;">
-                            <form action="{{ route('toggle-pedra-contato') }}" method="POST" style="margin:0;">
-                                @csrf
-                                <input type="hidden" name="id_contato" value="<?= $c['ID_CONTATO_BLING'] ?>">
-                                <input type="hidden" name="aba" value="<?= $aba ?>">
-                            </form>
-                        </td>
+
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
