@@ -318,36 +318,52 @@ let carregandoBaixas = false;
 
 function abrirModalBaixas(idCliente) {
     // Se já estiver carregando uma requisição, ignora o clique
-    if (carregandoBaixas) return;
+    if (carregandoBaixas) {
+        console.warn(`[abrirModalBaixas] Clique bloqueado! Já existe uma requisição em andamento para o cliente ID: ${idCliente}`);
+        return;
+    }
 
     const modal = document.getElementById('modal-detalhes');
-    if (!modal) return;
+    if (!modal) {
+        console.error('[abrirModalBaixas] Erro: Elemento #modal-detalhes não foi encontrado na página.');
+        return;
+    }
 
     const title = document.getElementById('modal-detalhes-title');
     const body = document.getElementById('modal-detalhes-body');
 
     // Ativa a trava antes de iniciar o fetch
     carregandoBaixas = true;
+    console.log(`[abrirModalBaixas] Iniciando busca das baixas para o cliente ID: ${idCliente}...`);
 
     title.innerText = 'Minhas Baixas do Cliente';
     body.innerHTML = '<div class="text-center" style="padding: 20px;">Carregando baixas...</div>';
 
     modal.style.display = 'flex';
 
-    fetch(`${(typeof BASE_URL !== 'undefined' ? BASE_URL : '')}/perfil/api-baixas-colaborador?id=${idCliente}`)
-        .then(res => res.json())
+    const url = `${(typeof BASE_URL !== 'undefined' ? BASE_URL : '')}/perfil/api-baixas-colaborador?id=${idCliente}`;
+
+    fetch(url)
+        .then(res => {
+            console.log('[abrirModalBaixas] Resposta do servidor recebida. Convertendo para JSON...');
+            return res.json();
+        })
         .then(data => {
             if (data.html) {
+                console.log('[abrirModalBaixas] Sucesso! HTML das baixas renderizado.');
                 body.innerHTML = data.html;
             } else {
+                console.error('[abrirModalBaixas] O servidor respondeu, mas retornou um erro interno:', data.error);
                 body.innerHTML = '<div class="text-center" style="padding: 20px; color: red;">' + (data.error || 'Erro ao carregar') + '</div>';
             }
         })
         .catch(err => {
+            console.error('[abrirModalBaixas] Falha crítica na requisição HTTP (Network Error):', err);
             body.innerHTML = '<div class="text-center" style="padding: 20px; color: red;">Erro na requisição.</div>';
         })
         .finally(() => {
-            // CRÍTICO: Libera a trava independente de ter dado certo ou errado (sucesso ou erro)
+            // Libera a trava independente de ter dado certo ou errado
             carregandoBaixas = false;
+            console.log('[abrirModalBaixas] Processo finalizado. Trava liberada para novos cliques.');
         });
 }
