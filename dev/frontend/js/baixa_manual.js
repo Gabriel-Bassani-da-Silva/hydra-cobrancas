@@ -1,5 +1,7 @@
 // ── BAIXA MANUAL ────────────────────────────────────────────────────────────
 let parcelasBaixaAtual = [];
+// 🌟 TRAVA DE SEGURANÇA GLOBAL: impede cliques e requisições simultâneas
+let requisicaoEmAndamento = false;
 
 function getBaseUrl() {
     if (typeof BASE !== 'undefined') return BASE;
@@ -28,6 +30,12 @@ if (typeof formatDate !== 'function') {
 function abrirModalBaixa(idsPedidos) {
     if (!idsPedidos) return;
 
+    // 🌟 SE JÁ EXISTE UMA REQUISIÇÃO EM ANDAMENTO, BLOQUEIA O CLIQUE IMEDIATAMENTE
+    if (requisicaoEmAndamento) {
+        console.warn('Bloqueio ativo: Evitando clique duplicado.');
+        return;
+    }
+
     let idsArray = [];
     if (typeof idsPedidos === 'string') {
         idsArray = idsPedidos.split(',').map(id => id.trim());
@@ -39,10 +47,15 @@ function abrirModalBaixa(idsPedidos) {
 
     if (idsArray.length === 0) return;
 
-    // Reset absoluto antes de qualquer requisição
+    // Ativa a trava de segurança antes de iniciar o fetch
+    requisicaoEmAndamento = true;
+
+    // Limpa o estado e a tela anterior
     parcelasBaixaAtual = [];
     const container = document.getElementById('baixa-parcelas-container');
-    if (container) container.innerHTML = '';
+    if (container) {
+        container.innerHTML = '<div style="text-align:center; padding:15px; color:#64748b;">A carregar parcelas...</div>';
+    }
 
     fetch(`${getBaseUrl()}/contas-receber/api/parcelas-por-ids?ids=${idsArray.join(',')}`)
         .then(r => r.json())
@@ -53,8 +66,6 @@ function abrirModalBaixa(idsPedidos) {
             }
 
             const parcelasApi = res.data || [];
-
-            // 🌟 DEDUPLICAÇÃO ABSOLUTA: Filtra o JSON para garantir que IDs idênticos nunca entrem no array
             const idsUnicosProcessados = new Set();
 
             parcelasApi.forEach(p => {
@@ -70,13 +81,16 @@ function abrirModalBaixa(idsPedidos) {
                 return;
             }
 
-            // Renderiza apenas com os dados unificados e limpos
             renderParcelasModalBaixa();
             document.getElementById('modal-baixa-manual').style.display = 'flex';
         })
         .catch(err => {
             console.error(err);
             alert('Erro de conexão ao buscar parcelas.');
+        })
+        .finally(() => {
+            // 🌟 SÓ LIBERA PARA UM NOVO CLIQUE QUANDO A REQUISIÇÃO TERMINAR COMPLETAMENTE
+            requisicaoEmAndamento = false;
         });
 }
 
@@ -84,17 +98,17 @@ function fecharModalBaixa() {
     document.getElementById('modal-baixa-manual').style.display = 'none';
     const container = document.getElementById('baixa-parcelas-container');
     if (container) container.innerHTML = '';
+    // Garante que o estado de clique está limpo ao fechar
+    requisicaoEmAndamento = false;
 }
 
 function renderParcelasModalBaixa() {
     const container = document.getElementById('baixa-parcelas-container');
     if (!container) return;
 
-    // Força a limpeza visual completa do container antes de começar
     container.innerHTML = '';
     container.classList.remove('hidden');
 
-    // Agrupamento estrito por número do pedido
     const grupos = {};
     parcelasBaixaAtual.forEach((p, idx) => {
         const num = (p.NUM_PEDIDO && p.NUM_PEDIDO !== '—') ? p.NUM_PEDIDO : `avulso_${p.ID_PEDIDO}`;
@@ -193,8 +207,6 @@ function renderParcelasModalBaixa() {
     });
 
     html += `</tbody></table>`;
-
-    // Injeção única e direta do bloco HTML montado de uma vez só
     container.innerHTML = html;
     atualizarTotalBaixa();
 }
