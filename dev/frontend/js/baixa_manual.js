@@ -44,7 +44,7 @@ window.abrirModalBaixa = function (idsPedidos) {
     const modal = document.getElementById('modal-baixa-manual');
     if (modal) modal.style.display = 'flex';
 
-    fetch(`${getBaseUrl()}/contas-receber/api/parcelas-por-pedidos?ids=${idsArray.join(',')}`)
+    fetch(`${getBaseUrl()}/contas-receber/api/parcelas-por-ids?ids=${idsArray.join(',')}`)
         .then(r => r.json())
         .then(res => {
             if (res.error) {
