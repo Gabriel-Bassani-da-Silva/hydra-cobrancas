@@ -58,9 +58,9 @@ let filtroCobranca = 'sem'; // 'sem' = apenas sem cobrança ativa | 'todos'
 function getActiveDataArray() {
     const { aba, grupo, clientes, representantes, financeiros, pedidos } = INITIAL_DATA;
     let data;
-    if ((aba === 'clientes' || aba === 'representantes') && (grupo === 'padrao' || grupo === 'cheques' || grupo === 'antecipados')) {
-        data = aba === 'clientes' ? clientes : representantes;
-    } else if ((aba === 'clientes' || aba === 'representantes') && grupo === 'financeiro') {
+    if ((aba === 'clientes' || aba === 'representantes' || aba === 'pedras') && (grupo === 'padrao' || grupo === 'cheques' || grupo === 'antecipados')) {
+        data = (aba === 'representantes') ? representantes : clientes;
+    } else if ((aba === 'clientes' || aba === 'representantes' || aba === 'pedras') && grupo === 'financeiro') {
         data = financeiros;
     } else if (aba === 'pedidos') {
         data = pedidos;
@@ -72,9 +72,9 @@ function getActiveDataArray() {
 
 function renderCurrentView(data) {
     const { aba, grupo, isPagos } = INITIAL_DATA;
-    if ((aba === 'clientes' || aba === 'representantes') && (grupo === 'padrao' || grupo === 'cheques' || grupo === 'antecipados')) {
+    if ((aba === 'clientes' || aba === 'representantes' || aba === 'pedras') && (grupo === 'padrao' || grupo === 'cheques' || grupo === 'antecipados')) {
         renderPadrao(aba, data);
-    } else if ((aba === 'clientes' || aba === 'representantes') && grupo === 'financeiro') {
+    } else if ((aba === 'clientes' || aba === 'representantes' || aba === 'pedras') && grupo === 'financeiro') {
         renderFinanceiro(data);
     } else if (aba === 'pedidos') {
         renderPedidos(data, isPagos);

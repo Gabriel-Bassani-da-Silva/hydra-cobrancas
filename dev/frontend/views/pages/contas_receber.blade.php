@@ -204,7 +204,7 @@ $isPagos = request('status') === 'pagos';
                 <thead>
                     <tr>
                         <th></th>
-                        <th data-sort="az" class="sortable sortable-header"><?= $aba === 'clientes' ? 'Cliente' : 'Representante' ?> <span class="sort-icon"></span></th>
+                        <th data-sort="az" class="sortable sortable-header"><?= $aba === 'representantes' ? 'Representante' : 'Cliente' ?> <span class="sort-icon"></span></th>
                         <?php if ($aba === 'representantes'): ?><th>Clientes</th>@endif
                         <th data-sort="qtd" class="center-col sortable sortable-header">Qtd. Pedidos <span class="sort-icon"></span></th>
                         <th data-sort="valor" class="valor-col sortable sortable-header">Total em Aberto <span class="sort-icon"></span></th>
