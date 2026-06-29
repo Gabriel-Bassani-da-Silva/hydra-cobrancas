@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('cr-search');
     if (searchInput) {
-        searchInput.addEventListener('input', function() {
+        searchInput.addEventListener('input', function () {
             const val = this.value.toLowerCase();
             const rows = document.querySelectorAll('#table-minhas-cobrancas tbody tr.clickable-row');
             rows.forEach(row => {
@@ -61,36 +61,36 @@ document.addEventListener('DOMContentLoaded', () => {
         btn.addEventListener('click', (e) => {
             const idCobranca = e.currentTarget.getAttribute('data-id');
             const url = document.querySelector('meta[name="base-url"]')?.getAttribute('content') || (typeof BASE_URL !== 'undefined' ? BASE_URL : '');
-            
+
             e.currentTarget.disabled = true;
             e.currentTarget.innerHTML = 'Atualizando...';
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             fetch(`${url}/cobranca/atualizar-pedidos`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
                 body: JSON.stringify({ id_cobranca: idCobranca })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Pedidos da cobrança atualizados com sucesso (pagos removidos, novos pendentes adicionados)!');
-                    window.location.reload();
-                } else {
-                    alert('Erro ao atualizar: ' + (data.error || 'Desconhecido'));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Pedidos da cobrança atualizados com sucesso (pagos removidos, novos pendentes adicionados)!');
+                        window.location.reload();
+                    } else {
+                        alert('Erro ao atualizar: ' + (data.error || 'Desconhecido'));
+                        e.currentTarget.disabled = false;
+                        e.currentTarget.innerHTML = 'Atualizar Pedidos';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Erro de comunicação.');
                     e.currentTarget.disabled = false;
                     e.currentTarget.innerHTML = 'Atualizar Pedidos';
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Erro de comunicação.');
-                e.currentTarget.disabled = false;
-                e.currentTarget.innerHTML = 'Atualizar Pedidos';
-            });
+                });
         });
     });
 
@@ -99,39 +99,39 @@ document.addEventListener('DOMContentLoaded', () => {
     btnDesistir.forEach(btn => {
         btn.addEventListener('click', (e) => {
             if (!confirm('Tem certeza que deseja desistir desta cobrança? Ela será encerrada e voltará a ficar disponível para outros colaboradores.')) return;
-            
+
             const idCobranca = e.currentTarget.getAttribute('data-id');
             const url = document.querySelector('meta[name="base-url"]')?.getAttribute('content') || (typeof BASE_URL !== 'undefined' ? BASE_URL : '');
-            
+
             e.currentTarget.disabled = true;
             e.currentTarget.innerHTML = 'Cancelando...';
 
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
             fetch(`${url}/cobranca/desistir`, {
                 method: 'POST',
-                headers: { 
+                headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 },
                 body: JSON.stringify({ id_cobranca: idCobranca })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Cobrança cancelada com sucesso!');
-                    window.location.reload();
-                } else {
-                    alert('Erro ao cancelar: ' + (data.error || 'Desconhecido'));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Cobrança cancelada com sucesso!');
+                        window.location.reload();
+                    } else {
+                        alert('Erro ao cancelar: ' + (data.error || 'Desconhecido'));
+                        e.currentTarget.disabled = false;
+                        e.currentTarget.innerHTML = 'Desistir';
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Erro de comunicação.');
                     e.currentTarget.disabled = false;
                     e.currentTarget.innerHTML = 'Desistir';
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Erro de comunicação.');
-                e.currentTarget.disabled = false;
-                e.currentTarget.innerHTML = 'Desistir';
-            });
+                });
         });
     });
 
@@ -151,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Expandir cobrança ao clicar na linha
     document.querySelectorAll('.clickable-row').forEach(row => {
-        row.addEventListener('click', function(e) {
+        row.addEventListener('click', function (e) {
             if (e.target.closest('.btn-atualizar-cob') || e.target.closest('.btn-desistir-cob') || e.target.closest('.cr-col-acoes') || e.target.closest('.dropdown-content')) {
                 return;
             }
@@ -165,22 +165,22 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Delegação global para botoes de parcelas e click do toggleDetalhes
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         let btnParcelas = e.target.closest('[data-toggle-parcelas]');
-        
+
         if (!btnParcelas) {
             const row = e.target.closest('tr.expandable-row');
             if (row && row.closest('.cr-modal')) {
                 btnParcelas = row.querySelector('[data-toggle-parcelas]');
             }
         }
-        
+
         if (btnParcelas) {
             if (e.target.closest('a.btn-action-icon') || e.target.closest('a.btn-action-icon-sm')) return;
             e.preventDefault();
             const targetId = btnParcelas.getAttribute('data-toggle-parcelas');
             const detailRow = document.getElementById('parcelas_' + targetId);
-            
+
             if (detailRow) {
                 if (detailRow.classList.contains('d-none')) {
                     detailRow.classList.remove('d-none');
@@ -194,20 +194,20 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-window.toggleDetalhesPerfil = function(btnEl, id, nome, tipo) {
+window.toggleDetalhesPerfil = function (btnEl, id, nome, tipo) {
     if (!btnEl) return;
-    
+
     document.querySelectorAll('.btn-expand.expanded').forEach(b => {
         if (b !== btnEl) b.classList.remove('expanded');
     });
     btnEl.classList.toggle('expanded');
 
-    const modal  = document.getElementById('modal-detalhes');
-    const title  = document.getElementById('modal-detalhes-title');
-    const body   = document.getElementById('modal-detalhes-body');
+    const modal = document.getElementById('modal-detalhes');
+    const title = document.getElementById('modal-detalhes-title');
+    const body = document.getElementById('modal-detalhes-body');
 
     title.textContent = "Pedidos de: " + nome;
-    body.innerHTML    = `<div class="detail-content loading" style="text-align:center;padding:40px;">Carregando...</div>`;
+    body.innerHTML = `<div class="detail-content loading" style="text-align:center;padding:40px;">Carregando...</div>`;
     modal.style.display = 'flex';
 
     fetch(`${(typeof BASE_URL !== 'undefined' ? BASE_URL : '')}/perfil/api/pedidos?id=${id}&tipo=${tipo}`)
@@ -235,7 +235,7 @@ function editarBaixa(idDetalhe) {
     document.getElementById('valor-display-' + idDetalhe).style.display = 'none';
     document.getElementById('input-baixa-' + idDetalhe).style.display = 'inline-block';
     document.getElementById('input-baixa-' + idDetalhe).focus();
-    
+
     document.getElementById('btn-edit-' + idDetalhe).style.display = 'none';
     document.getElementById('btn-save-' + idDetalhe).style.display = 'inline-block';
     document.getElementById('btn-cancel-' + idDetalhe).style.display = 'inline-block';
@@ -244,7 +244,7 @@ function editarBaixa(idDetalhe) {
 function cancelarEdicaoBaixa(idDetalhe) {
     document.getElementById('valor-display-' + idDetalhe).style.display = 'inline-block';
     document.getElementById('input-baixa-' + idDetalhe).style.display = 'none';
-    
+
     document.getElementById('btn-edit-' + idDetalhe).style.display = 'inline-block';
     document.getElementById('btn-save-' + idDetalhe).style.display = 'none';
     document.getElementById('btn-cancel-' + idDetalhe).style.display = 'none';
@@ -271,18 +271,18 @@ function salvarBaixa(idDetalhe) {
             valor: novoValor
         })
     })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            window.location.reload();
-        } else {
-            alert('Erro: ' + (data.error || 'Falha ao editar baixa.'));
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        alert('Erro ao editar baixa.');
-    });
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Erro: ' + (data.error || 'Falha ao editar baixa.'));
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Erro ao editar baixa.');
+        });
 }
 
 function estornarBaixa(idDetalhe) {
@@ -299,36 +299,45 @@ function estornarBaixa(idDetalhe) {
             id_detalhe: idDetalhe
         })
     })
-    .then(r => r.json())
-    .then(data => {
-        if (data.success) {
-            window.location.reload();
-        } else {
-            alert('Erro: ' + (data.error || 'Falha ao estornar baixa.'));
-        }
-    })
-    .catch(err => {
-        console.error(err);
-        alert('Erro ao estornar baixa.');
-    });
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Erro: ' + (data.error || 'Falha ao estornar baixa.'));
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert('Erro ao estornar baixa.');
+        });
 }
 
+// Variável de controle (flag) para evitar múltiplos cliques/requisições simultâneas
+let carregandoBaixas = false;
+
 function abrirModalBaixas(idCliente) {
+    // Se já estiver carregando uma requisição, ignora o clique
+    if (carregandoBaixas) return;
+
     const modal = document.getElementById('modal-detalhes');
     if (!modal) return;
-    
+
     const title = document.getElementById('modal-detalhes-title');
     const body = document.getElementById('modal-detalhes-body');
 
+    // Ativa a trava antes de iniciar o fetch
+    carregandoBaixas = true;
+
     title.innerText = 'Minhas Baixas do Cliente';
     body.innerHTML = '<div class="text-center" style="padding: 20px;">Carregando baixas...</div>';
-    
+
     modal.style.display = 'flex';
-    
+
     fetch(`${(typeof BASE_URL !== 'undefined' ? BASE_URL : '')}/perfil/api-baixas-colaborador?id=${idCliente}`)
         .then(res => res.json())
         .then(data => {
-            if(data.html) {
+            if (data.html) {
                 body.innerHTML = data.html;
             } else {
                 body.innerHTML = '<div class="text-center" style="padding: 20px; color: red;">' + (data.error || 'Erro ao carregar') + '</div>';
@@ -336,5 +345,9 @@ function abrirModalBaixas(idCliente) {
         })
         .catch(err => {
             body.innerHTML = '<div class="text-center" style="padding: 20px; color: red;">Erro na requisição.</div>';
+        })
+        .finally(() => {
+            // CRÍTICO: Libera a trava independente de ter dado certo ou errado (sucesso ou erro)
+            carregandoBaixas = false;
         });
 }
