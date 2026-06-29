@@ -110,6 +110,13 @@ class PerfilController extends Controller {
         }
 
         $minhasBaixas = [];
+        $countBaixas = (int) \Illuminate\Support\Facades\DB::table('DETALHE_PAGAMENTO as dp')
+            ->join('REGISTRO_PAGAMENTO as rp', 'rp.ID_REGISTRO', '=', 'dp.ID_REGISTRO')
+            ->join('PEDIDO as p', 'p.ID_PEDIDO', '=', 'dp.ID_PEDIDO')
+            ->where('rp.ID_COLABORADOR', $idColaborador)
+            ->distinct()
+            ->count('p.ID_CLIENTE');
+
         if ($aba === 'baixas') {
             $minhasBaixas = \Illuminate\Support\Facades\DB::table('DETALHE_PAGAMENTO as dp')
                 ->join('REGISTRO_PAGAMENTO as rp', 'rp.ID_REGISTRO', '=', 'dp.ID_REGISTRO')
@@ -133,7 +140,10 @@ class PerfilController extends Controller {
             'grupo' => $grupo,
             'minhasCobrancas' => $minhasCobrancas,
             'cobrancasFinanceiros' => $cobrancasFinanceiros,
-            'minhasBaixas' => $minhasBaixas
+            'cobrancasClientes' => $cobrancasClientes,
+            'cobrancasRepresentantes' => $cobrancasRepresentantes,
+            'minhasBaixas' => $minhasBaixas,
+            'countBaixas' => $countBaixas
         ]);
     }
 
@@ -185,7 +195,7 @@ class PerfilController extends Controller {
             return response()->json(['error' => 'ID não informado']);
         }
 
-        $idColaborador = session('user_id');
+        $idColaborador = auth()->user()->ID_COLABORADOR ?? 0;
         
         $baixas = \Illuminate\Support\Facades\DB::table('DETALHE_PAGAMENTO as dp')
             ->join('REGISTRO_PAGAMENTO as rp', 'rp.ID_REGISTRO', '=', 'dp.ID_REGISTRO')

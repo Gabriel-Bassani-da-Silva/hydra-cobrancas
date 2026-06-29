@@ -49,7 +49,7 @@ if (!function_exists('formatarCpfCnpj')) {
             Representantes <span class="tab-count"><?= count($cobrancasRepresentantes ?? []) ?></span>
         </a>
         <a href="{{ route('perfil-page') }}?aba=baixas" class="tab <?= $aba === 'baixas' ? 'active' : '' ?>">
-            Minhas Baixas <span class="tab-count"><?= count($minhasBaixas ?? []) ?></span>
+            Minhas Baixas <span class="tab-count"><?= $countBaixas ?? count($minhasBaixas ?? []) ?></span>
         </a>
     </div>
 
