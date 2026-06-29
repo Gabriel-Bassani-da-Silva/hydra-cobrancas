@@ -9,7 +9,7 @@ function getBaseUrl() {
 
 // ── Funções Auxiliares ──────────────────────────────────────────────────────────
 if (typeof formatCurrency !== 'function') {
-    window.formatCurrency = function(value) {
+    window.formatCurrency = function (value) {
         return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL'
@@ -18,7 +18,7 @@ if (typeof formatCurrency !== 'function') {
 }
 
 if (typeof formatDate !== 'function') {
-    window.formatDate = function(dateStr) {
+    window.formatDate = function (dateStr) {
         if (!dateStr || dateStr === '0000-00-00') return '—';
         const [y, m, d] = dateStr.split(' ')[0].split('-');
         return `${d}/${m}/${y}`;
@@ -27,7 +27,7 @@ if (typeof formatDate !== 'function') {
 
 function abrirModalBaixa(idsPedidos) {
     if (!idsPedidos) return;
-    
+
     let idsArray = [];
     if (typeof idsPedidos === 'string') {
         idsArray = idsPedidos.split(',').map(id => id.trim());
@@ -40,7 +40,7 @@ function abrirModalBaixa(idsPedidos) {
     if (idsArray.length === 0) return;
 
     parcelasBaixaAtual = [];
-    
+
     fetch(`${getBaseUrl()}/contas-receber/api/parcelas-por-ids?ids=${idsArray.join(',')}`)
         .then(r => r.json())
         .then(res => {
@@ -50,7 +50,7 @@ function abrirModalBaixa(idsPedidos) {
             }
 
             const parcelasApi = res.data || [];
-            
+
             parcelasApi.forEach(p => {
                 if (parseInt(p.SITUACAO_PEDIDO) !== 2) {
                     parcelasBaixaAtual.push(p);
@@ -77,7 +77,7 @@ function fecharModalBaixa() {
 function renderParcelasModalBaixa() {
     const container = document.getElementById('baixa-parcelas-container');
     container.classList.remove('hidden');
-    
+
     // Agrupar parcelas
     const grupos = {};
     parcelasBaixaAtual.forEach((p, idx) => {
@@ -89,6 +89,7 @@ function renderParcelasModalBaixa() {
                 totalDevendo: 0
             };
         }
+        // Nota: Certifique-se de que p.VALOR_PARCELA (ou similar) seja o total da parcela específica, se aplicável
         const devendo = parseFloat(p.TOTAL_PEDIDO) - parseFloat(p.VALOR_PAGO || 0);
         p._devendo = devendo;
         p._idx = idx;
@@ -108,30 +109,30 @@ function renderParcelasModalBaixa() {
             </thead>
             <tbody>
     `;
-    
+
     const totalPedidos = Object.keys(grupos).length;
     const isAutoExpandCli = (totalPedidos === 1);
 
     Object.values(grupos).forEach((g, gIdx) => {
         const nomeGrupo = g.numPedido && g.numPedido !== '—' ? `Ped. ${g.numPedido}` : 'Conta Avulsa';
         const subGroupId = `baixa_grupo_${gIdx}`;
-        
+
         const isAutoExpandPed = (g.parcelas.length === 1);
         const shouldExpand = isAutoExpandCli || isAutoExpandPed;
-        
-        const expandedCls = shouldExpand ? 'expanded' : '';
-        const dNoneCls = shouldExpand ? '' : 'd-none';
-        
-        // Linha principal expansível
+
+        const expandedStyle = shouldExpand ? 'transform: rotate(90deg);' : '';
+        const dNoneStyle = shouldExpand ? '' : 'display: none;';
+
+        // Linha principal expansível (Adicionado evento onclick para alternar visualização)
         html += `
-            <tr class="expandable-row" style="cursor:pointer; border-bottom: 1px solid #e2e8f0;">
+            <tr class="expandable-row" style="cursor:pointer; border-bottom: 1px solid #e2e8f0;" onclick="toggleLinhaPedido('${subGroupId}', this)">
                 <td class="expand-col" style="padding: 10px;">
-                    <button class="btn-expand ${expandedCls}" data-toggle-parcelas="${subGroupId}" title="Ver parcelas">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M7 10l5 5 5-5z"/></svg>
+                    <button class="btn-expand" style="background:none; border:none; cursor:pointer; transition: transform 0.2s; ${expandedStyle}" title="Ver parcelas">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
                     </button>
                 </td>
                 <td style="padding: 10px;"><strong>${nomeGrupo}</strong></td>
-                <td class="text-center" style="padding: 10px;"><span style="font-size: 0.75rem; background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-weight: 600;">${g.parcelas.length}</span></td>
+                <td class="text-center" style="padding: 10px; text-align: center;"><span style="font-size: 0.75rem; background: #e2e8f0; color: #475569; padding: 2px 8px; border-radius: 12px; font-weight: 600;">${g.parcelas.length}</span></td>
                 <td class="valor-col" style="padding: 10px; text-align: right;" onclick="event.stopPropagation();">
                     <div style="color:#ef4444; font-weight: 600;">${formatCurrency(g.totalDevendo)}</div>
                     <label style="display:inline-flex; align-items:center; gap:4px; cursor:pointer; font-size:0.75rem; color:#64748b; margin-top:2px;">
@@ -141,15 +142,18 @@ function renderParcelasModalBaixa() {
                 </td>
             </tr>
         `;
-        
+
         // Linha detalhe com parcelas
         html += `
-            <tr class="detail-row ${dNoneCls}" id="parcelas_${subGroupId}">
+            <tr class="detail-row" id="parcelas_${subGroupId}" style="${dNoneStyle}">
                 <td colspan="4" style="padding: 0;">
                     <div style="background: #f8fafc; padding: 10px 15px; border-bottom: 1px solid #e2e8f0; border-left: 3px solid #3b82f6;">
         `;
-        
+
         g.parcelas.forEach(p => {
+            // FIX CRÍTICO: Usar p.ID_PARCELA ou p.ID no data-id para não misturar dados se houver mais de uma parcela por pedido
+            const idIdentificadorParcela = p.ID_PARCELA || p.ID || p.ID_PEDIDO;
+
             html += `
                         <div style="display:flex; justify-content:space-between; align-items:center; padding: 8px 0; border-bottom: 1px dashed #cbd5e1;">
                             <div style="flex:1;">
@@ -159,7 +163,7 @@ function renderParcelasModalBaixa() {
                             <div style="display:flex; align-items:center; gap: 8px; width: 220px;">
                                 <div style="position:relative; flex:1;">
                                     <span style="position:absolute; left:8px; top:50%; transform:translateY(-50%); color:#94a3b8; font-size:0.85rem;">R$</span>
-                                    <input type="number" step="0.01" min="0" data-max="${p._devendo.toFixed(2)}" class="input-baixa-valor grupo-input-${gIdx}" id="input-baixa-${p._idx}" data-id="${p.ID_PEDIDO}" data-idx="${p._idx}" value="0.00" style="width:100%; padding:6px 6px 6px 26px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.9rem; text-align:right; font-weight: 500;" oninput="atualizarTotalBaixa()">
+                                    <input type="number" step="0.01" min="0" data-max="${p._devendo.toFixed(2)}" class="input-baixa-valor grupo-input-${gIdx}" id="input-baixa-${p._idx}" data-id="${idIdentificadorParcela}" data-idx="${p._idx}" value="0.00" style="width:100%; padding:6px 6px 6px 26px; border:1px solid #cbd5e1; border-radius:4px; font-size:0.9rem; text-align:right; font-weight: 500;" oninput="atualizarTotalBaixa()">
                                 </div>
                                 <label style="display:inline-flex; align-items:center; justify-content:center; cursor:pointer; padding: 4px; border-radius: 4px;">
                                     <input type="checkbox" id="check-parcela-${p._idx}" class="checkbox-parcela-${gIdx}" onchange="toggleBaixaParcela(${p._idx}, ${p._devendo.toFixed(2)}, this.checked)" style="width:16px; height:16px; cursor:pointer; accent-color: #2563eb; margin:0;" title="Preencher Total">
@@ -168,21 +172,34 @@ function renderParcelasModalBaixa() {
                         </div>
             `;
         });
-        
+
         html += `
                     </div>
                 </td>
             </tr>
         `;
     });
-    
+
     html += `
             </tbody>
         </table>
     `;
-    
+
     container.innerHTML = html;
     atualizarTotalBaixa();
+}
+
+// Nova função auxiliar para fazer a tabela abrir/fechar ao clicar
+function toggleLinhaPedido(subGroupId, trElement) {
+    const detailRow = document.getElementById(`parcelas_${subGroupId}`);
+    const btnExpand = trElement.querySelector('.btn-expand');
+    if (detailRow.style.display === 'none') {
+        detailRow.style.display = '';
+        btnExpand.style.transform = 'rotate(90deg)';
+    } else {
+        detailRow.style.display = 'none';
+        btnExpand.style.transform = '';
+    }
 }
 
 function toggleBaixarTudoCheckbox(isChecked) {
@@ -237,27 +254,33 @@ function atualizarTotalBaixa() {
     document.querySelectorAll('.input-baixa-valor').forEach(input => {
         total += parseFloat(input.value || 0);
     });
-    document.getElementById('baixa-total-display').textContent = formatCurrency(total);
+    const display = document.getElementById('baixa-total-display');
+    if (display) display.textContent = formatCurrency(total);
 }
 
 function confirmarBaixa() {
     const inputs = document.querySelectorAll('.input-baixa-valor');
     const baixas = [];
     let hasInvalid = false;
-    
+    let hasOverpaid = false;
+
     inputs.forEach(input => {
         const val = parseFloat(input.value || 0);
-        
+        const max = parseFloat(input.getAttribute('data-max') || 0);
+
         if (val < 0) {
             hasInvalid = true;
+            input.style.borderColor = 'red';
+        } else if (val > max) {
+            hasOverpaid = true; // Evita pagar a mais do que o devido
             input.style.borderColor = 'red';
         } else {
             input.style.borderColor = '#cbd5e1';
         }
-        
-        if (val > 0) {
+
+        if (val > 0 && val <= max) {
             baixas.push({
-                id: parseInt(input.getAttribute('data-id')),
+                id: parseInt(input.getAttribute('data-id')), // Agora enviando ID correto da parcela
                 valor: val
             });
         }
@@ -268,39 +291,51 @@ function confirmarBaixa() {
         return;
     }
 
+    if (hasOverpaid) {
+        alert("Valor inválido. O valor informado é maior do que o saldo devedor da parcela.");
+        return;
+    }
+
     if (baixas.length === 0) {
-        alert("Nenhum valor a baixar.");
+        alert("Nenhum valor válido a baixar.");
         return;
     }
 
     const btnConfirma = document.querySelector('#modal-baixa-manual .btn-modal-confirm-blue');
-    const oldText = btnConfirma.innerHTML;
-    btnConfirma.innerHTML = 'Baixando...';
-    btnConfirma.disabled = true;
+    let oldText = '';
+    if (btnConfirma) {
+        oldText = btnConfirma.innerHTML;
+        btnConfirma.innerHTML = 'Baixando...';
+        btnConfirma.disabled = true;
+    }
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     fetch(getBaseUrl() + '/contas-receber/baixar', {
         method: 'POST',
-        headers: { 
+        headers: {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': csrfToken
         },
         body: JSON.stringify({ baixas })
     })
-    .then(r => r.json())
-    .then(res => {
-        if (res.success) {
-            fecharModalBaixa();
-            window.location.reload();
-        } else {
-            alert('Erro: ' + (res.error || 'Erro desconhecido'));
-            btnConfirma.innerHTML = oldText;
-            btnConfirma.disabled = false;
-        }
-    })
-    .catch(err => {
-        alert('Erro de conexão ao salvar.');
-        btnConfirma.innerHTML = oldText;
-        btnConfirma.disabled = false;
-    });
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                fecharModalBaixa();
+                window.location.reload();
+            } else {
+                alert('Erro: ' + (res.error || 'Erro desconhecido'));
+                if (btnConfirma) {
+                    btnConfirma.innerHTML = oldText;
+                    btnConfirma.disabled = false;
+                }
+            }
+        })
+        .catch(err => {
+            alert('Erro de conexão ao salvar.');
+            if (btnConfirma) {
+                btnConfirma.innerHTML = oldText;
+                btnConfirma.disabled = false;
+            }
+        });
 }
