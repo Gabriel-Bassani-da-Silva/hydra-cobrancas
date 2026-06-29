@@ -39,8 +39,10 @@ function abrirModalBaixa(idsPedidos) {
 
     if (idsArray.length === 0) return;
 
-    // 🌟 PROTEÇÃO: Limpa a lista global ANTES do fetch para não acumular dados anteriores
+    // Reset absoluto antes de qualquer requisição
     parcelasBaixaAtual = [];
+    const container = document.getElementById('baixa-parcelas-container');
+    if (container) container.innerHTML = '';
 
     fetch(`${getBaseUrl()}/contas-receber/api/parcelas-por-ids?ids=${idsArray.join(',')}`)
         .then(r => r.json())
@@ -52,13 +54,13 @@ function abrirModalBaixa(idsPedidos) {
 
             const parcelasApi = res.data || [];
 
-            // Usado para evitar IDs duplicados vindos diretamente da API
-            const idsProcessados = new Set();
+            // 🌟 DEDUPLICAÇÃO ABSOLUTA: Filtra o JSON para garantir que IDs idênticos nunca entrem no array
+            const idsUnicosProcessados = new Set();
 
             parcelasApi.forEach(p => {
                 const idUnico = p.ID_PARCELA || p.ID || p.ID_PEDIDO;
-                if (parseInt(p.SITUACAO_PEDIDO) !== 2 && !idsProcessados.has(idUnico)) {
-                    idsProcessados.add(idUnico);
+                if (parseInt(p.SITUACAO_PEDIDO) !== 2 && !idsUnicosProcessados.has(idUnico)) {
+                    idsUnicosProcessados.add(idUnico);
                     parcelasBaixaAtual.push(p);
                 }
             });
@@ -68,6 +70,7 @@ function abrirModalBaixa(idsPedidos) {
                 return;
             }
 
+            // Renderiza apenas com os dados unificados e limpos
             renderParcelasModalBaixa();
             document.getElementById('modal-baixa-manual').style.display = 'flex';
         })
@@ -79,7 +82,6 @@ function abrirModalBaixa(idsPedidos) {
 
 function fecharModalBaixa() {
     document.getElementById('modal-baixa-manual').style.display = 'none';
-    // Limpa o ecrã ao fechar para evitar que pisque informação antiga na próxima abertura
     const container = document.getElementById('baixa-parcelas-container');
     if (container) container.innerHTML = '';
 }
@@ -88,11 +90,11 @@ function renderParcelasModalBaixa() {
     const container = document.getElementById('baixa-parcelas-container');
     if (!container) return;
 
-    // 🌟 CORREÇÃO CRÍTICA: Limpa completamente o HTML antigo do contentor antes de renderizar
+    // Força a limpeza visual completa do container antes de começar
     container.innerHTML = '';
     container.classList.remove('hidden');
 
-    // Agrupar parcelas
+    // Agrupamento estrito por número do pedido
     const grupos = {};
     parcelasBaixaAtual.forEach((p, idx) => {
         const num = (p.NUM_PEDIDO && p.NUM_PEDIDO !== '—') ? p.NUM_PEDIDO : `avulso_${p.ID_PEDIDO}`;
@@ -116,8 +118,8 @@ function renderParcelasModalBaixa() {
                 <tr>
                     <th style="width: 40px; padding: 10px;"></th>
                     <th style="padding: 10px; font-weight: 600; color: #475569;">Pedido</th>
-                    <th class="center-col" style="padding: 10px; font-weight: 600; color: #475569;">Parcelas</th>
-                    <th class="valor-col" style="padding: 10px; font-weight: 600; color: #475569;">Valor Devendo</th>
+                    <th class="center-col" style="padding: 10px; font-weight: 600; color: #475569; text-align: center;">Parcelas</th>
+                    <th class="valor-col" style="padding: 10px; font-weight: 600; color: #475569; text-align: right;">Valor Devendo</th>
                 </tr>
             </thead>
             <tbody>
@@ -137,7 +139,7 @@ function renderParcelasModalBaixa() {
         const dNoneStyle = shouldExpand ? '' : 'display: none;';
 
         html += `
-            <tr class="expandable-row" style="cursor:pointer; border-bottom: 1px solid #e2e8f0;" onclick="toggleLinhaPedido('${subGroupId}', this)">
+            <tr class="expandable-row" style="border-bottom: 1px solid #e2e8f0; cursor: pointer;" onclick="toggleLinhaPedido('${subGroupId}', this)">
                 <td class="expand-col" style="padding: 10px;">
                     <button class="btn-expand" style="background:none; border:none; cursor:pointer; transition: transform 0.2s; ${expandedStyle}" title="Ver parcelas">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6-1.41-1.41z"/></svg>
@@ -191,6 +193,8 @@ function renderParcelasModalBaixa() {
     });
 
     html += `</tbody></table>`;
+
+    // Injeção única e direta do bloco HTML montado de uma vez só
     container.innerHTML = html;
     atualizarTotalBaixa();
 }
@@ -212,22 +216,14 @@ function toggleBaixarTudoCheckbox(isChecked) {
         chk.checked = isChecked;
     });
     document.querySelectorAll('.input-baixa-valor').forEach(input => {
-        if (isChecked) {
-            input.value = parseFloat(input.getAttribute('data-max')).toFixed(2);
-        } else {
-            input.value = '0.00';
-        }
+        input.value = isChecked ? parseFloat(input.getAttribute('data-max')).toFixed(2) : '0.00';
     });
     atualizarTotalBaixa();
 }
 
 function toggleBaixaGrupo(gIdx, isChecked) {
     document.querySelectorAll(`.grupo-input-${gIdx}`).forEach(input => {
-        if (isChecked) {
-            input.value = parseFloat(input.getAttribute('data-max')).toFixed(2);
-        } else {
-            input.value = '0.00';
-        }
+        input.value = isChecked ? parseFloat(input.getAttribute('data-max')).toFixed(2) : '0.00';
     });
     document.querySelectorAll(`.checkbox-parcela-${gIdx}`).forEach(chk => {
         chk.checked = isChecked;
@@ -238,11 +234,7 @@ function toggleBaixaGrupo(gIdx, isChecked) {
 function toggleBaixaParcela(idx, maxValor, isChecked) {
     const input = document.getElementById(`input-baixa-${idx}`);
     if (input) {
-        if (isChecked) {
-            input.value = maxValor.toFixed(2);
-        } else {
-            input.value = '0.00';
-        }
+        input.value = isChecked ? maxValor.toFixed(2) : '0.00';
         atualizarTotalBaixa();
     }
 }
