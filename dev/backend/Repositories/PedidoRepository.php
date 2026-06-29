@@ -481,6 +481,10 @@ class PedidoRepository {
                AND " . $this->getDateFilter($this->getExibirAte(), $this->getExibirAPartirDe()) . "
                AND p.EXIBIR = 1";
                
+        if ($filtro !== 'pedras') {
+            $sql .= " AND (c.PEDRAS IS NULL OR c.PEDRAS = 0)";
+        }
+
         $formas = $this->formasEspeciais();
         if ($filtro === 'inadimplentes') {
             $sql .= " AND (c.ID_CONTATO_BLING IS NULL OR c.EXIBIR = 1)";

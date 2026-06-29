@@ -23,6 +23,7 @@ class ContatosController extends Controller {
         $representantes = $this->model->getRepresentantesComTelefones($somenteComTelefone, $somenteConfirmados, $somenteTentativas, $inadimplentes);
         $semTelefone = $this->model->getClientesSemTelefone($inadimplentes);
         $contatosFinanceiros = $this->model->getAllContatosFinanceiros($somenteConfirmados, $somenteTentativas);
+        $pedras = $this->model->getClientesPedras();
 
         return view('pages.contatos', [
             'aba' => $aba,
@@ -32,8 +33,23 @@ class ContatosController extends Controller {
             'clientes' => $clientes,
             'representantes' => $representantes,
             'semTelefone' => $semTelefone,
-            'contatosFinanceiros' => $contatosFinanceiros
+            'contatosFinanceiros' => $contatosFinanceiros,
+            'pedras' => $pedras
         ]);
+    }
+
+    public function togglePedra() {
+        $idContato = request()->post()['id_contato'] ?? null;
+        if ($idContato) {
+            $this->model->togglePedra($idContato);
+        }
+        
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['ok' => true]);
+        }
+        
+        $aba = request()->post()['aba'] ?? 'clientes';
+        return redirect(url('/') . '/contatos?aba=' . $aba);
     }
 
     public function salvarTelefone() {

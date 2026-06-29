@@ -109,6 +109,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/contatos/excluir-telefone', [ContatosController::class, 'excluirTelefone'])->name('excluir-telefone-contato');
     Route::post('/contatos/toggle-confirmado', [ContatosController::class, 'toggleConfirmado'])->name('toggle-telefone-confirmado');
     Route::post('/contatos/toggle-origem', [ContatosController::class, 'toggleOrigem'])->name('toggle-origem-telefone');
+    Route::post('/contatos/toggle-pedra', [ContatosController::class, 'togglePedra'])->name('toggle-pedra-contato');
     Route::post('/contatos/salvar-contato-financeiro', [ContatosController::class, 'salvarContatoFinanceiro'])->name('salvar-contato-financeiro');
     Route::post('/contatos/excluir-contato-financeiro', [ContatosController::class, 'excluirContatoFinanceiro'])->name('excluir-contato-financeiro');
     Route::get('/contatos/api/contatos', [ContatosController::class, 'apiContatos'])->name('api-contatos');

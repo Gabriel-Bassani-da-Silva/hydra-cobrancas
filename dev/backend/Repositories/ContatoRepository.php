@@ -156,7 +156,7 @@ class ContatoRepository {
              ) t ON t.ID_CONTATO_BLING = ce.ID_CONTATO_BLING $whereConfirmado
              LEFT JOIN COLABORADOR cc ON cc.ID_COLABORADOR = t.ID_COLAB_CRIACAO
              LEFT JOIN COLABORADOR ca ON ca.ID_COLABORADOR = t.ID_COLAB_ALTERACAO
-             WHERE c.EXIBIR = 1 $whereInadimplente
+             WHERE c.EXIBIR = 1 AND c.PEDRAS = 0 $whereInadimplente
              GROUP BY ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO
              ORDER BY ce.NOME_CONTATO"
         );
@@ -237,10 +237,34 @@ class ContatoRepository {
              FROM CLIENTE c
              JOIN CONTATO_EXTERNO ce ON ce.ID_CONTATO_BLING = c.ID_CONTATO_BLING
              LEFT JOIN CONTATO_TEL ct ON ct.ID_CONTATO_BLING = ce.ID_CONTATO_BLING
-             WHERE c.EXIBIR = 1 AND ct.ID_TEL IS NULL $whereInadimplente
+             WHERE c.EXIBIR = 1 AND c.PEDRAS = 0 AND ct.ID_TEL IS NULL $whereInadimplente
              ORDER BY ce.NOME_CONTATO"
         );
         return $stmt->fetchAll();
+    }
+
+    public function getClientesPedras(): array {
+        $stmt = $this->pdo->query(
+            "SELECT ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO,
+                    GROUP_CONCAT(DISTINCT CONCAT(t.ID_TEL, ':', t.NUM_TEL, ':', t.CONFIRMADO, ':', t.ORIGEM, ':', IFNULL(cc.NOME_COLABORADOR, ''), ':', IFNULL(ca.NOME_COLABORADOR, '')) SEPARATOR '|') AS telefones
+             FROM CLIENTE c
+             JOIN CONTATO_EXTERNO ce ON ce.ID_CONTATO_BLING = c.ID_CONTATO_BLING
+             LEFT JOIN (
+                 SELECT ct.ID_CONTATO_BLING, t.ID_TEL, t.NUM_TEL, t.CONFIRMADO, t.ORIGEM, t.ID_COLAB_CRIACAO, t.ID_COLAB_ALTERACAO 
+                 FROM CONTATO_TEL ct JOIN TEL t ON t.ID_TEL = ct.ID_TEL
+             ) t ON t.ID_CONTATO_BLING = ce.ID_CONTATO_BLING
+             LEFT JOIN COLABORADOR cc ON cc.ID_COLABORADOR = t.ID_COLAB_CRIACAO
+             LEFT JOIN COLABORADOR ca ON ca.ID_COLABORADOR = t.ID_COLAB_ALTERACAO
+             WHERE c.EXIBIR = 1 AND c.PEDRAS = 1
+             GROUP BY ce.ID_CONTATO_BLING, ce.NOME_CONTATO, ce.NUMERO_DOCUMENTO
+             ORDER BY ce.NOME_CONTATO"
+        );
+        return $this->parseTelefones($stmt->fetchAll());
+    }
+
+    public function togglePedra($idContatoBling): void {
+        $stmt = $this->pdo->prepare("UPDATE CLIENTE SET PEDRAS = IF(IFNULL(PEDRAS, 0) = 1, 0, 1) WHERE ID_CONTATO_BLING = :id");
+        $stmt->execute(['id' => $idContatoBling]);
     }
 
     public function getContatosFinanceiros($idContatoBling): array {
