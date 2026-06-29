@@ -471,7 +471,8 @@ class PedidoRepository {
                 GROUP_CONCAT(p.ID_PEDIDO) AS IDS_PEDIDOS,
                 GROUP_CONCAT(p.NUM_PEDIDO) AS NUMEROS_PEDIDOS,
                 MAX(CASE WHEN tel.ID_TEL IS NOT NULL THEN 1 ELSE 0 END) AS TEM_TELEFONE,
-                MAX(CASE WHEN tel.CONFIRMADO = 1 THEN 1 ELSE 0 END) AS TELEFONE_CONFIRMADO
+                MAX(CASE WHEN tel.CONFIRMADO = 1 THEN 1 ELSE 0 END) AS TELEFONE_CONFIRMADO,
+                MAX(c.PEDRAS) AS PEDRAS
              FROM " . $this->getPedidoBaseSql() . " p
              LEFT JOIN CLIENTE c ON c.ID_CONTATO_BLING = p.ID_CLIENTE
              LEFT JOIN CONTATO_EXTERNO c_ext ON c_ext.ID_CONTATO_BLING = p.ID_CLIENTE
@@ -630,6 +631,8 @@ class PedidoRepository {
                
         if ($filtro === 'pedras') {
             $sql .= " AND cf.PEDRAS = 1";
+        } else {
+            $sql .= " AND (cf.PEDRAS IS NULL OR cf.PEDRAS = 0)";
         }
         
         $sql .= " GROUP BY cf.ID_CONTATO, cf.NOME_CONTATO, t.NUM_TEL, t.CONFIRMADO

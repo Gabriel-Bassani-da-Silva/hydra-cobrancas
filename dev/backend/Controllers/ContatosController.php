@@ -33,8 +33,7 @@ class ContatosController extends Controller {
             'clientes' => $clientes,
             'representantes' => $representantes,
             'semTelefone' => $semTelefone,
-            'contatosFinanceiros' => $contatosFinanceiros,
-            'pedras' => $pedras
+            'contatosFinanceiros' => $contatosFinanceiros
         ]);
     }
 

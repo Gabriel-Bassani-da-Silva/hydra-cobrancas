@@ -94,9 +94,6 @@ $formatDoc = function($doc) {
         <a href="<?= getTabUrl('financeiros') ?>" class="tab <?= $aba === 'financeiros' ? 'active' : '' ?>">
             Contatos Financeiros <span class="tab-count"><?= count($contatosFinanceiros) ?></span>
         </a>
-        <a href="<?= getTabUrl('pedras') ?>" class="tab <?= $aba === 'pedras' ? 'active' : '' ?>">
-            Pedras <span class="tab-count"><?= isset($pedras) ? count($pedras) : 0 ?></span>
-        </a>
     </div>
 
     <!-- ═══ ABA: CLIENTES ═══ -->
@@ -204,89 +201,7 @@ $formatDoc = function($doc) {
     </div>
     @endif
 
-    <!-- ═══ ABA: PEDRAS ═══ -->
-    <?php if ($aba === 'pedras'): ?>
-    <div class="card">
-        <div class="table-filters">
-            <div class="search-box">
-                <x-icons.search-circle width="18" height="18" />
-                <input type="text" id="search-table" placeholder="Buscar por nome, documento ou telefone...">
-            </div>
-        </div>
-        <div class="table-responsive">
-            <table class="phone-table">
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>CPF/CNPJ</th>
-                        <th>Telefones (Bling)</th>
-                        <th>Telefone Manual</th>
-                        <th style="width: 50px; text-align: center;">Ações</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php if (empty($pedras)): ?>
-                        <tr><td colspan="5" class="empty-msg">Nenhuma pedra encontrada.</td></tr>
-                    @endif
-                    <?php foreach ($pedras ?? [] as $c): ?>
-                    <tr class="c-table-row clickable-row" onclick="openManagePhonesModal('<?= $c['ID_CONTATO_BLING'] ?>', '<?= htmlspecialchars($c['NOME_CONTATO'], ENT_QUOTES) ?>', 'pedras')" title="Gerenciar Telefones">
-                        <td class="nome-col">
-                            <div class="nome-container">
-                                <?= htmlspecialchars($c['NOME_CONTATO']) ?>
-                            </div>
-                            <div style="display: none;" id="phones-data-<?= $c['ID_CONTATO_BLING'] ?>"><?= htmlspecialchars(json_encode($c['telefones_arr'] ?? []), ENT_QUOTES) ?></div>
-                        </td>
-                        <td class="doc-col"><?= $formatDoc($c['NUMERO_DOCUMENTO'] ?? '') ?></td>
-                        <td>
-                            <?php 
-                            $blingTels = array_filter($c['telefones_arr'] ?? [], fn($t) => $t['origem'] === 'bling');
-                            if (empty($blingTels)): ?>
-                                <span class="no-phone">Sem telefone</span>
-                            <?php else: ?>
-                                <div class="tel-list-container">
-                                <?php foreach ($blingTels as $t): ?>
-                                    <div class="tel-item simplified">
-                                        <span class="tel-num <?= $t['confirmado'] ? 'confirmed-text' : 'attempt-text' ?>"><?= htmlspecialchars(formatPhone($t['num'])) ?></span>
-                                    </div>
-                                <?php endforeach; ?>
-                                </div>
-                            @endif
-                        </td>
-                        <td>
-                            <?php 
-                            $manualTels = array_filter($c['telefones_arr'] ?? [], fn($t) => $t['origem'] === 'manual');
-                            if (empty($manualTels)): ?>
-                                <span class="no-phone">Sem telefone</span>
-                            <?php else: ?>
-                                <div class="tel-list-container">
-                                <?php foreach ($manualTels as $t): ?>
-                                    <div class="tel-item simplified">
-                                        <span class="tel-num <?= $t['confirmado'] ? 'confirmed-text' : 'attempt-text' ?>"><?= htmlspecialchars(formatPhone($t['num'])) ?></span>
-                                    </div>
-                                <?php endforeach; ?>
-                                </div>
-                            @endif
-                        </td>
-                        <td onclick="event.stopPropagation();" style="text-align: center;">
-                            <form action="{{ route('toggle-pedra-contato') }}" method="POST" style="margin:0;">
-                                @csrf
-                                <input type="hidden" name="id_contato" value="<?= $c['ID_CONTATO_BLING'] ?>">
-                                <input type="hidden" name="aba" value="<?= $aba ?>">
-                                <button type="submit" title="Remover Pedra" style="background:none; border:none; color:#10b981; cursor:pointer; padding:5px;">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    @endif
+
 
     <!-- ═══ ABA: REPRESENTANTES ═══ -->
     <?php if ($aba === 'representantes'): ?>

@@ -102,6 +102,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/contas-receber/api/lista', [ContasReceberController::class, 'apiLista'])->name('api-lista-contas');
     Route::get('/contas-receber/api/detalhe', [ContasReceberController::class, 'apiDetalhe'])->name('api-detalhe-conta');
     Route::get('/contas-receber/api-baixas-cliente', [ContasReceberController::class, 'apiBaixasCliente'])->name('api-baixas-cliente');
+    Route::post('/contas-receber/toggle-pedra', [ContasReceberController::class, 'togglePedra'])->name('toggle-pedra-contas-receber');
 
     // Contatos
     Route::get('/contatos', [ContatosController::class, 'index'])->name('contatos-page');

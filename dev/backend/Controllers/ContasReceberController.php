@@ -374,6 +374,20 @@ class ContasReceberController extends Controller {
     }
 
 
+    public function togglePedra() {
+        $idContato = request()->input('id_contato');
+        if (!$idContato) {
+            return response()->json(['ok' => false, 'error' => 'ID não informado']);
+        }
+        try {
+            $contatoRepo = new \App\Repositories\ContatoRepository();
+            $contatoRepo->togglePedra($idContato);
+            return response()->json(['ok' => true]);
+        } catch (\Exception $e) {
+            return response()->json(['ok' => false, 'error' => $e->getMessage()]);
+        }
+    }
+
     /**
      * JSON API: lista contas a receber com filtros.
      * Parâmetros GET: tipo (clientes|representantes), id, q (busca)
