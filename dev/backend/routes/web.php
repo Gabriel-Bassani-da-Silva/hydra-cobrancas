@@ -128,7 +128,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/contatos/importar/log', [ContatosController::class, 'logImportacao'])->name('log-importacao-page');
 
     Route::post('/cobrancas/marcar-pago', [ContasReceberController::class, 'marcarPagoLocal']);
-    Route::post('/contas-receber/baixar', [ContasReceberController::class, 'baixarManual']);
 
     Route::post('/baixas/editar', [\App\Controllers\BaixaController::class, 'editar']);
     Route::post('/baixas/estornar', [\App\Controllers\BaixaController::class, 'estornar']);
