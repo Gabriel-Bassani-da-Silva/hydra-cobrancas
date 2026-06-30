@@ -45,14 +45,19 @@ class TestesController extends Controller {
             $log[] = "[2] Cliente e Pedido de teste criados (R$ 100.00 pendentes).";
 
             // 1. Dar Baixa
-            $requestBaixa = Request::create('/contas-receber/baixar', 'POST', [
-                'id_pedido' => 888888888,
-                'valor_pago' => 50.00,
-                'data_pagamento' => date('Y-m-d')
+            request()->replace([
+                'baixas' => [
+                    [
+                        'id' => 888888888,
+                        'valor' => 50.00,
+                        'data_pagamento' => date('Y-m-d')
+                    ]
+                ]
             ]);
+            request()->setMethod('POST');
+            
             $controller = app()->make(ContasReceberController::class);
-            // Simulate the method call
-            $response = $controller->baixar($requestBaixa);
+            $response = $controller->baixar();
             $log[] = "[3] Requisição de baixa enviada (R$ 50.00). Retorno: " . json_encode($response);
 
             // Verify
@@ -64,12 +69,11 @@ class TestesController extends Controller {
             }
 
             // 2. Estornar Baixa (simulando a exclusão do detalhe)
-            // Para estornar via controller precisamos do ID da baixa (ID_DETALHE_PAGAMENTO)
             $idDetalhe = DB::selectOne("SELECT ID_DETALHE_PAGAMENTO FROM DETALHE_PAGAMENTO WHERE ID_PEDIDO = 888888888")->ID_DETALHE_PAGAMENTO ?? null;
             if ($idDetalhe) {
-                $requestEstorno = Request::create('/baixas/estornar', 'POST', ['id' => $idDetalhe]);
+                request()->replace(['id_detalhe' => $idDetalhe]);
                 $baixaCtrl = app()->make(BaixaController::class);
-                $baixaCtrl->estornar($requestEstorno);
+                $baixaCtrl->estornar();
                 $log[] = "[5] Requisição de estorno enviada para a baixa ID {$idDetalhe}.";
 
                 $verificaEstorno = DB::selectOne("SELECT SUM(VALOR_PAGO_PEDIDO) as total_pago FROM DETALHE_PAGAMENTO WHERE ID_PEDIDO = 888888888");
@@ -100,12 +104,12 @@ class TestesController extends Controller {
             $log[] = "[2] Cliente de teste criado.";
 
             // 1. Adicionar Telefone
-            $requestAdd = Request::create('/contatos/salvar-telefone', 'POST', [
+            request()->replace([
                 'id_contato_bling' => 999999999,
                 'numero_tel' => '99999999999'
             ]);
             $contatosCtrl = app()->make(ContatosController::class);
-            $contatosCtrl->salvarTelefone($requestAdd);
+            $contatosCtrl->salvarTelefone();
             $log[] = "[3] Requisição para salvar telefone (99999999999) enviada.";
 
             $tel = DB::selectOne("SELECT * FROM TEL WHERE NUM_TEL = '99999999999'");
@@ -118,12 +122,12 @@ class TestesController extends Controller {
             }
 
             // 2. Toggle Confirmado
-            $requestToggle = Request::create('/contatos/toggle-confirmado', 'POST', [
+            request()->replace([
                 'id_contato_bling' => 999999999,
                 'id_tel' => $tel->ID_TEL,
                 'confirmado' => 1
             ]);
-            $contatosCtrl->toggleConfirmado($requestToggle);
+            $contatosCtrl->toggleConfirmado();
             $log[] = "[5] Requisição para confirmar telefone enviada.";
             
             $verificaConf = DB::selectOne("SELECT CONFIRMADO FROM CONTATO_TEL WHERE ID_CONTATO_BLING = 999999999 AND ID_TEL = ?", [$tel->ID_TEL]);
@@ -134,11 +138,11 @@ class TestesController extends Controller {
             }
 
             // 3. Excluir Telefone
-            $requestDel = Request::create('/contatos/excluir-telefone', 'POST', [
+            request()->replace([
                 'id_contato_bling' => 999999999,
                 'id_tel' => $tel->ID_TEL
             ]);
-            $contatosCtrl->excluirTelefone($requestDel);
+            $contatosCtrl->excluirTelefone();
             $log[] = "[7] Requisição para excluir telefone enviada.";
 
             $verificaDel = DB::selectOne("SELECT * FROM CONTATO_TEL WHERE ID_CONTATO_BLING = 999999999 AND ID_TEL = ?", [$tel->ID_TEL]);

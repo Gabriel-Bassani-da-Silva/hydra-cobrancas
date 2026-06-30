@@ -222,8 +222,10 @@ class ContasReceberController extends Controller {
             return response()->json(['success' => false, 'error' => 'Método não permitido']);
         }
 
-        $input = file_get_contents('php://input');
-        $data = json_decode($input, true);
+        $data = request()->all();
+        if (empty($data)) {
+            $data = json_decode(file_get_contents('php://input'), true);
+        }
 
         if (empty($data['baixas']) || !is_array($data['baixas'])) {
             return response()->json(['success' => false, 'error' => 'Dados inválidos']);
