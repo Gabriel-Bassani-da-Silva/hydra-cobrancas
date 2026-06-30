@@ -74,7 +74,7 @@ class TestesController extends Controller {
             }
 
             // 2. Estornar Baixa (simulando a exclusão do detalhe)
-            $idDetalhe = DB::selectOne("SELECT ID_DETALHE_PAGAMENTO FROM DETALHE_PAGAMENTO WHERE ID_PEDIDO = 888888888")->ID_DETALHE_PAGAMENTO ?? null;
+            $idDetalhe = DB::selectOne("SELECT ID_DETALHE FROM DETALHE_PAGAMENTO WHERE ID_PEDIDO = 888888888")->ID_DETALHE ?? null;
             if ($idDetalhe) {
                 request()->merge(['id_detalhe' => $idDetalhe]);
                 $baixaCtrl = app()->make(BaixaController::class);
@@ -123,7 +123,7 @@ class TestesController extends Controller {
             $respDataAdd = json_decode($respAdd->getContent(), true) ?? ['error' => 'Not JSON'];
             $log[] = "[3] Requisição para salvar telefone (99999999999) enviada. Retorno: " . json_encode($respDataAdd);
 
-            if (empty($respDataAdd['success'])) {
+            if (empty($respDataAdd['ok'])) {
                 throw new Exception("Erro ao salvar telefone: " . ($respDataAdd['error'] ?? 'Desconhecido'));
             }
 
@@ -146,7 +146,7 @@ class TestesController extends Controller {
             $respDataToggle = json_decode($respToggle->getContent(), true) ?? ['error' => 'Not JSON'];
             $log[] = "[5] Requisição para confirmar telefone enviada. Retorno: " . json_encode($respDataToggle);
             
-            if (empty($respDataToggle['success'])) {
+            if (empty($respDataToggle['ok'])) {
                 throw new Exception("Erro ao confirmar telefone: " . ($respDataToggle['error'] ?? 'Desconhecido'));
             }
             
@@ -166,7 +166,7 @@ class TestesController extends Controller {
             $respDataDel = json_decode($respDel->getContent(), true) ?? ['error' => 'Not JSON'];
             $log[] = "[7] Requisição para excluir telefone enviada. Retorno: " . json_encode($respDataDel);
 
-            if (empty($respDataDel['success'])) {
+            if (empty($respDataDel['ok'])) {
                 throw new Exception("Erro ao excluir telefone: " . ($respDataDel['error'] ?? 'Desconhecido'));
             }
 
