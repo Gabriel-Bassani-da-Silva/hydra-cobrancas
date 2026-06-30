@@ -153,10 +153,11 @@
         top: 50%;
         transform: translateY(-50%);
         color: #94a3b8;
+        pointer-events: none;
     }
     
     .premium-input.with-icon {
-        padding-left: 2.75rem;
+        padding-left: 3.2rem !important;
     }
 </style>
 
