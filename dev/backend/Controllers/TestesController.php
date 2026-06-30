@@ -114,9 +114,9 @@ class TestesController extends Controller {
             $log[] = "[2] Cliente de teste criado.";
 
             // 1. Adicionar Telefone
-            request()->merge([
-                'id_contato_bling' => 999999999,
-                'numero_tel' => '99999999999'
+            request()->request->replace([
+                'id_contato' => 999999999,
+                'num_tel' => '99999999999'
             ]);
             $contatosCtrl = app()->make(ContatosController::class);
             $respAdd = $contatosCtrl->salvarTelefone();
@@ -137,8 +137,8 @@ class TestesController extends Controller {
             }
 
             // 2. Toggle Confirmado
-            request()->merge([
-                'id_contato_bling' => 999999999,
+            request()->request->replace([
+                'id_contato' => 999999999,
                 'id_tel' => $tel->ID_TEL,
                 'confirmado' => 1
             ]);
@@ -158,8 +158,8 @@ class TestesController extends Controller {
             }
 
             // 3. Excluir Telefone
-            request()->merge([
-                'id_contato_bling' => 999999999,
+            request()->request->replace([
+                'id_contato' => 999999999,
                 'id_tel' => $tel->ID_TEL
             ]);
             $respDel = $contatosCtrl->excluirTelefone();
