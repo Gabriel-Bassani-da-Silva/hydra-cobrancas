@@ -26,17 +26,30 @@ Route::get('/logout', [AuthController::class, 'logout']); // Fallback para get s
 // Rotas de Debug (Sem Auth)
 Route::get('/migrate-pedido', function() {
     try {
-        \Illuminate\Support\Facades\DB::unprepared("
-            -- Adiciona as colunas novas
-            ALTER TABLE PEDIDO ADD COLUMN ORIGEM VARCHAR(50) DEFAULT 'bling' AFTER ID_PEDIDO;
-            ALTER TABLE PEDIDO ADD COLUMN ID_BLING BIGINT NULL AFTER ORIGEM;
-            -- Copia o ID atual (que veio do Bling) para a nova coluna
-            UPDATE PEDIDO SET ID_BLING = ID_PEDIDO;
-            -- Transforma a coluna atual em AUTO_INCREMENT
-            ALTER TABLE PEDIDO MODIFY ID_PEDIDO BIGINT NOT NULL AUTO_INCREMENT;
-            -- Adiciona o índice único para ON DUPLICATE KEY UPDATE funcionar
-            ALTER TABLE PEDIDO ADD UNIQUE INDEX uk_origem_bling (ORIGEM, ID_BLING);
-        ");
+        $pdo = \Illuminate\Support\Facades\DB::connection()->getPdo();
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
+
+        // 1. Adiciona as novas colunas
+        $pdo->exec("ALTER TABLE PEDIDO ADD COLUMN ORIGEM VARCHAR(50) DEFAULT 'bling' AFTER ID_PEDIDO;");
+        $pdo->exec("ALTER TABLE PEDIDO ADD COLUMN ID_BLING BIGINT NULL AFTER ORIGEM;");
+
+        // 2. Copia o ID do Bling para a nova coluna antes de modificar o PK
+        $pdo->exec("UPDATE PEDIDO SET ID_BLING = ID_PEDIDO;");
+
+        // 3. Drop da FK que bloqueia o MODIFY (será recriada depois)
+        $pdo->exec("ALTER TABLE VINCULO_COBRANCA_PEDIDO DROP FOREIGN KEY FK_VINCULO_COBR_PED_PEDIDO;");
+
+        // 4. Transforma ID_PEDIDO em AUTO_INCREMENT
+        $pdo->exec("ALTER TABLE PEDIDO MODIFY ID_PEDIDO BIGINT NOT NULL AUTO_INCREMENT;");
+
+        // 5. Recria a FK (o tipo da coluna continua BIGINT, então é 100% compatível)
+        $pdo->exec("ALTER TABLE VINCULO_COBRANCA_PEDIDO ADD CONSTRAINT FK_VINCULO_COBR_PED_PEDIDO FOREIGN KEY (ID_PEDIDO) REFERENCES PEDIDO (ID_PEDIDO);");
+
+        // 6. Índice único para ON DUPLICATE KEY UPDATE funcionar na sincronização
+        $pdo->exec("ALTER TABLE PEDIDO ADD UNIQUE INDEX uk_origem_bling (ORIGEM, ID_BLING);");
+
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
+
         return 'Migracao da tabela PEDIDO concluida com sucesso!';
     } catch (\Exception $e) {
         return 'Erro Fatal: ' . $e->getMessage();
