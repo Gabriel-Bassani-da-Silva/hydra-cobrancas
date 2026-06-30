@@ -20,7 +20,7 @@ class TestesController extends Controller {
         DB::statement("DELETE FROM DETALHE_PAGAMENTO WHERE ID_PEDIDO = 888888888");
         DB::statement("DELETE FROM PEDIDO WHERE ID_PEDIDO = 888888888");
         DB::statement("DELETE FROM CONTATO_TEL WHERE ID_CONTATO_BLING = 999999999");
-        DB::statement("DELETE FROM TEL WHERE NUMERO_TEL = '99999999999'");
+        DB::statement("DELETE FROM TEL WHERE NUM_TEL = '99999999999'");
         DB::statement("DELETE FROM CONTATO_FINANCEIRO WHERE ID_CLIENTE = 999999999");
         DB::statement("DELETE FROM CLIENTE WHERE ID_CONTATO_BLING = 999999999");
         DB::statement("DELETE FROM CONTATO_EXTERNO WHERE ID_CONTATO_BLING = 999999999");
@@ -109,7 +109,7 @@ class TestesController extends Controller {
             $contatosCtrl->salvarTelefone($requestAdd);
             $log[] = "[3] Requisição para salvar telefone (99999999999) enviada.";
 
-            $tel = DB::selectOne("SELECT * FROM TEL WHERE NUMERO_TEL = '99999999999'");
+            $tel = DB::selectOne("SELECT * FROM TEL WHERE NUM_TEL = '99999999999'");
             $contatoTel = DB::selectOne("SELECT * FROM CONTATO_TEL WHERE ID_CONTATO_BLING = 999999999 AND ID_TEL = ?", [$tel->ID_TEL ?? 0]);
             
             if ($tel && $contatoTel) {
