@@ -37,6 +37,7 @@
                         <th>Valor a Baixar</th>
                         <th>Data Pago</th>
                         <th>Colaborador</th>
+                        <th class="text-center" style="color: #ea580c;">É Cheque?</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -63,6 +64,9 @@
                                     </option>
                                 @endforeach
                             </select>
+                        </td>
+                        <td class="text-center">
+                            <input class="form-check-input" type="checkbox" name="is_cheque[{{ $idx }}]" value="1" title="Marcar como cheque">
                         </td>
                     </tr>
                     @endforeach

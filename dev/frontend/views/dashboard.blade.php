@@ -34,6 +34,7 @@
                             <th>Colaborador</th>
                             <th class="text-center">Baixas</th>
                             <th class="text-center">Pontos</th>
+                            <th class="valor-col" style="color: #ea580c;">Cheques Pendentes</th>
                             <th class="valor-col">Total Recebido</th>
                         </tr>
                     </thead>
@@ -54,11 +55,12 @@
                                 <td style="font-weight: 500;">{{ $item->NOME_COLABORADOR }}</td>
                                 <td class="text-center" style="color: #475569;">{{ $item->QTD_BAIXAS }}</td>
                                 <td class="text-center" style="color: #3b82f6; font-weight: 700;">{{ $item->PONTOS_TOTAIS ?? 0 }} pts</td>
+                                <td class="valor-col" style="color: #ea580c; font-weight: 600;">R$ {{ number_format($item->TOTAL_CHEQUES ?? 0, 2, ',', '.') }}</td>
                                 <td class="valor-col" style="color: #059669; font-weight: 600;">R$ {{ number_format($item->TOTAL_RECEBIDO, 2, ',', '.') }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center" style="padding: 2rem; color: #64748b;">Nenhum recebimento registrado.</td>
+                                <td colspan="6" class="text-center" style="padding: 2rem; color: #64748b;">Nenhum recebimento registrado.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -83,7 +85,7 @@
                             <th style="width: 60px; text-align: center;">Pos</th>
                             <th>Colaborador</th>
                             <th class="text-center">Baixas</th>
-                            <th class="text-center">Pontos</th>
+                            <th class="valor-col" style="color: #ea580c;">Cheques Pendentes</th>
                             <th class="valor-col">Total Recebido</th>
                         </tr>
                     </thead>
@@ -103,7 +105,7 @@
                                 </td>
                                 <td style="font-weight: 500;">{{ $item->NOME_COLABORADOR }}</td>
                                 <td class="text-center" style="color: #475569;">{{ $item->QTD_BAIXAS }}</td>
-                                <td class="text-center" style="color: #3b82f6; font-weight: 700;">{{ $item->PONTOS_TOTAIS ?? 0 }} pts</td>
+                                <td class="valor-col" style="color: #ea580c; font-weight: 600;">R$ {{ number_format($item->TOTAL_CHEQUES ?? 0, 2, ',', '.') }}</td>
                                 <td class="valor-col" style="color: #059669; font-weight: 600;">R$ {{ number_format($item->TOTAL_RECEBIDO, 2, ',', '.') }}</td>
                             </tr>
                         @empty

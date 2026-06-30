@@ -271,6 +271,7 @@ class BaixasImportController extends Controller {
     public function confirmarImportacao() {
         $prontos = session()->get('baixas_prontas', []);
         $colabsEditados = request()->input('colaboradores', []);
+        $isChequeEditados = request()->input('is_cheque', []);
 
         if (empty($prontos)) {
             session()->flash('flash_msg', "Não há registros para importar.");
@@ -279,6 +280,7 @@ class BaixasImportController extends Controller {
 
         $sucessos = 0;
         $erros    = [];
+        $idFormaCheque = config('hydra.bling.formas_pagamento.cheque', 7179734);
 
         foreach ($prontos as $idx => $item) {
             try {
@@ -294,6 +296,16 @@ class BaixasImportController extends Controller {
                         'data_pago' => !empty($item['data_pago']) ? $item['data_pago'] : null,
                     ]
                 ], $idColab, true);
+
+                if (!empty($isChequeEditados[$idx])) {
+                    \Illuminate\Support\Facades\DB::table('PEDIDO')
+                        ->where('ID_PEDIDO', $item['id_pedido'])
+                        ->update([
+                            'ID_FORMA_PAGAMENTO' => $idFormaCheque,
+                            'STATUS_CHEQUE' => 'pendente'
+                        ]);
+                }
+
                 $sucessos++;
             } catch (\Exception $e) {
                 $erros[] = "Pedido #{$item['num_pedido']}: " . $e->getMessage();

@@ -103,6 +103,9 @@
                                                     <button onclick="abrirModalBaixa({{ json_encode($ped['ids']) }})" title="{{ $qtdParc > 1 ? 'Baixar todas as parcelas' : 'Baixar' }}" class="btn-action-icon-sm" style="margin-left:4px; border:none; background:transparent; cursor:pointer;">
                                                         <x-icons.check width="14" height="14" />
                                                     </button>
+                                                    <button onclick="converterParaCheque('{{ implode(',', $ped['ids']) }}')" title="Mudar para Cheque" class="btn-action-icon-sm" style="margin-left:4px; border:none; background:transparent; cursor:pointer; color: #ea580c;">
+                                                        <span style="font-size:12px;">💸</span>
+                                                    </button>
                                                 </td>
                                             </tr>
 
@@ -144,6 +147,9 @@
                                                                                 <button onclick="abrirModalBaixa([{{ $p['ID_CONTA_RECEBER'] }}])" title="Baixar esta parcela" class="btn-action-icon-sm" style="margin-left:4px; border:none; background:transparent; cursor:pointer;">
                                                                                     <x-icons.check width="14" height="14" />
                                                                                </button>
+                                                                               <button onclick="converterParaCheque('{{ $p['ID_CONTA_RECEBER'] }}')" title="Mudar para Cheque" class="btn-action-icon-sm" style="margin-left:4px; border:none; background:transparent; cursor:pointer; color: #ea580c;">
+                                                                                    <span style="font-size:12px;">💸</span>
+                                                                                </button>
                                                                             </td>
                                                                         </tr>
                                                                     @endforeach
@@ -214,6 +220,9 @@
                             <button onclick="abrirModalBaixa({{ json_encode($grupo['ids']) }})" title="{{ $qtd > 1 ? 'Baixar todas as parcelas' : 'Baixar' }}" class="btn-action-icon-sm" style="margin-left:4px; border:none; background:transparent; cursor:pointer;">
                                 <x-icons.check width="14" height="14" />
                             </button>
+                            <button onclick="converterParaCheque('{{ implode(',', $grupo['ids']) }}')" title="Mudar para Cheque" class="btn-action-icon-sm" style="margin-left:4px; border:none; background:transparent; cursor:pointer; color: #ea580c;">
+                                <span style="font-size:12px;">💸</span>
+                            </button>
                         </td>
                     </tr>
 
@@ -253,6 +262,9 @@
                                                         </a>
                                                         <button onclick="abrirModalBaixa([{{ $p['ID_CONTA_RECEBER'] }}])" title="Baixar esta parcela" class="btn-action-icon-sm" style="margin-left:4px; border:none; background:transparent; cursor:pointer;">
                                                             <x-icons.check width="14" height="14" />
+                                                        </button>
+                                                        <button onclick="converterParaCheque('{{ $p['ID_CONTA_RECEBER'] }}')" title="Mudar para Cheque" class="btn-action-icon-sm" style="margin-left:4px; border:none; background:transparent; cursor:pointer; color: #ea580c;">
+                                                            <span style="font-size:12px;">💸</span>
                                                         </button>
                                                     </td>
                                                 </tr>

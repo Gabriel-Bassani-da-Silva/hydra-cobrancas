@@ -14,6 +14,7 @@ use App\Controllers\PerfilController;
 use App\Controllers\ExportController;
 use App\Controllers\CsvExportController;
 use App\Controllers\RankingConfigController;
+use App\Controllers\ChequesController;
 
 // Exportação Google Sheets (sem auth middleware para ser lido publicamente pelo Sheets)
 Route::get('/api/exportar-contatos-csv', [CsvExportController::class, 'exportarContatos'])->name('api-export-csv');
@@ -33,9 +34,17 @@ Route::get('/limpar-nomes', function () {
         return 'Erro: ' . $e->getMessage();
     }
 });
-// Rota temporária para atualizar a view de ranking diário
-Route::get('/update-ranking-vencimento', function () {
+// Rota temporária para criar coluna STATUS_CHEQUE e atualizar views de ranking
+Route::get('/update-ranking-cheques', function () {
     try {
+        // 1. Adicionar coluna STATUS_CHEQUE na tabela PEDIDO
+        try {
+            \Illuminate\Support\Facades\DB::statement("ALTER TABLE `PEDIDO` ADD COLUMN `STATUS_CHEQUE` ENUM('pendente', 'compensado') NOT NULL DEFAULT 'pendente'");
+        } catch (\Exception $e) {
+            // Ignora erro se a coluna já existir
+        }
+
+        // 2. Recriar vw_ranking_diario
         \Illuminate\Support\Facades\DB::statement("DROP VIEW IF EXISTS `vw_ranking_diario`");
         \Illuminate\Support\Facades\DB::statement("
             CREATE VIEW `vw_ranking_diario` AS
@@ -43,16 +52,8 @@ Route::get('/update-ranking-vencimento', function () {
                 c.ID_COLABORADOR,
                 c.NOME_COLABORADOR,
                 COUNT(DISTINCT rp.ID_REGISTRO) as QTD_BAIXAS,
-                SUM(dp.VALOR_PAGO_PEDIDO) as TOTAL_RECEBIDO,
-                (
-                    SELECT COUNT(DISTINCT p2.ID_PEDIDO) * (SELECT PONTOS_PEDIDO_PAGO FROM CONFIGURACOES_RANKING LIMIT 1)
-                    FROM DETALHE_PAGAMENTO dp2
-                    JOIN REGISTRO_PAGAMENTO rp2 ON rp2.ID_REGISTRO = dp2.ID_REGISTRO
-                    JOIN PEDIDO p2 ON p2.ID_PEDIDO = dp2.ID_PEDIDO
-                    WHERE rp2.ID_COLABORADOR = c.ID_COLABORADOR
-                    AND p2.DATA_VENCIMENTO >= (SELECT DATA_INICIO_DIARIO FROM CONFIGURACOES_RANKING LIMIT 1)
-                    AND (p2.VALOR_PAGO_BLING >= p2.TOTAL_PEDIDO OR (SELECT SUM(dp3.VALOR_PAGO_PEDIDO) FROM DETALHE_PAGAMENTO dp3 WHERE dp3.ID_PEDIDO = p2.ID_PEDIDO) >= p2.TOTAL_PEDIDO)
-                ) as PONTOS_TOTAIS
+                SUM(CASE WHEN p.ID_FORMA_PAGAMENTO = 7179734 AND p.STATUS_CHEQUE = 'pendente' THEN 0 ELSE dp.VALOR_PAGO_PEDIDO END) as TOTAL_RECEBIDO,
+                SUM(CASE WHEN p.ID_FORMA_PAGAMENTO = 7179734 AND p.STATUS_CHEQUE = 'pendente' THEN dp.VALOR_PAGO_PEDIDO ELSE 0 END) as TOTAL_CHEQUES
             FROM REGISTRO_PAGAMENTO rp
             JOIN COLABORADOR c ON c.ID_COLABORADOR = rp.ID_COLABORADOR
             JOIN DETALHE_PAGAMENTO dp ON dp.ID_REGISTRO = rp.ID_REGISTRO
@@ -60,7 +61,33 @@ Route::get('/update-ranking-vencimento', function () {
             WHERE p.DATA_VENCIMENTO >= (SELECT DATA_INICIO_DIARIO FROM CONFIGURACOES_RANKING LIMIT 1)
             GROUP BY c.ID_COLABORADOR, c.NOME_COLABORADOR
         ");
-        return 'View vw_ranking_diario atualizada com sucesso para usar DATA_VENCIMENTO!';
+
+        // 3. Recriar vw_ranking_total
+        \Illuminate\Support\Facades\DB::statement("DROP VIEW IF EXISTS `vw_ranking_total`");
+        \Illuminate\Support\Facades\DB::statement("
+            CREATE VIEW `vw_ranking_total` AS
+            SELECT 
+                c.ID_COLABORADOR,
+                c.NOME_COLABORADOR,
+                COUNT(DISTINCT rp.ID_REGISTRO) as QTD_BAIXAS,
+                SUM(CASE WHEN p.ID_FORMA_PAGAMENTO = 7179734 AND p.STATUS_CHEQUE = 'pendente' THEN 0 ELSE dp.VALOR_PAGO_PEDIDO END) as TOTAL_RECEBIDO,
+                SUM(CASE WHEN p.ID_FORMA_PAGAMENTO = 7179734 AND p.STATUS_CHEQUE = 'pendente' THEN dp.VALOR_PAGO_PEDIDO ELSE 0 END) as TOTAL_CHEQUES,
+                (
+                    SELECT COUNT(DISTINCT p2.ID_PEDIDO) * (SELECT PONTOS_PEDIDO_PAGO FROM CONFIGURACOES_RANKING LIMIT 1)
+                    FROM DETALHE_PAGAMENTO dp2
+                    JOIN REGISTRO_PAGAMENTO rp2 ON rp2.ID_REGISTRO = dp2.ID_REGISTRO
+                    JOIN PEDIDO p2 ON p2.ID_PEDIDO = dp2.ID_PEDIDO
+                    WHERE rp2.ID_COLABORADOR = c.ID_COLABORADOR
+                    AND (p2.VALOR_PAGO_BLING >= p2.TOTAL_PEDIDO OR (SELECT SUM(dp3.VALOR_PAGO_PEDIDO) FROM DETALHE_PAGAMENTO dp3 WHERE dp3.ID_PEDIDO = p2.ID_PEDIDO) >= p2.TOTAL_PEDIDO)
+                ) as PONTOS_TOTAIS
+            FROM REGISTRO_PAGAMENTO rp
+            JOIN COLABORADOR c ON c.ID_COLABORADOR = rp.ID_COLABORADOR
+            JOIN DETALHE_PAGAMENTO dp ON dp.ID_REGISTRO = rp.ID_REGISTRO
+            JOIN PEDIDO p ON p.ID_PEDIDO = dp.ID_PEDIDO
+            GROUP BY c.ID_COLABORADOR, c.NOME_COLABORADOR
+        ");
+
+        return 'Banco de dados e views de ranking (Cheques) atualizados com sucesso!';
     } catch (\Exception $e) {
         return 'Erro: ' . $e->getMessage();
     }
@@ -138,6 +165,12 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/baixas/editar', [\App\Controllers\BaixaController::class, 'editar']);
     Route::post('/baixas/estornar', [\App\Controllers\BaixaController::class, 'estornar']);
+
+    // Cheques
+    Route::get('/contas-receber/cheques', [ChequesController::class, 'index'])->name('cheques-page');
+    Route::post('/contas-receber/cheques/{id}/compensar', [ChequesController::class, 'compensar'])->name('cheques-compensar');
+    Route::post('/contas-receber/cheques/{id}/devolver', [ChequesController::class, 'devolver'])->name('cheques-devolver');
+    Route::post('/contas-receber/cheques/{id}/converter', [ChequesController::class, 'converterParaCheque'])->name('cheques-converter');
 
     // Divergências (ações, sem página própria — integrado na aba Baixas do Contas a Receber)
     Route::get('/divergencias/api-divergencias-cliente', [DivergenciaController::class, 'apiDivergenciasCliente']);

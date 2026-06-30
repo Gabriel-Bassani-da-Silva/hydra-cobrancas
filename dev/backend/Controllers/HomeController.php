@@ -18,7 +18,6 @@ class HomeController extends Controller
                 ->get();
 
             $rankingDiario = \Illuminate\Support\Facades\DB::table('vw_ranking_diario')
-                ->orderByDesc('PONTOS_TOTAIS')
                 ->orderByDesc('TOTAL_RECEBIDO')
                 ->get();
 

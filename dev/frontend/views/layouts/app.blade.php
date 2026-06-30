@@ -53,6 +53,11 @@
                         <span>Contas</span>
                     </a>
 
+                    <a href="{{ url('/contas-receber/cheques') }}" class="header-icon-btn" title="Gestão de Cheques">
+                        <span style="font-size: 1.2rem; margin-right: 4px;">💸</span>
+                        <span>Cheques</span>
+                    </a>
+
                     <a href="{{ url('/perfil') }}" class="header-icon-btn profile" title="Meu Perfil">
                         <x-icons.icon-10 />
                     </a>
