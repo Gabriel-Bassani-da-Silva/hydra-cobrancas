@@ -167,12 +167,15 @@ class PedidoRepository {
                 $totalBaixa += (float)$b['valor'];
             }
 
-            // Cria o registro principal
-            $stmtRegistro = DB::connection()->getPdo()->prepare("INSERT INTO REGISTRO_PAGAMENTO (VALOR_REGISTRO, ID_COLABORADOR) VALUES (:valor, :colab)");
-            $stmtRegistro->execute([
-                'valor' => $totalBaixa,
-                'colab' => $idColaborador
-            ]);
+            // Cria o registro principal — suporta data histórica (data_pago)
+            $dataPago = !empty($baixas[0]['data_pago']) ? $baixas[0]['data_pago'] : null;
+            if ($dataPago) {
+                $stmtRegistro = DB::connection()->getPdo()->prepare("INSERT INTO REGISTRO_PAGAMENTO (VALOR_REGISTRO, ID_COLABORADOR, DATA_REGISTRO) VALUES (:valor, :colab, :data)");
+                $stmtRegistro->execute(['valor' => $totalBaixa, 'colab' => $idColaborador, 'data' => $dataPago]);
+            } else {
+                $stmtRegistro = DB::connection()->getPdo()->prepare("INSERT INTO REGISTRO_PAGAMENTO (VALOR_REGISTRO, ID_COLABORADOR) VALUES (:valor, :colab)");
+                $stmtRegistro->execute(['valor' => $totalBaixa, 'colab' => $idColaborador]);
+            }
             $idRegistro = DB::connection()->getPdo()->lastInsertId();
 
             // Insere os detalhes

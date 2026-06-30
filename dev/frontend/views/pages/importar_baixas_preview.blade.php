@@ -1,67 +1,103 @@
 @extends('layouts.app')
-@section('title', 'Preview da Importação')
+@section('title', 'Preview - Importar Baixas')
 @section('body_class', 'contatos-page scrollable-page')
 @section('content')
+<style>
+.scrollable-page main, .scrollable-page .contatos-wrapper { height: auto !important; overflow: visible !important; }
+.badge-criado { background: #0d6efd; color: #fff; font-size: 11px; padding: 2px 7px; border-radius: 4px; }
+.badge-exist  { background: #198754; color: #fff; font-size: 11px; padding: 2px 7px; border-radius: 4px; }
+</style>
 <div class="contatos-wrapper">
     <div class="contatos-header-actions">
-        <h2>Pré-Visualização do Cruzamento</h2>
-        <p>Verifique quais baixas encontraram um Pedido no sistema.</p>
+        <h2>Pré-Visualização da Importação</h2>
+        <p>Revise os registros. Pedidos marcados como <span class="badge-criado">NOVO</span> serão criados durante a confirmação.</p>
     </div>
-    <div class="card p-4 mt-3">
-        <h4 class="text-success">✅ Encontrados e Prontos ({{ count($prontos) }})</h4>
+
+    <div class="card p-4 mt-3" style="max-width: 1100px; margin: 20px auto;">
+
+        {{-- PRONTOS --}}
+        <h5 class="mb-2">
+            ✅ Prontos para importar ({{ count($prontos) }})
+            @if(count($criados ?? []) > 0)
+                — <span class="text-primary">{{ count($criados) }} serão criados como novos pedidos</span>
+            @endif
+        </h5>
+
         @if(count($prontos) > 0)
-        <table class="table table-sm table-bordered mt-2">
-            <thead class="table-light">
-                <tr>
-                    <th>Nº Pedido</th>
-                    <th>Cliente</th>
-                    <th>Valor do Pedido</th>
-                    <th>Valor a Baixar</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach(array_slice($prontos, 0, 50) as $p)
-                <tr>
-                    <td>{{ $p['num_pedido'] }}</td>
-                    <td>{{ $p['cliente'] }}</td>
-                    <td>R$ {{ number_format($p['total_pedido'], 2, ',', '.') }}</td>
-                    <td class="text-success fw-bold">R$ {{ number_format($p['valor_pago'], 2, ',', '.') }}</td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
-        @if(count($prontos) > 50)
-            <p class="text-muted small">Exibindo os primeiros 50 registros...</p>
+        <div style="overflow-x:auto;">
+            <table class="table table-sm table-bordered table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Status</th>
+                        <th>NUM_PEDIDO</th>
+                        <th>Cliente</th>
+                        <th>Total Pedido</th>
+                        <th>Valor a Baixar</th>
+                        <th>Data Pago</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(array_slice($prontos, 0, 100) as $p)
+                    <tr>
+                        <td>
+                            @if(($p['status'] ?? '') === 'criado')
+                                <span class="badge-criado">NOVO</span>
+                            @else
+                                <span class="badge-exist">EXISTE</span>
+                            @endif
+                        </td>
+                        <td>{{ $p['num_pedido'] }}</td>
+                        <td>{{ $p['cliente'] }}</td>
+                        <td>R$ {{ number_format($p['total_pedido'], 2, ',', '.') }}</td>
+                        <td class="text-success fw-bold">R$ {{ number_format($p['valor_pago'], 2, ',', '.') }}</td>
+                        <td>{{ $p['data_pago'] ?: '(hoje)' }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        @if(count($prontos) > 100)
+            <p class="text-muted small">Exibindo 100 de {{ count($prontos) }} registros.</p>
         @endif
         @else
-            <p class="text-muted">Nenhum pedido foi cruzado com sucesso.</p>
+            <p class="text-muted">Nenhum pedido localizado ou criável.</p>
         @endif
 
         <hr class="my-4">
 
-        <h4 class="text-danger">⚠️ Não Encontrados ({{ count($naoEncontrados) }})</h4>
+        {{-- NÃO ENCONTRADOS --}}
+        <h5 class="text-danger mb-2">⚠️ Ignorados — cliente não localizado ({{ count($naoEncontrados) }})</h5>
         @if(count($naoEncontrados) > 0)
-        <p class="text-muted">Os números abaixo não foram localizados no sistema e serão IGNORADOS nesta versão.</p>
-        <ul class="list-unstyled">
-            @foreach(array_slice($naoEncontrados, 0, 20) as $n)
-                <li><span class="badge bg-secondary">{{ $n['num_pedido'] }}</span> (R$ {{ number_format($n['valor_pago'], 2, ',', '.') }})</li>
-            @endforeach
-        </ul>
-        @if(count($naoEncontrados) > 20)
-            <p class="text-muted small">E mais {{ count($naoEncontrados) - 20 }} não encontrados...</p>
-        @endif
+        <table class="table table-sm table-bordered">
+            <thead class="table-danger">
+                <tr><th>NUM_PEDIDO</th><th>Cliente Informado</th><th>Valor</th><th>Motivo</th></tr>
+            </thead>
+            <tbody>
+                @foreach(array_slice($naoEncontrados, 0, 30) as $n)
+                <tr>
+                    <td>{{ $n['num_pedido'] }}</td>
+                    <td>{{ $n['nome_cliente'] }}</td>
+                    <td>R$ {{ number_format($n['valor_pago'], 2, ',', '.') }}</td>
+                    <td class="text-danger small">{{ $n['motivo'] ?? 'Não localizado' }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+        @else
+            <p class="text-success small">🎉 Todos os registros foram processados!</p>
         @endif
 
-        <div class="mt-4 text-end">
+        {{-- AÇÕES --}}
+        <div class="mt-4 d-flex justify-content-between align-items-center">
+            <a href="{{ route('importar-baixas-page') }}" class="btn btn-outline-secondary">✕ Cancelar</a>
+            @if(count($prontos) > 0)
             <form action="{{ route('confirmar-importacao-baixas') }}" method="POST">
                 @csrf
-                <a href="{{ route('importar-baixas-page') }}" class="btn btn-outline-secondary me-2">Cancelar</a>
-                @if(count($prontos) > 0)
-                <button type="submit" class="btn btn-success">
-                    Confirmar e Efetuar {{ count($prontos) }} Baixas
+                <button type="submit" class="btn btn-success px-5">
+                    ✓ Confirmar e Baixar {{ count($prontos) }} registro(s)
                 </button>
-                @endif
             </form>
+            @endif
         </div>
     </div>
 </div>
