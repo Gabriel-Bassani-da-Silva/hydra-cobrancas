@@ -108,11 +108,12 @@ async function executarTeste(url) {
 async function testarTodasRotas() {
     const rotas = [
         '/',
-        '/contas_receber',
+        '/config-bling',
+        '/cobranca',
+        '/contas-receber',
         '/contatos',
-        '/cobrancas',
-        '/cobrancas/kanban',
-        '/divergencias',
+        '/contatos/importar',
+        '/contatos/importar/log',
         '/perfil',
         '/testes'
     ];
