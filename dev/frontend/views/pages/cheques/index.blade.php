@@ -118,13 +118,13 @@
                                 <td class="text-right font-semibold">
                                     R$ {{ number_format($cheque->VALOR_PAGO_PEDIDO, 2, ',', '.') }}
                                 </td>
-                                <td class="text-center">
+                                <td class="text-center" style="white-space: nowrap;">
                                     <span class="status-badge badge-success" style="font-size:0.7rem; margin-right: 8px;">Compensado</span>
                                     <form method="POST" action="{{ route('cheques-descompensar', $cheque->ID_PEDIDO) }}" style="display:inline;" onsubmit="return confirm('Deseja descompensar este cheque? O valor dele voltará para Pendente no ranking.');">
                                         @csrf
                                         <button type="submit" style="display:inline-flex; align-items:center; gap:4px; padding: 4px 10px; border-radius: 4px; border: 1px solid #cbd5e1; background: #f8fafc; color: #475569; font-weight: 500; font-size: 0.85rem; cursor:pointer; transition: 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">
-                                            <x-icons.icon-14 width="14" height="14" />
-                                            Descompensar
+                                            <x-icons.refresh width="14" height="14" />
+                                            Desfazer
                                         </button>
                                     </form>
                                 </td>
