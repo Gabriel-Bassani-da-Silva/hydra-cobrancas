@@ -39,7 +39,7 @@
             <nav>
                 @auth
                     <a href="{{ url('/regras-ranking') }}" class="header-icon-btn" title="Regras do Ranking">
-                        <x-icons.icon-1 width="20" height="20" />
+                        <x-icons.icon-6 width="20" height="20" />
                         <span>Ranking</span>
                     </a>
 
