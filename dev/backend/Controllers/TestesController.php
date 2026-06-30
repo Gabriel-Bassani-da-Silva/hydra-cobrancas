@@ -290,6 +290,8 @@ class TestesController extends Controller {
             $this->limparMocks();
             return response()->json(['status' => 'error', 'log' => $log], 500);
         }
+    }
+
     public function testarCobrancas() {
         $log = ["[1] Iniciando Teste de Cobranças (Puxar, Desistir)..."];
         try {
