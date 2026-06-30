@@ -26,6 +26,39 @@ Route::get('/logout', [AuthController::class, 'logout']); // Fallback para get s
 
 
 
+// Rota temporária para atualizar a view de ranking diário
+Route::get('/update-ranking-vencimento', function () {
+    try {
+        \Illuminate\Support\Facades\DB::statement("DROP VIEW IF EXISTS `vw_ranking_diario`");
+        \Illuminate\Support\Facades\DB::statement("
+            CREATE VIEW `vw_ranking_diario` AS
+            SELECT 
+                c.ID_COLABORADOR,
+                c.NOME_COLABORADOR,
+                COUNT(DISTINCT rp.ID_REGISTRO) as QTD_BAIXAS,
+                SUM(dp.VALOR_PAGO_PEDIDO) as TOTAL_RECEBIDO,
+                (
+                    SELECT COUNT(DISTINCT p2.ID_PEDIDO) * (SELECT PONTOS_PEDIDO_PAGO FROM CONFIGURACOES_RANKING LIMIT 1)
+                    FROM DETALHE_PAGAMENTO dp2
+                    JOIN REGISTRO_PAGAMENTO rp2 ON rp2.ID_REGISTRO = dp2.ID_REGISTRO
+                    JOIN PEDIDO p2 ON p2.ID_PEDIDO = dp2.ID_PEDIDO
+                    WHERE rp2.ID_COLABORADOR = c.ID_COLABORADOR
+                    AND p2.DATA_VENCIMENTO >= (SELECT DATA_INICIO_DIARIO FROM CONFIGURACOES_RANKING LIMIT 1)
+                    AND (p2.VALOR_PAGO_BLING >= p2.TOTAL_PEDIDO OR (SELECT SUM(dp3.VALOR_PAGO_PEDIDO) FROM DETALHE_PAGAMENTO dp3 WHERE dp3.ID_PEDIDO = p2.ID_PEDIDO) >= p2.TOTAL_PEDIDO)
+                ) as PONTOS_TOTAIS
+            FROM REGISTRO_PAGAMENTO rp
+            JOIN COLABORADOR c ON c.ID_COLABORADOR = rp.ID_COLABORADOR
+            JOIN DETALHE_PAGAMENTO dp ON dp.ID_REGISTRO = rp.ID_REGISTRO
+            JOIN PEDIDO p ON p.ID_PEDIDO = dp.ID_PEDIDO
+            WHERE p.DATA_VENCIMENTO >= (SELECT DATA_INICIO_DIARIO FROM CONFIGURACOES_RANKING LIMIT 1)
+            GROUP BY c.ID_COLABORADOR, c.NOME_COLABORADOR
+        ");
+        return 'View vw_ranking_diario atualizada com sucesso para usar DATA_VENCIMENTO!';
+    } catch (\Exception $e) {
+        return 'Erro: ' . $e->getMessage();
+    }
+});
+
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Rotas Protegidas

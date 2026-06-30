@@ -198,7 +198,7 @@
                         </svg>
                         <input type="date" class="premium-input with-icon" id="data_inicio_diario" name="data_inicio_diario" value="{{ $config->DATA_INICIO_DIARIO ?? date('Y-m-d') }}" required>
                     </div>
-                    <span class="input-hint">Apenas as baixas efetuadas <strong>a partir desta data</strong> serão contabilizadas no ranking "Diário". Títulos anteriores aparecerão apenas no "Total".</span>
+                    <span class="input-hint">Apenas os pedidos com <strong>vencimento a partir desta data</strong> serão contabilizados no ranking "Diário". Títulos com vencimento anterior aparecerão apenas no "Total".</span>
                 </div>
 
                 <div class="form-group">
