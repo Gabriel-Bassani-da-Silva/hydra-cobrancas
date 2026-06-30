@@ -144,4 +144,8 @@ Route::middleware('auth')->group(function () {
     // Exportação
     Route::get('/exportar/tudo', [ExportController::class, 'exportarTudo'])->name('exportar-tudo');
     Route::get('/exportar/{tabela}', [ExportController::class, 'exportarTabela'])->name('exportar-tabela');
+
+    // Testes Webhook
+    Route::get('/testes', [\App\Controllers\TestesController::class, 'index'])->name('testes-page');
+    Route::post('/testes/executar', [\App\Controllers\TestesController::class, 'executarTeste']);
 });
