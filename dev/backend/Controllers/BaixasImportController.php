@@ -32,9 +32,9 @@ class BaixasImportController extends Controller {
         require_once $dir . 'SimpleXLSXGen.php';
 
         $linhas = [
-            ['NUM_PEDIDO', 'NOME_CLIENTE',     'TOTAL_PEDIDO', 'DATA_VENCIMENTO', 'VALOR_PAGO'],
-            ['1234',       'João da Silva',     '500.00',       '2026-07-15',      '500.00'],
-            ['NF-5678',    'Empresa ABC Ltda',  '320.50',       '2026-07-20',      '320.50'],
+            ['NUM_PEDIDO', 'NOME_CLIENTE',     'TOTAL_PEDIDO', 'DATA_VENCIMENTO', 'VALOR_PAGO', 'COLABORADOR'],
+            ['1234',       'João da Silva',     '500.00',       '2026-07-15',      '500.00',     'gabriel'],
+            ['NF-5678',    'Empresa ABC Ltda',  '320.50',       '2026-07-20',      '320.50',     'admin'],
         ];
 
         $xlsx = \Shuchkin\SimpleXLSXGen::fromArray($linhas);
