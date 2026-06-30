@@ -41,6 +41,7 @@ class TestesController extends Controller {
     public function testarBaixas() {
         $log = ["[1] Iniciando Teste de Baixas e Estornos..."];
         try {
+            request()->headers->set('Accept', 'application/json');
             $this->setupMockClientePedido();
             $log[] = "[2] Cliente e Pedido de teste criados (R$ 100.00 pendentes).";
 
@@ -110,6 +111,7 @@ class TestesController extends Controller {
     public function testarTelefones() {
         $log = ["[1] Iniciando Teste de Contatos e Telefones..."];
         try {
+            request()->headers->set('Accept', 'application/json');
             $this->setupMockClientePedido();
             $log[] = "[2] Cliente de teste criado.";
 

@@ -111,7 +111,7 @@ class ContatosController extends Controller {
             }
         }
 
-        if (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+        if (request()->ajax() || request()->wantsJson()) {
             return response()->json(['ok' => true, 'user' => auth()->user()->NOME_COLABORADOR ?? '']);
         }
 
