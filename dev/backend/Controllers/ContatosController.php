@@ -24,6 +24,7 @@ class ContatosController extends Controller {
         $semTelefone = $this->model->getClientesSemTelefone($inadimplentes);
         $contatosFinanceiros = $this->model->getAllContatosFinanceiros($somenteConfirmados, $somenteTentativas);
         $pedras = $this->model->getClientesPedras();
+        $clientesTodos = $this->model->buscarContatos('', 'clientes');
 
         return view('pages.contatos.index', [
             'aba' => $aba,
@@ -33,7 +34,9 @@ class ContatosController extends Controller {
             'clientes' => $clientes,
             'representantes' => $representantes,
             'semTelefone' => $semTelefone,
-            'contatosFinanceiros' => $contatosFinanceiros
+            'contatosFinanceiros' => $contatosFinanceiros,
+            'pedras' => $pedras,
+            'clientesTodos' => $clientesTodos
         ]);
     }
 

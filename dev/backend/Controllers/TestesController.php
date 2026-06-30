@@ -23,9 +23,8 @@ class TestesController extends Controller {
         DB::statement("DELETE FROM CONTATO_EXTERNO WHERE ID_CONTATO_BLING = 999999999");
         DB::statement("DELETE FROM DETALHE_PAGAMENTO WHERE ID_PEDIDO = 888888888");
         DB::statement("DELETE FROM TEL WHERE NUM_TEL = '99999999999'");
+        DB::statement("DELETE FROM TEL WHERE NUM_TEL = '88888888888'");
         DB::statement("DELETE FROM CONTATO_TEL WHERE ID_CONTATO_BLING = 999999999");
-        DB::statement("DELETE FROM HISTORICO_LIGACOES WHERE ID_PEDIDO = 888888888");
-        DB::statement("DELETE FROM DIVERGENCIAS_BAIXA WHERE ID_PEDIDO = 888888888");
         DB::statement("DELETE FROM VINCULO_CONTATO_CLIENTE WHERE ID_CLIENTE = 999999999");
         DB::statement("DELETE FROM CONTATO_FINANCEIRO WHERE NOME_CONTATO LIKE '%TESTE%'");
         DB::statement("SET FOREIGN_KEY_CHECKS = 1;");
@@ -349,7 +348,7 @@ class TestesController extends Controller {
             $log[] = "[2] Cliente e Pedido criados.";
 
             DB::statement("INSERT INTO DETALHE_PAGAMENTO (ID_PEDIDO, VALOR_PAGO_PEDIDO) VALUES (888888888, 100.00)");
-            DB::statement("INSERT INTO DIVERGENCIAS_BAIXA (ID_PEDIDO, VALOR_PAGO_SISTEMA, VALOR_PAGO_BLING) VALUES (888888888, 100.00, 50.00)");
+            DB::statement("UPDATE PEDIDO SET VALOR_PAGO_BLING = 50.00 WHERE ID_PEDIDO = 888888888");
             $log[] = "[3] Mocks de divergência injetados no banco (Sistema 100 / Bling 50).";
             
             request()->request->replace([
