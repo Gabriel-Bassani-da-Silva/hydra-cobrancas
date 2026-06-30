@@ -58,7 +58,12 @@ class TestesController extends Controller {
             
             $controller = app()->make(ContasReceberController::class);
             $response = $controller->baixar();
-            $log[] = "[3] Requisição de baixa enviada (R$ 50.00). Retorno: " . json_encode($response);
+            $responseData = $response->getData(true);
+            $log[] = "[3] Requisição de baixa enviada (R$ 50.00). Retorno: " . json_encode($responseData);
+
+            if (empty($responseData['success'])) {
+                throw new Exception("Controller retornou erro: " . ($responseData['error'] ?? 'Desconhecido'));
+            }
 
             // Verify
             $detalhe = DB::selectOne("SELECT SUM(VALOR_PAGO_PEDIDO) as total_pago FROM DETALHE_PAGAMENTO WHERE ID_PEDIDO = 888888888");
@@ -73,8 +78,13 @@ class TestesController extends Controller {
             if ($idDetalhe) {
                 request()->merge(['id_detalhe' => $idDetalhe]);
                 $baixaCtrl = app()->make(BaixaController::class);
-                $baixaCtrl->estornar();
-                $log[] = "[5] Requisição de estorno enviada para a baixa ID {$idDetalhe}.";
+                $responseEstorno = $baixaCtrl->estornar();
+                $respDataEstorno = $responseEstorno->getData(true);
+                $log[] = "[5] Requisição de estorno enviada para a baixa ID {$idDetalhe}. Retorno: " . json_encode($respDataEstorno);
+
+                if (empty($respDataEstorno['success'])) {
+                    throw new Exception("Controller de estorno retornou erro: " . ($respDataEstorno['error'] ?? 'Desconhecido'));
+                }
 
                 $verificaEstorno = DB::selectOne("SELECT SUM(VALOR_PAGO_PEDIDO) as total_pago FROM DETALHE_PAGAMENTO WHERE ID_PEDIDO = 888888888");
                 if (!$verificaEstorno || $verificaEstorno->total_pago == 0) {
@@ -109,8 +119,13 @@ class TestesController extends Controller {
                 'numero_tel' => '99999999999'
             ]);
             $contatosCtrl = app()->make(ContatosController::class);
-            $contatosCtrl->salvarTelefone();
-            $log[] = "[3] Requisição para salvar telefone (99999999999) enviada.";
+            $respAdd = $contatosCtrl->salvarTelefone();
+            $respDataAdd = json_decode($respAdd->getContent(), true) ?? ['error' => 'Not JSON'];
+            $log[] = "[3] Requisição para salvar telefone (99999999999) enviada. Retorno: " . json_encode($respDataAdd);
+
+            if (empty($respDataAdd['success'])) {
+                throw new Exception("Erro ao salvar telefone: " . ($respDataAdd['error'] ?? 'Desconhecido'));
+            }
 
             $tel = DB::selectOne("SELECT * FROM TEL WHERE NUM_TEL = '99999999999'");
             $contatoTel = DB::selectOne("SELECT * FROM CONTATO_TEL WHERE ID_CONTATO_BLING = 999999999 AND ID_TEL = ?", [$tel->ID_TEL ?? 0]);
@@ -127,8 +142,13 @@ class TestesController extends Controller {
                 'id_tel' => $tel->ID_TEL,
                 'confirmado' => 1
             ]);
-            $contatosCtrl->toggleConfirmado();
-            $log[] = "[5] Requisição para confirmar telefone enviada.";
+            $respToggle = $contatosCtrl->toggleConfirmado();
+            $respDataToggle = json_decode($respToggle->getContent(), true) ?? ['error' => 'Not JSON'];
+            $log[] = "[5] Requisição para confirmar telefone enviada. Retorno: " . json_encode($respDataToggle);
+            
+            if (empty($respDataToggle['success'])) {
+                throw new Exception("Erro ao confirmar telefone: " . ($respDataToggle['error'] ?? 'Desconhecido'));
+            }
             
             $verificaConf = DB::selectOne("SELECT CONFIRMADO FROM CONTATO_TEL WHERE ID_CONTATO_BLING = 999999999 AND ID_TEL = ?", [$tel->ID_TEL]);
             if ($verificaConf && $verificaConf->CONFIRMADO == 1) {
@@ -142,8 +162,13 @@ class TestesController extends Controller {
                 'id_contato_bling' => 999999999,
                 'id_tel' => $tel->ID_TEL
             ]);
-            $contatosCtrl->excluirTelefone();
-            $log[] = "[7] Requisição para excluir telefone enviada.";
+            $respDel = $contatosCtrl->excluirTelefone();
+            $respDataDel = json_decode($respDel->getContent(), true) ?? ['error' => 'Not JSON'];
+            $log[] = "[7] Requisição para excluir telefone enviada. Retorno: " . json_encode($respDataDel);
+
+            if (empty($respDataDel['success'])) {
+                throw new Exception("Erro ao excluir telefone: " . ($respDataDel['error'] ?? 'Desconhecido'));
+            }
 
             $verificaDel = DB::selectOne("SELECT * FROM CONTATO_TEL WHERE ID_CONTATO_BLING = 999999999 AND ID_TEL = ?", [$tel->ID_TEL]);
             if (!$verificaDel) {
