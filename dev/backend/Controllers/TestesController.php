@@ -318,7 +318,8 @@ class TestesController extends Controller {
             request()->json()->replace([
                 'tipo' => 'clientes',
                 'id' => 999999999,
-                'clientes' => [999999999]
+                'clientes' => [999999999],
+                'id_cobranca' => $respDataPuxar['id_cobranca'] ?? null
             ]);
             $respDesistir = $cobrancaCtrl->desistir();
             $respDataDesistir = json_decode($respDesistir->getContent(), true) ?? [];

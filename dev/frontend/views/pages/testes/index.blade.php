@@ -58,6 +58,12 @@
 
         </div>
 
+        <div style="margin-bottom: 2rem; display: flex; justify-content: flex-end;">
+            <button onclick="testarTodasRotas()" class="btn btn-primary" style="background: var(--warning-color); color: #fff; border: none; font-weight: 600;">
+                <i class="ph ph-heartbeat"></i> Testar 200 em Todas as Páginas
+            </button>
+        </div>
+
         <h3 style="margin-bottom: 0.5rem; font-size: 1rem; color: var(--text-primary);">Log de Execução:</h3>
         <div id="teste-resultado" style="background: #1e1e1e; color: #a6e22e; padding: 1rem; border-radius: var(--radius-md); font-family: monospace; min-height: 200px; white-space: pre-wrap; font-size: 0.9rem; border: 1px solid #333;">Aguardando ação...</div>
     </div>
@@ -79,19 +85,57 @@ async function executarTeste(url) {
             }
         });
         
-        const data = await response.json();
-        
-        if (response.ok) {
-            box.style.color = '#a6e22e'; 
-            box.innerText = data.log.join('\n');
-        } else {
-            box.style.color = '#f92672'; 
-            box.innerText = data.log ? data.log.join('\n') : 'ERRO: ' + (data.message || 'Erro desconhecido');
+        if (!response.ok) {
+            let errorText = "Erro desconhecido";
+            try {
+                const errorData = await response.json();
+                errorText = errorData.log ? errorData.log.join('\n') : JSON.stringify(errorData);
+            } catch (e) {
+                errorText = `Status ${response.status} - ${response.statusText}`;
+            }
+            throw new Error(errorText);
         }
-    } catch (error) {
+
+        const data = await response.json();
+        box.style.color = '#a6e22e';
+        box.innerText += data.log.join('\n') + '\n\n';
+    } catch (e) {
         box.style.color = '#f92672';
-        box.innerText = 'FALHA DE REDE: ' + error.message;
+        box.innerText += `\n[X] FALHA CRÍTICA:\n${e.message}\n`;
     }
+}
+
+async function testarTodasRotas() {
+    const rotas = [
+        '/',
+        '/contas_receber',
+        '/contatos',
+        '/cobrancas',
+        '/cobrancas/kanban',
+        '/divergencias',
+        '/perfil',
+        '/testes'
+    ];
+
+    const box = document.getElementById('teste-resultado');
+    box.style.color = '#fd971f';
+    box.innerText = `Iniciando varredura de rotas (Health Check)...\n\n`;
+
+    for (let rota of rotas) {
+        try {
+            let res = await fetch(rota);
+            if (res.status === 200) {
+                box.innerText += `[200 OK] ${rota}\n`;
+            } else {
+                box.style.color = '#f92672';
+                box.innerText += `[ERROR ${res.status}] ${rota}\n`;
+            }
+        } catch (e) {
+            box.style.color = '#f92672';
+            box.innerText += `[FAIL] ${rota} - ${e.message}\n`;
+        }
+    }
+    box.innerText += `\nVarredura concluída.`;
 }
 </script>
 @endsection
