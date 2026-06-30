@@ -70,16 +70,13 @@ async function executarTeste(url) {
         if (response.ok) {
             box.style.color = '#a6e22e'; 
             box.innerText = data.log.join('\n');
-            toast.success('Teste concluído com sucesso!');
         } else {
             box.style.color = '#f92672'; 
             box.innerText = data.log ? data.log.join('\n') : 'ERRO: ' + (data.message || 'Erro desconhecido');
-            toast.error('O teste falhou em alguma etapa.');
         }
     } catch (error) {
         box.style.color = '#f92672';
         box.innerText = 'FALHA DE REDE: ' + error.message;
-        toast.error('Erro de conexão ao executar teste.');
     }
 }
 </script>
