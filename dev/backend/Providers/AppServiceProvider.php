@@ -25,12 +25,18 @@ class AppServiceProvider extends ServiceProvider
         }
 
         View::composer('layouts.app', function ($view) {
-            $pedidoModel = new \App\Repositories\PedidoRepository();
-            $totais = $pedidoModel->getTotalEmAberto();
-            $ultimaSinc = $pedidoModel->getUltimaSincronizacao();
-            
-            $blingService = new \App\Integrations\Bling\BlingService();
-            $blingConnected = $blingService->isConnected();
+            $totais = ['TOTAL_VALOR' => 0, 'QTD_CONTAS' => 0];
+            $ultimaSinc = '-';
+            $blingConnected = false;
+
+            if (auth()->check()) {
+                $pedidoModel = new \App\Repositories\PedidoRepository();
+                $totais = $pedidoModel->getTotalEmAberto();
+                $ultimaSinc = $pedidoModel->getUltimaSincronizacao();
+                
+                $blingService = new \App\Integrations\Bling\BlingService();
+                $blingConnected = $blingService->isConnected();
+            }
 
             $view->with('totais', $totais)
                  ->with('ultimaSinc', $ultimaSinc)

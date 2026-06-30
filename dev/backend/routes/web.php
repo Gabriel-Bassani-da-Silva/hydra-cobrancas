@@ -131,9 +131,86 @@ Route::get('/update-view', function() {
     return 'View vw_divergencias_pagamento atualizada com sucesso!';
 });
 
+Route::get('/migrate-ranking', function () {
+    try {
+        // Tabela de configurações
+        DB::statement("
+            CREATE TABLE IF NOT EXISTS `CONFIGURACOES_RANKING` (
+                `ID` INT AUTO_INCREMENT PRIMARY KEY,
+                `DATA_INICIO_DIARIO` DATE NOT NULL,
+                `PONTOS_PEDIDO_PAGO` INT NOT NULL DEFAULT 10
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+        ");
+
+        // Inserir registro inicial se vazio
+        if (DB::table('CONFIGURACOES_RANKING')->count() == 0) {
+            DB::table('CONFIGURACOES_RANKING')->insert([
+                'DATA_INICIO_DIARIO' => date('Y-m-d'),
+                'PONTOS_PEDIDO_PAGO' => 10
+            ]);
+        }
+
+        // View Geral do Ranking (Considera tudo)
+        DB::statement("DROP VIEW IF EXISTS `vw_ranking_total`");
+        DB::statement("
+            CREATE VIEW `vw_ranking_total` AS
+            SELECT 
+                c.ID_COLABORADOR,
+                c.NOME_COLABORADOR,
+                COUNT(DISTINCT rp.ID_REGISTRO) as QTD_BAIXAS,
+                SUM(dp.VALOR_PAGO_PEDIDO) as TOTAL_RECEBIDO,
+                (
+                    SELECT COUNT(DISTINCT p2.ID_PEDIDO) * (SELECT PONTOS_PEDIDO_PAGO FROM CONFIGURACOES_RANKING LIMIT 1)
+                    FROM DETALHE_PAGAMENTO dp2
+                    JOIN REGISTRO_PAGAMENTO rp2 ON rp2.ID_REGISTRO = dp2.ID_REGISTRO
+                    JOIN PEDIDO p2 ON p2.ID_PEDIDO = dp2.ID_PEDIDO
+                    WHERE rp2.ID_COLABORADOR = c.ID_COLABORADOR
+                    AND (p2.VALOR_PAGO_BLING >= p2.TOTAL_PEDIDO OR (SELECT SUM(dp3.VALOR_PAGO_PEDIDO) FROM DETALHE_PAGAMENTO dp3 WHERE dp3.ID_PEDIDO = p2.ID_PEDIDO) >= p2.TOTAL_PEDIDO)
+                ) as PONTOS_TOTAIS
+            FROM REGISTRO_PAGAMENTO rp
+            JOIN COLABORADOR c ON c.ID_COLABORADOR = rp.ID_COLABORADOR
+            JOIN DETALHE_PAGAMENTO dp ON dp.ID_REGISTRO = rp.ID_REGISTRO
+            GROUP BY c.ID_COLABORADOR, c.NOME_COLABORADOR
+        ");
+
+        // View Diário do Ranking (Filtra por DATA_INICIO_DIARIO)
+        DB::statement("DROP VIEW IF EXISTS `vw_ranking_diario`");
+        DB::statement("
+            CREATE VIEW `vw_ranking_diario` AS
+            SELECT 
+                c.ID_COLABORADOR,
+                c.NOME_COLABORADOR,
+                COUNT(DISTINCT rp.ID_REGISTRO) as QTD_BAIXAS,
+                SUM(dp.VALOR_PAGO_PEDIDO) as TOTAL_RECEBIDO,
+                (
+                    SELECT COUNT(DISTINCT p2.ID_PEDIDO) * (SELECT PONTOS_PEDIDO_PAGO FROM CONFIGURACOES_RANKING LIMIT 1)
+                    FROM DETALHE_PAGAMENTO dp2
+                    JOIN REGISTRO_PAGAMENTO rp2 ON rp2.ID_REGISTRO = dp2.ID_REGISTRO
+                    JOIN PEDIDO p2 ON p2.ID_PEDIDO = dp2.ID_PEDIDO
+                    WHERE rp2.ID_COLABORADOR = c.ID_COLABORADOR
+                    AND DATE(rp2.DATA_REGISTRO) >= (SELECT DATA_INICIO_DIARIO FROM CONFIGURACOES_RANKING LIMIT 1)
+                    AND (p2.VALOR_PAGO_BLING >= p2.TOTAL_PEDIDO OR (SELECT SUM(dp3.VALOR_PAGO_PEDIDO) FROM DETALHE_PAGAMENTO dp3 WHERE dp3.ID_PEDIDO = p2.ID_PEDIDO) >= p2.TOTAL_PEDIDO)
+                ) as PONTOS_TOTAIS
+            FROM REGISTRO_PAGAMENTO rp
+            JOIN COLABORADOR c ON c.ID_COLABORADOR = rp.ID_COLABORADOR
+            JOIN DETALHE_PAGAMENTO dp ON dp.ID_REGISTRO = rp.ID_REGISTRO
+            WHERE DATE(rp.DATA_REGISTRO) >= (SELECT DATA_INICIO_DIARIO FROM CONFIGURACOES_RANKING LIMIT 1)
+            GROUP BY c.ID_COLABORADOR, c.NOME_COLABORADOR
+        ");
+
+        return 'Tabela e views do Ranking criadas com sucesso!';
+    } catch (\Exception $e) {
+        return 'Erro: ' . $e->getMessage();
+    }
+});
+
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
 // Rotas Protegidas
 Route::middleware('auth')->group(function () {
-    Route::get('/', [HomeController::class, 'index'])->name('home');
+    // Regras do Ranking
+    Route::get('/regras-ranking', [RankingConfigController::class, 'edit'])->name('regras-ranking.edit');
+    Route::post('/regras-ranking', [RankingConfigController::class, 'update'])->name('regras-ranking.update');
 
     // Bling
     Route::get('/config-bling', [BlingController::class, 'index'])->name('bling-page');

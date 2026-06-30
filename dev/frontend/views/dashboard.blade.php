@@ -24,7 +24,7 @@
         <!-- RANKING TOTAL -->
         <div class="card" style="margin-bottom: 0;">
             <h2>Ranking Total</h2>
-            <p style="color: #64748b; margin-bottom: 1rem;">Total geral de recebimentos baixados por colaborador.</p>
+            <p style="color: #64748b; margin-bottom: 1rem;">Total geral de recebimentos e pontos conquistados.</p>
             
             <div class="table-responsive">
                 <table class="cr-table">
@@ -32,7 +32,8 @@
                         <tr>
                             <th style="width: 60px; text-align: center;">Pos</th>
                             <th>Colaborador</th>
-                            <th class="text-center">Qtd. Baixas</th>
+                            <th class="text-center">Baixas</th>
+                            <th class="text-center">Pontos</th>
                             <th class="valor-col">Total Recebido</th>
                         </tr>
                     </thead>
@@ -52,11 +53,12 @@
                                 </td>
                                 <td style="font-weight: 500;">{{ $item->NOME_COLABORADOR }}</td>
                                 <td class="text-center" style="color: #475569;">{{ $item->QTD_BAIXAS }}</td>
+                                <td class="text-center" style="color: #3b82f6; font-weight: 700;">{{ $item->PONTOS_TOTAIS ?? 0 }} pts</td>
                                 <td class="valor-col" style="color: #059669; font-weight: 600;">R$ {{ number_format($item->TOTAL_RECEBIDO, 2, ',', '.') }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center" style="padding: 2rem; color: #64748b;">Nenhum recebimento registrado.</td>
+                                <td colspan="5" class="text-center" style="padding: 2rem; color: #64748b;">Nenhum recebimento registrado.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -64,18 +66,14 @@
             </div>
         </div>
 
-        <!-- RANKING POR DATA (DIÁRIO) -->
+        <!-- RANKING DIÁRIO / VIGENTE -->
         <div class="card" style="margin-bottom: 0;">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem;">
-                <div>
-                    <h2>Ranking por Vencimento</h2>
-                    <p style="color: #64748b; margin-bottom: 0;">Títulos vencidos a partir de determinada data e que já foram recebidos.</p>
-                </div>
-                
-                <form action="" method="GET" style="display: flex; gap: 0.5rem; align-items: center; background: #f8fafc; padding: 0.5rem; border-radius: 0.5rem; border: 1px solid #e2e8f0;">
-                    <label for="data_vencimento" style="font-size: 0.875rem; font-weight: 600; color: #475569; white-space: nowrap;">A partir de:</label>
-                    <input type="date" id="data_vencimento" name="data_vencimento" value="{{ $dataFiltro ?? date('Y-m-d') }}" style="padding: 0.25rem 0.5rem; border: 1px solid #cbd5e1; border-radius: 0.375rem; outline: none; font-size: 0.875rem; color: #0f172a; cursor: pointer;" onchange="this.form.submit()">
-                </form>
+            <div style="margin-bottom: 1rem;">
+                <h2>Ranking Diário (Vigente)</h2>
+                <p style="color: #64748b; margin-bottom: 0;">
+                    Baixas recebidas a partir da data de corte: 
+                    <strong style="color: #0f172a;">{{ date('d/m/Y', strtotime($dataFiltro)) }}</strong>
+                </p>
             </div>
             
             <div class="table-responsive">
@@ -84,7 +82,8 @@
                         <tr>
                             <th style="width: 60px; text-align: center;">Pos</th>
                             <th>Colaborador</th>
-                            <th class="text-center">Qtd. Baixas</th>
+                            <th class="text-center">Baixas</th>
+                            <th class="text-center">Pontos</th>
                             <th class="valor-col">Total Recebido</th>
                         </tr>
                     </thead>
@@ -104,11 +103,12 @@
                                 </td>
                                 <td style="font-weight: 500;">{{ $item->NOME_COLABORADOR }}</td>
                                 <td class="text-center" style="color: #475569;">{{ $item->QTD_BAIXAS }}</td>
+                                <td class="text-center" style="color: #3b82f6; font-weight: 700;">{{ $item->PONTOS_TOTAIS ?? 0 }} pts</td>
                                 <td class="valor-col" style="color: #059669; font-weight: 600;">R$ {{ number_format($item->TOTAL_RECEBIDO, 2, ',', '.') }}</td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="text-center" style="padding: 2rem; color: #64748b;">Nenhum recebimento registrado para este período.</td>
+                                <td colspan="5" class="text-center" style="padding: 2rem; color: #64748b;">Nenhum recebimento registrado para este período.</td>
                             </tr>
                         @endforelse
                     </tbody>

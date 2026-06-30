@@ -24,36 +24,50 @@
     @if (!View::hasSection('hide_header'))
         <header class="header">
             <div class="header-dates">
-                <span>Total em Aberto: <strong>R$ {{ number_format($totais['TOTAL_VALOR'] ?? 0, 2, ',', '.') }}</strong></span>
-                <span>Contas Pendentes: <strong>{{ $totais['QTD_CONTAS'] ?? 0 }}</strong></span>
-                <span>Última Sinc: <strong>{{ $ultimaSinc ?? '-' }}</strong></span>
-                <a href="{{ url('/config-bling') }}" class="bling-status {{ !empty($blingConnected) && $blingConnected ? 'ok' : 'error' }}" style="text-decoration: none; cursor: pointer;" title="Clique para configurar o Bling">
-                    Bling: {{ (!empty($blingConnected) && $blingConnected) ? 'Conexão ok' : 'Erro de conexão' }}
-                </a>
+                @auth
+                    <span>Total em Aberto: <strong>R$ {{ number_format($totais['TOTAL_VALOR'] ?? 0, 2, ',', '.') }}</strong></span>
+                    <span>Contas Pendentes: <strong>{{ $totais['QTD_CONTAS'] ?? 0 }}</strong></span>
+                    <span>Última Sinc: <strong>{{ $ultimaSinc ?? '-' }}</strong></span>
+                    <a href="{{ url('/config-bling') }}" class="bling-status {{ !empty($blingConnected) && $blingConnected ? 'ok' : 'error' }}" style="text-decoration: none; cursor: pointer;" title="Clique para configurar o Bling">
+                        Bling: {{ (!empty($blingConnected) && $blingConnected) ? 'Conexão ok' : 'Erro de conexão' }}
+                    </a>
+                @else
+                    <span style="color: #64748b; font-weight: 500;">Dashboard Pública</span>
+                @endauth
             </div>
 
             <nav>
-                <a href="{{ url('/contatos') }}" class="header-icon-btn" title="Gerenciar Telefones">
-                    <x-icons.icon-7 width="20" height="20" />
-                    <span>Telefones</span>
-                </a>
+                @auth
+                    <a href="{{ url('/regras-ranking') }}" class="header-icon-btn" title="Regras do Ranking">
+                        <x-icons.icon-1 width="20" height="20" />
+                        <span>Ranking</span>
+                    </a>
 
-                <a href="{{ url('/contas-receber') }}" class="header-icon-btn" title="Contas a Receber">
-                    <x-icons.icon-8 width="20" height="20" />
-                    <span>Contas</span>
-                </a>
+                    <a href="{{ url('/contatos') }}" class="header-icon-btn" title="Gerenciar Telefones">
+                        <x-icons.icon-7 width="20" height="20" />
+                        <span>Telefones</span>
+                    </a>
 
+                    <a href="{{ url('/contas-receber') }}" class="header-icon-btn" title="Contas a Receber">
+                        <x-icons.icon-8 width="20" height="20" />
+                        <span>Contas</span>
+                    </a>
 
-                <a href="{{ url('/perfil') }}" class="header-icon-btn profile" title="Meu Perfil">
-                    <x-icons.icon-10 />
-                </a>
+                    <a href="{{ url('/perfil') }}" class="header-icon-btn profile" title="Meu Perfil">
+                        <x-icons.icon-10 />
+                    </a>
 
-                <form method="POST" action="{{ route('logout') }}" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="header-icon-btn" title="Sair" style="color: #d9534f; margin-left: 10px; background:none; border:none; cursor:pointer; padding:0;">
-                        <x-icons.icon-11 width="24" height="24" />
-                    </button>
-                </form>
+                    <form method="POST" action="{{ route('logout') }}" style="display:inline;">
+                        @csrf
+                        <button type="submit" class="header-icon-btn" title="Sair" style="color: #d9534f; margin-left: 10px; background:none; border:none; cursor:pointer; padding:0;">
+                            <x-icons.icon-11 width="24" height="24" />
+                        </button>
+                    </form>
+                @else
+                    <a href="{{ url('/login') }}" class="header-icon-btn" title="Fazer Login" style="color: #3b82f6; border: 1px solid #3b82f6; padding: 4px 12px; border-radius: 4px; font-weight: 500;">
+                        <span>Fazer Login</span>
+                    </a>
+                @endauth
             </nav>
         </header>
     @endif
