@@ -145,7 +145,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/exportar/tudo', [ExportController::class, 'exportarTudo'])->name('exportar-tudo');
     Route::get('/exportar/{tabela}', [ExportController::class, 'exportarTabela'])->name('exportar-tabela');
 
-    // Testes Webhook
+    // Testes de Sistema (Isolados)
     Route::get('/testes', [\App\Controllers\TestesController::class, 'index'])->name('testes-page');
-    Route::post('/testes/executar', [\App\Controllers\TestesController::class, 'executarTeste']);
+    Route::post('/testes/baixas', [\App\Controllers\TestesController::class, 'testarBaixas']);
+    Route::post('/testes/telefones', [\App\Controllers\TestesController::class, 'testarTelefones']);
+    Route::post('/testes/webhook', [\App\Controllers\TestesController::class, 'testarWebhook']);
 });
