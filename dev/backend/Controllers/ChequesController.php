@@ -55,6 +55,19 @@ class ChequesController extends Controller
         }
     }
 
+    public function descompensar(Request $request, $idPedido)
+    {
+        try {
+            DB::table('PEDIDO')
+                ->where('ID_PEDIDO', $idPedido)
+                ->update(['STATUS_CHEQUE' => 'pendente']);
+            
+            return redirect('/contas-receber/cheques')->with('success_message', 'Cheque descompensado! Ele voltou para a lista de pendentes e seu valor retornou à coluna de cheques no ranking.');
+        } catch (\Exception $e) {
+            return redirect('/contas-receber/cheques')->with('error_message', 'Erro ao descompensar cheque: ' . $e->getMessage());
+        }
+    }
+
     public function devolver(Request $request, $idDetalhe)
     {
         try {

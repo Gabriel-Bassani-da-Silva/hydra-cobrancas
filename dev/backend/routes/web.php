@@ -169,6 +169,7 @@ Route::middleware('auth')->group(function () {
     // Cheques
     Route::get('/contas-receber/cheques', [ChequesController::class, 'index'])->name('cheques-page');
     Route::post('/contas-receber/cheques/{id}/compensar', [ChequesController::class, 'compensar'])->name('cheques-compensar');
+    Route::post('/contas-receber/cheques/{id}/descompensar', [ChequesController::class, 'descompensar'])->name('cheques-descompensar');
     Route::post('/contas-receber/cheques/{id}/devolver', [ChequesController::class, 'devolver'])->name('cheques-devolver');
     Route::post('/contas-receber/cheques/{id}/converter', [ChequesController::class, 'converterParaCheque'])->name('cheques-converter');
 

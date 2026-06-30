@@ -28,11 +28,11 @@
 
     <!-- Abas Principais -->
     <div class="tabs" id="chequesTabs">
-        <a href="#" class="tab active" data-target="pendentes" style="color: #ea580c;">
-            Pendentes (A Receber) <span class="tab-count" style="background: #ea580c; color: white;">{{ count($pendentes) }}</span>
+        <a href="#" class="tab active" data-target="pendentes">
+            Pendentes (A Receber) <span class="tab-count">{{ count($pendentes) }}</span>
         </a>
-        <a href="#" class="tab" data-target="compensados" style="color: #059669;">
-            Compensados <span class="tab-count" style="background: #059669; color: white;">{{ count($compensados) }}</span>
+        <a href="#" class="tab" data-target="compensados">
+            Compensados <span class="tab-count">{{ count($compensados) }}</span>
         </a>
     </div>
 
@@ -61,19 +61,21 @@
                                 <td>{{ $cheque->CLIENTE ?? 'N/A' }}</td>
                                 <td>{{ $cheque->NOME_COLABORADOR ?? 'N/A' }}</td>
                                 <td>{{ date('d/m/Y', strtotime($cheque->DATA_REGISTRO)) }}</td>
-                                <td class="text-right font-semibold" style="color: #ea580c;">
+                                <td class="text-right font-semibold">
                                     R$ {{ number_format($cheque->VALOR_PAGO_PEDIDO, 2, ',', '.') }}
                                 </td>
                                 <td class="text-center">
                                     <form method="POST" action="{{ route('cheques-compensar', $cheque->ID_PEDIDO) }}" style="display:inline;" onsubmit="return confirm('Deseja dar este cheque como compensado no caixa?');">
                                         @csrf
-                                        <button type="submit" class="btn-action-icon-sm" title="Compensar Cheque" style="color: #059669; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 4px; padding: 4px 8px; font-weight: 500; cursor: pointer;">
+                                        <button type="submit" style="display:inline-flex; align-items:center; gap:4px; padding: 4px 10px; border-radius: 4px; border: 1px solid #10b981; background: #ecfdf5; color: #047857; font-weight: 500; font-size: 0.85rem; cursor:pointer; transition: 0.2s;" onmouseover="this.style.background='#d1fae5'" onmouseout="this.style.background='#ecfdf5'">
+                                            <x-icons.check width="14" height="14" />
                                             Compensar
                                         </button>
                                     </form>
                                     <form method="POST" action="{{ route('cheques-devolver', $cheque->ID_DETALHE) }}" style="display:inline;" onsubmit="return confirm('ATENÇÃO: O cheque foi devolvido ou não foi pago?\nIsso vai excluir a baixa e o pedido voltará para cobrança. Deseja continuar?');">
                                         @csrf
-                                        <button type="submit" class="btn-action-icon-sm" title="Cheque Devolvido/Não Pago" style="color: #dc2626; background: #fef2f2; border: 1px solid #fecaca; border-radius: 4px; padding: 4px 8px; font-weight: 500; cursor: pointer; margin-left: 4px;">
+                                        <button type="submit" style="display:inline-flex; align-items:center; gap:4px; margin-left:4px; padding: 4px 10px; border-radius: 4px; border: 1px solid #f87171; background: #fef2f2; color: #b91c1c; font-weight: 500; font-size: 0.85rem; cursor:pointer; transition: 0.2s;" onmouseover="this.style.background='#fee2e2'" onmouseout="this.style.background='#fef2f2'">
+                                            <x-icons.icon-11 width="14" height="14" />
                                             Não Pago
                                         </button>
                                     </form>
@@ -113,11 +115,18 @@
                                 <td>{{ $cheque->CLIENTE ?? 'N/A' }}</td>
                                 <td>{{ $cheque->NOME_COLABORADOR ?? 'N/A' }}</td>
                                 <td>{{ date('d/m/Y', strtotime($cheque->DATA_REGISTRO)) }}</td>
-                                <td class="text-right font-semibold" style="color: #059669;">
+                                <td class="text-right font-semibold">
                                     R$ {{ number_format($cheque->VALOR_PAGO_PEDIDO, 2, ',', '.') }}
                                 </td>
                                 <td class="text-center">
-                                    <span style="background: #059669; color: white; padding: 2px 8px; border-radius: 12px; font-size: 11px; font-weight: 600;">Compensado</span>
+                                    <span class="status-badge badge-success" style="font-size:0.7rem; margin-right: 8px;">Compensado</span>
+                                    <form method="POST" action="{{ route('cheques-descompensar', $cheque->ID_PEDIDO) }}" style="display:inline;" onsubmit="return confirm('Deseja descompensar este cheque? O valor dele voltará para Pendente no ranking.');">
+                                        @csrf
+                                        <button type="submit" style="display:inline-flex; align-items:center; gap:4px; padding: 4px 10px; border-radius: 4px; border: 1px solid #cbd5e1; background: #f8fafc; color: #475569; font-weight: 500; font-size: 0.85rem; cursor:pointer; transition: 0.2s;" onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">
+                                            <x-icons.icon-14 width="14" height="14" />
+                                            Descompensar
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
                         @empty
