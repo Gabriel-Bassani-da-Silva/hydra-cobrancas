@@ -152,7 +152,7 @@ class TestesController extends Controller {
                 throw new Exception("Erro ao confirmar telefone: " . ($respDataToggle['error'] ?? 'Desconhecido'));
             }
             
-            $verificaConf = DB::selectOne("SELECT CONFIRMADO FROM CONTATO_TEL WHERE ID_CONTATO_BLING = 999999999 AND ID_TEL = ?", [$tel->ID_TEL]);
+            $verificaConf = DB::selectOne("SELECT CONFIRMADO FROM TEL WHERE ID_TEL = ?", [$tel->ID_TEL]);
             if ($verificaConf && $verificaConf->CONFIRMADO == 1) {
                 $log[] = "[6] SUCESSO: Telefone marcado como confirmado.";
             } else {
