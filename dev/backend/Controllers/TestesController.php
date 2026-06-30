@@ -45,7 +45,7 @@ class TestesController extends Controller {
             $log[] = "[2] Cliente e Pedido de teste criados (R$ 100.00 pendentes).";
 
             // 1. Dar Baixa
-            request()->replace([
+            request()->merge([
                 'baixas' => [
                     [
                         'id' => 888888888,
@@ -71,7 +71,7 @@ class TestesController extends Controller {
             // 2. Estornar Baixa (simulando a exclusão do detalhe)
             $idDetalhe = DB::selectOne("SELECT ID_DETALHE_PAGAMENTO FROM DETALHE_PAGAMENTO WHERE ID_PEDIDO = 888888888")->ID_DETALHE_PAGAMENTO ?? null;
             if ($idDetalhe) {
-                request()->replace(['id_detalhe' => $idDetalhe]);
+                request()->merge(['id_detalhe' => $idDetalhe]);
                 $baixaCtrl = app()->make(BaixaController::class);
                 $baixaCtrl->estornar();
                 $log[] = "[5] Requisição de estorno enviada para a baixa ID {$idDetalhe}.";
@@ -104,7 +104,7 @@ class TestesController extends Controller {
             $log[] = "[2] Cliente de teste criado.";
 
             // 1. Adicionar Telefone
-            request()->replace([
+            request()->merge([
                 'id_contato_bling' => 999999999,
                 'numero_tel' => '99999999999'
             ]);
@@ -122,7 +122,7 @@ class TestesController extends Controller {
             }
 
             // 2. Toggle Confirmado
-            request()->replace([
+            request()->merge([
                 'id_contato_bling' => 999999999,
                 'id_tel' => $tel->ID_TEL,
                 'confirmado' => 1
@@ -138,7 +138,7 @@ class TestesController extends Controller {
             }
 
             // 3. Excluir Telefone
-            request()->replace([
+            request()->merge([
                 'id_contato_bling' => 999999999,
                 'id_tel' => $tel->ID_TEL
             ]);
