@@ -27,6 +27,10 @@ $isPagos = request('status') === 'pagos';
             <p>Gerencie e sincronize contas a receber do Bling</p>
         </div>
         <div class="actions-buttons">
+            <a href="{{ route('importar-baixas-page') }}" class="btn-sync btn-secondary" style="background-color: #107c41; color: #fff; border:none;" title="Importar Baixas via Excel">
+                <x-icons.upload width="16" height="16" />
+                Importar Excel
+            </a>
             <button onclick="sincronizarPedidoPorId()" class="btn-sync btn-secondary btn-primary-override" title="Sincronizar pedido específico pelo ID do Bling">
                 <x-icons.folder-open width="16" height="16" />
                 Sincronizar por ID

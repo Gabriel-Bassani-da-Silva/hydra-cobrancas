@@ -29,10 +29,11 @@ class PedidoImportService {
             $chunks = array_chunk($allIds, 500);
             foreach ($chunks as $chunk) {
                 $inQuery = implode(',', array_fill(0, count($chunk), '?'));
-                $stmtIds = DB::connection()->getPdo()->prepare("SELECT ID_PEDIDO, VALOR_PAGO_BLING, NUM_PEDIDO, ID_REPRESENTANTE FROM PEDIDO WHERE ID_PEDIDO IN ($inQuery)");
+                $stmtIds = DB::connection()->getPdo()->prepare("SELECT ID_PEDIDO, ID_BLING, VALOR_PAGO_BLING, NUM_PEDIDO, ID_REPRESENTANTE FROM PEDIDO WHERE ID_BLING IN ($inQuery) AND ORIGEM = 'bling'");
                 $stmtIds->execute(array_values($chunk));
                 while ($row = $stmtIds->fetch(\PDO::FETCH_ASSOC)) {
-                    $existingData[$row['ID_PEDIDO']] = [
+                    $existingData[$row['ID_BLING']] = [
+                        'id_pedido' => $row['ID_PEDIDO'], // O verdadeiro PK auto_increment
                         'valor' => (float)$row['VALOR_PAGO_BLING'],
                         'num_pedido' => $row['NUM_PEDIDO'],
                         'id_representante' => $row['ID_REPRESENTANTE']
@@ -146,6 +147,7 @@ class PedidoImportService {
             }
 
             $registrosParaInserir[] = [
+                'bling',
                 $id,
                 $numeroOrigem,
                 $conta['valor'] ?? 0,
@@ -172,12 +174,12 @@ class PedidoImportService {
                     $flatParams = [];
                     
                     foreach ($chunk as $row) {
-                        $placeholders[] = '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+                        $placeholders[] = '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
                         $flatParams = array_merge($flatParams, $row);
                     }
                     
                     $sql = "INSERT INTO PEDIDO (
-                                ID_PEDIDO, NUM_PEDIDO, TOTAL_PEDIDO, DATA_VENCIMENTO,
+                                ORIGEM, ID_BLING, NUM_PEDIDO, TOTAL_PEDIDO, DATA_VENCIMENTO,
                                 VALOR_PAGO_BLING, SITUACAO_PEDIDO, ID_REPRESENTANTE, ID_CLIENTE, ID_FORMA_PAGAMENTO, EXIBIR
                             ) VALUES " . implode(',', $placeholders) . "
                             ON DUPLICATE KEY UPDATE
@@ -208,8 +210,9 @@ class PedidoImportService {
 
         if ($mode === 'full_sync' && $blingService !== null) {
             $stmtLocal = DB::connection()->getPdo()->prepare(
-                "SELECT ID_PEDIDO FROM PEDIDO 
+                "SELECT ID_BLING FROM PEDIDO 
                  WHERE EXIBIR = 1 
+                   AND ORIGEM = 'bling'
                    AND SITUACAO_PEDIDO IN (1, 3) 
                    AND DATA_VENCIMENTO >= '2025-01-01'"
             );
@@ -219,20 +222,21 @@ class PedidoImportService {
             $missingIds = array_diff($localPendingIds, $allIds);
 
             foreach ($missingIds as $missingId) {
+                if (!$missingId) continue;
                 $detalhe = $blingService->getContaReceber($missingId);
                 if ($detalhe) {
                     $sit = (int)($detalhe['situacao'] ?? 1);
                     if ($sit === 2) {
-                        $stmtUpdate = DB::connection()->getPdo()->prepare("UPDATE PEDIDO SET VALOR_PAGO_BLING = TOTAL_PEDIDO, SITUACAO_PEDIDO = 2 WHERE ID_PEDIDO = :id");
+                        $stmtUpdate = DB::connection()->getPdo()->prepare("UPDATE PEDIDO SET VALOR_PAGO_BLING = TOTAL_PEDIDO, SITUACAO_PEDIDO = 2 WHERE ID_BLING = :id AND ORIGEM = 'bling'");
                         $stmtUpdate->execute(['id' => $missingId]);
                         $atualizados++;
                     } else if ($sit === 4 || $sit === 5) {
-                        $stmtUpdate = DB::connection()->getPdo()->prepare("UPDATE PEDIDO SET EXIBIR = 0, SITUACAO_PEDIDO = :sit WHERE ID_PEDIDO = :id");
+                        $stmtUpdate = DB::connection()->getPdo()->prepare("UPDATE PEDIDO SET EXIBIR = 0, SITUACAO_PEDIDO = :sit WHERE ID_BLING = :id AND ORIGEM = 'bling'");
                         $stmtUpdate->execute(['id' => $missingId, 'sit' => $sit]);
                         $atualizados++;
                     }
                 } else {
-                    $stmtUpdate = DB::connection()->getPdo()->prepare("UPDATE PEDIDO SET EXIBIR = 0, SITUACAO_PEDIDO = 5 WHERE ID_PEDIDO = :id");
+                    $stmtUpdate = DB::connection()->getPdo()->prepare("UPDATE PEDIDO SET EXIBIR = 0, SITUACAO_PEDIDO = 5 WHERE ID_BLING = :id AND ORIGEM = 'bling'");
                     $stmtUpdate->execute(['id' => $missingId]);
                     $atualizados++;
                 }

@@ -1,0 +1,28 @@
+{
+    "Tel": {
+        "id_tel": "auto_increment",
+        "numero": "String(11)",
+        "confirmado": "boolean",
+        "origem": "bling"
+    },
+    "Colaborador": {
+        "id_colaborador": "auto_increment",
+        "usuario": "string",
+        "senha": "string"
+    },
+    "Contato": {
+        "id_contato": "auto_increment",
+        "nome": "string",
+        "email": "string",
+        "cpf_cnpj": "string",
+        "endereco": "string",
+        "numero": "string",
+        "complemento": "string",
+        "bairro": "string",
+        "cidade": "string",
+        "estado": "string",
+        "cep": "string",
+        "criado_em": "date",
+        "atualizado_em": "date"
+    }
+}

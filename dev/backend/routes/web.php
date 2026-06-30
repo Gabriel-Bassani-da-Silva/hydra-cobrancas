@@ -24,6 +24,57 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/logout', [AuthController::class, 'logout']); // Fallback para get se necessário
 
 // Rotas de Debug (Sem Auth)
+Route::get('/migrate-pedido', function() {
+    try {
+        \Illuminate\Support\Facades\DB::unprepared("
+            -- Adiciona as colunas novas
+            ALTER TABLE PEDIDO ADD COLUMN ORIGEM VARCHAR(50) DEFAULT 'bling' AFTER ID_PEDIDO;
+            ALTER TABLE PEDIDO ADD COLUMN ID_BLING BIGINT NULL AFTER ORIGEM;
+            -- Copia o ID atual (que veio do Bling) para a nova coluna
+            UPDATE PEDIDO SET ID_BLING = ID_PEDIDO;
+            -- Transforma a coluna atual em AUTO_INCREMENT
+            ALTER TABLE PEDIDO MODIFY ID_PEDIDO BIGINT NOT NULL AUTO_INCREMENT;
+            -- Adiciona o índice único para ON DUPLICATE KEY UPDATE funcionar
+            ALTER TABLE PEDIDO ADD UNIQUE INDEX uk_origem_bling (ORIGEM, ID_BLING);
+        ");
+        return 'Migracao da tabela PEDIDO concluida com sucesso!';
+    } catch (\Exception $e) {
+        return 'Erro Fatal: ' . $e->getMessage();
+    }
+});
+
+/**
+ * Migração da tabela CONTATO_EXTERNO:
+ * - Cria nova PK auto-incremental `ID_CONTATO`
+ * - O antigo `ID_CONTATO_BLING` (PK do Bling) vira `ID_BLING` e permanece como índice único
+ * - Todas as tabelas que referenciam ID_CONTATO_BLING (CONTATO_TEL, CLIENTE, REPRESENTANTE, etc.)
+ *   continuam usando essa coluna — NÃO precisam ser alteradas nesta etapa.
+ */
+Route::get('/migrate-contato', function() {
+    try {
+        $pdo = \Illuminate\Support\Facades\DB::connection()->getPdo();
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 0;");
+
+        // 1. Adiciona nova PK auto-incremental
+        $pdo->exec("ALTER TABLE CONTATO_EXTERNO ADD COLUMN ID_CONTATO BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST;");
+
+        // 2. Renomeia a antiga PK (ID_CONTATO_BLING) para ID_BLING, mas mantém coluna
+        $pdo->exec("ALTER TABLE CONTATO_EXTERNO ADD COLUMN ID_BLING BIGINT NULL AFTER ID_CONTATO;");
+
+        // 3. Copia o valor do ID do Bling
+        $pdo->exec("UPDATE CONTATO_EXTERNO SET ID_BLING = ID_CONTATO_BLING;");
+
+        // 4. Adiciona índice único para suportar upserts via ON DUPLICATE KEY UPDATE
+        $pdo->exec("ALTER TABLE CONTATO_EXTERNO ADD UNIQUE INDEX uk_contato_bling (ID_BLING);");
+
+        $pdo->exec("SET FOREIGN_KEY_CHECKS = 1;");
+
+        return 'Migracao da tabela CONTATO_EXTERNO concluida com sucesso!';
+    } catch (\Exception $e) {
+        return 'Erro Fatal: ' . $e->getMessage();
+    }
+});
+
 Route::get('/debug-erro', function() {
     ob_start();
     try {
@@ -103,6 +154,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/contas-receber/api/detalhe', [ContasReceberController::class, 'apiDetalhe'])->name('api-detalhe-conta');
     Route::get('/contas-receber/api-baixas-cliente', [ContasReceberController::class, 'apiBaixasCliente'])->name('api-baixas-cliente');
     Route::post('/contas-receber/toggle-pedra', [ContasReceberController::class, 'togglePedra'])->name('toggle-pedra-contas-receber');
+
+    // Contas a Receber - Importação (Excel)
+    Route::get('/contas-receber/importar', [\App\Controllers\BaixasImportController::class, 'importar'])->name('importar-baixas-page');
+    Route::get('/contas-receber/importar/template', [\App\Controllers\BaixasImportController::class, 'downloadTemplate'])->name('baixar-template-baixas');
+    Route::post('/contas-receber/importar/processar', [\App\Controllers\BaixasImportController::class, 'processarImportacao'])->name('processar-importacao-baixas');
+    Route::post('/contas-receber/importar/mapeamento', [\App\Controllers\BaixasImportController::class, 'processarMapeamento'])->name('salvar-mapeamento-baixas');
+    Route::post('/contas-receber/importar/confirmar', [\App\Controllers\BaixasImportController::class, 'confirmarImportacao'])->name('confirmar-importacao-baixas');
+    Route::get('/contas-receber/importar/log', [\App\Controllers\BaixasImportController::class, 'logImportacao'])->name('log-importacao-baixas');
 
     // Contatos
     Route::get('/contatos', [ContatosController::class, 'index'])->name('contatos-page');
