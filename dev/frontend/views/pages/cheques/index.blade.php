@@ -123,4 +123,41 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabBtns = document.querySelectorAll('#chequesTabs .nav-link');
+    const tabPanes = document.querySelectorAll('#chequesTabsContent .tab-pane');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            // Remove active from all
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabPanes.forEach(p => {
+                p.classList.remove('active', 'show');
+                p.style.display = 'none';
+            });
+
+            // Add active to clicked
+            this.classList.add('active');
+            const targetId = this.getAttribute('data-bs-target').replace('#', '');
+            const targetPane = document.getElementById(targetId);
+            if(targetPane) {
+                targetPane.classList.add('active', 'show');
+                targetPane.style.display = 'block';
+            }
+        });
+    });
+
+    // Initialize
+    tabPanes.forEach(p => {
+        if (!p.classList.contains('active')) {
+            p.style.display = 'none';
+        } else {
+            p.style.display = 'block';
+        }
+    });
+});
+</script>
 @endsection
