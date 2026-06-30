@@ -21,7 +21,14 @@ class BaixasImportController extends Controller {
      */
     public function downloadTemplate() {
         $dir = __DIR__ . '/../../Libraries/';
-        if (!file_exists($dir . 'SimpleXLSXGen.php')) die('Biblioteca SimpleXLSXGen ausente.');
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+        if (!file_exists($dir . 'SimpleXLSXGen.php')) {
+            $content = @file_get_contents('https://raw.githubusercontent.com/shuchkin/simplexlsxgen/master/src/SimpleXLSXGen.php');
+            if ($content) file_put_contents($dir . 'SimpleXLSXGen.php', $content);
+        }
+        if (!file_exists($dir . 'SimpleXLSXGen.php')) die('Erro ao baixar a biblioteca SimpleXLSXGen.');
+
         require_once $dir . 'SimpleXLSXGen.php';
 
         $linhas = [
@@ -39,7 +46,14 @@ class BaixasImportController extends Controller {
      */
     public function processarImportacao() {
         $dir = __DIR__ . '/../../Libraries/';
-        if (!file_exists($dir . 'SimpleXLSX.php')) die('Biblioteca SimpleXLSX ausente.');
+        if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+        if (!file_exists($dir . 'SimpleXLSX.php')) {
+            $content = @file_get_contents('https://raw.githubusercontent.com/shuchkin/simplexlsx/master/src/SimpleXLSX.php');
+            if ($content) file_put_contents($dir . 'SimpleXLSX.php', $content);
+        }
+        if (!file_exists($dir . 'SimpleXLSX.php')) die('Erro ao baixar a biblioteca SimpleXLSX.');
+
         require_once $dir . 'SimpleXLSX.php';
 
         if (!request()->isMethod('post') || !request()->hasFile('arquivo_xlsx')) {
