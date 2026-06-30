@@ -11,10 +11,12 @@ use App\Services\ContasReceberFiltroService;
 class ContasReceberController extends Controller {
     private $model;
     private $cobrancaService;
+    private $filtroService;
 
     public function __construct() {
         $this->model = new PedidoRepository();
         $this->cobrancaService = new CobrancaService();
+        $this->filtroService = new ContasReceberFiltroService($this->model, $this->cobrancaService);
     }
 
 
