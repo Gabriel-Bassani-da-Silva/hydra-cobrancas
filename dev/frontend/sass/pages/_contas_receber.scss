@@ -638,6 +638,149 @@
 }
 
 .cr-mini-filter {
+
+
+// ─── Aba Baixas ──────────────────────────────────────────────────────────────
+
+// Cabeçalho de colunas de valor na tabela de divergências
+.th-local  { color: #64748b; }
+.th-bling  { color: #059669; }
+
+// Valor com destaque de divergência (vermelho)
+.valor-divergencia {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+// Mensagem de vazio para divergências
+.empty-divergencias {
+    padding: 2rem;
+    color: #64748b;
+}
+
+// Total de divergências (vermelho)
+.cr-total-danger {
+    color: #ef4444;
+}
+
+// Linha de rodapé do total de divergências
+.tfoot-total {
+    background-color: #f8fafc;
+    font-weight: bold;
+    border-top: 2px solid #e2e8f0;
+
+    .tfoot-label {
+        text-align: right;
+        padding-right: 1rem;
+        color: #475569;
+    }
+}
+
+// ─── Modal Corrigir Baixa ────────────────────────────────────────────────────
+
+.modal-container-corrigir {
+    max-width: 400px;
+    padding: 20px;
+}
+
+.field-group {
+    margin-top: 15px;
+}
+
+.field-label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.cr-input-full {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.modal-actions-end {
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+// ─── Clickable rows ───────────────────────────────────────────────────────────
+
+.clickable-row {
+    cursor: pointer;
+}
+
+
+// Cabeçalho de colunas de valor na tabela de divergências
+.th-local  { color: #64748b; }
+.th-bling  { color: #059669; }
+
+// Valor com destaque de divergência (vermelho)
+.valor-divergencia {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+// Mensagem de vazio para divergências
+.empty-divergencias {
+    padding: 2rem;
+    color: #64748b;
+}
+
+// Total de divergências (vermelho)
+.cr-total-danger {
+    color: #ef4444;
+}
+
+// Linha de rodapé do total de divergências
+.tfoot-total {
+    background-color: #f8fafc;
+    font-weight: bold;
+    border-top: 2px solid #e2e8f0;
+
+    .tfoot-label {
+        text-align: right;
+        padding-right: 1rem;
+        color: #475569;
+    }
+}
+
+// ─── Modal Corrigir Baixa ────────────────────────────────────────────────────
+
+.modal-container-corrigir {
+    max-width: 400px;
+    padding: 20px;
+}
+
+.field-group {
+    margin-top: 15px;
+}
+
+.field-label {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.cr-input-full {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.modal-actions-end {
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+// ─── Clickable rows ───────────────────────────────────────────────────────────
+
+.clickable-row {
+    cursor: pointer;
+}
+
     font-size: 0.75rem;
     padding: 4px 8px;
     border-radius: 6px;

@@ -1,0 +1,209 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// _baixa_manual.scss
+// Estilos para o modal de Baixa Manual e suas sub-estruturas.
+// Substitui todos os style="" inline gerados pelo baixa_manual.js
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ── Tabela interna do modal ────────────────────────────────────────────────
+
+.baixa-parcelas-table {
+    width: 100%;
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    margin-bottom: 0;
+
+    thead {
+        background: #f8fafc;
+
+        th {
+            padding: 10px;
+            font-weight: 600;
+            color: #475569;
+        }
+
+        th.col-parcelas { text-align: center; }
+        th.col-valor    { text-align: right; }
+    }
+
+    // Linha expansível de grupo de pedido
+    .baixa-row-grupo {
+        border-bottom: 1px solid #e2e8f0;
+        cursor: pointer;
+
+        td { padding: 10px; }
+
+        .td-valor-grupo {
+            text-align: right;
+        }
+    }
+
+    // Linha de detalhe (parcelas internas)
+    .baixa-row-detalhe {
+        td { padding: 0; }
+    }
+}
+
+// ── Botão expand dentro do modal ──────────────────────────────────────────
+
+.baixa-btn-expand {
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    &.expanded { transform: rotate(90deg); }
+}
+
+// ── Badge de contagem de parcelas ─────────────────────────────────────────
+
+.baixa-badge-parcelas {
+    font-size: 0.75rem;
+    background: #e2e8f0;
+    color: #475569;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+// ── Valor devendo (vermelho) ───────────────────────────────────────────────
+
+.baixa-valor-devendo {
+    color: #ef4444;
+    font-weight: 600;
+}
+
+// ── Label "Baixar Tudo" ───────────────────────────────────────────────────
+
+.baixa-check-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+// ── Container de parcelas detalhadas ──────────────────────────────────────
+
+.baixa-detalhe-inner {
+    background: #f8fafc;
+    padding: 10px 15px;
+    border-bottom: 1px solid #e2e8f0;
+    border-left: 3px solid #3b82f6;
+}
+
+// ── Item de parcela individual ────────────────────────────────────────────
+
+.baixa-parcela-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px dashed #cbd5e1;
+
+    &:last-child { border-bottom: none; }
+}
+
+.baixa-parcela-info {
+    flex: 1;
+
+    .baixa-parcela-venc {
+        font-size: 0.85rem;
+        color: #475569;
+        font-weight: 600;
+    }
+
+    .baixa-parcela-falta {
+        font-size: 0.75rem;
+        color: #64748b;
+        margin-left: 8px;
+    }
+}
+
+.baixa-parcela-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 220px;
+}
+
+// ── Input de valor da baixa ───────────────────────────────────────────────
+
+.baixa-input-wrapper {
+    position: relative;
+    flex: 1;
+
+    .baixa-input-prefix {
+        position: absolute;
+        left: 8px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #94a3b8;
+        font-size: 0.85rem;
+        pointer-events: none;
+    }
+}
+
+.input-baixa-valor {
+    width: 100%;
+    padding: 6px 6px 6px 26px;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    text-align: right;
+    font-weight: 500;
+
+    &:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+    }
+
+    &.error { border-color: #ef4444; }
+}
+
+// ── Checkbox de parcela ───────────────────────────────────────────────────
+
+.baixa-check-parcela-label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: #2563eb;
+        margin: 0;
+    }
+}
+
+.baixa-check-grupo {
+    width: 14px;
+    height: 14px;
+    cursor: pointer;
+    accent-color: #2563eb;
+    margin: 0;
+}
+
+// ── Mensagem de loading nos modais ────────────────────────────────────────
+
+.loading-msg {
+    text-align: center;
+    padding: 20px;
+    color: #64748b;
+}
+
+.error-msg {
+    text-align: center;
+    padding: 20px;
+    color: #ef4444;
+}

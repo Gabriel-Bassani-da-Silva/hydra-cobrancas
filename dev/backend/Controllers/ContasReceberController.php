@@ -6,6 +6,7 @@ use App\Repositories\PedidoRepository;
 
 use App\Integrations\Bling\BlingService;
 use App\Services\CobrancaService;
+use App\Services\ContasReceberFiltroService;
 
 class ContasReceberController extends Controller {
     private $model;
@@ -31,166 +32,29 @@ class ContasReceberController extends Controller {
      * Exibe resumos por cliente e representante em abas.
      */
     public function index() {
-        $aba = request()->query()['aba'] ?? 'clientes';
-        $grupo = request()->query()['grupo'] ?? 'padrao'; // 'padrao' ou 'financeiro'
+        $aba = request()->query('aba', 'clientes');
+        $grupo = request()->query('grupo', 'padrao'); // 'padrao' ou 'financeiro'
+        $status = request()->query('status', 'pendentes');
 
-        $resumoClientes = [];
-        $resumoRepresentantes = [];
-        $resumoContatosFinanceiros = [];
-        $todosPedidos = [];
-        $isPagos = false;
+        $dados = $this->filtroService->compilarDadosDaAba($aba, $grupo, $status);
 
-        if ($aba === 'clientes') {
-            if ($grupo === 'padrao') {
-                $resumoClientes = $this->model->getResumoClientes('inadimplentes');
-            } elseif ($grupo === 'financeiro') {
-                $resumoContatosFinanceiros = $this->model->getResumoContatosFinanceirosClientes();
-            } elseif ($grupo === 'cheques') {
-                $resumoClientes = $this->model->getResumoClientes('cheques');
-            } elseif ($grupo === 'antecipados') {
-                $resumoClientes = $this->model->getResumoClientes('antecipados');
-            }
-        } elseif ($aba === 'representantes') {
-            if ($grupo === 'padrao') {
-                $resumoRepresentantes = $this->model->getResumoRepresentantes();
-            } elseif ($grupo === 'financeiro') {
-                $resumoContatosFinanceiros = $this->model->getResumoContatosFinanceirosRepresentantes();
-            }
-        } elseif ($aba === 'pedras') {
-            if ($grupo === 'padrao') {
-                $resumoClientes = $this->model->getResumoClientes('pedras');
-            } elseif ($grupo === 'financeiro') {
-                $resumoContatosFinanceiros = $this->model->getResumoContatosFinanceirosClientes('pedras');
-            }
-        } elseif ($aba === 'pedidos') {
-            $status = request()->query()['status'] ?? 'pendentes';
-            if ($status === 'pagos') {
-                $todosPedidos = $this->model->getAllPedidosPagos();
-            } elseif ($status === 'antecipado') {
-                $todosPedidos = $this->model->getAllPedidosPorFormaPagamento(config('hydra.bling.formas_pagamento.antecipado'));
-            } elseif ($status === 'cheque') {
-                $todosPedidos = $this->model->getAllPedidosPorFormaPagamento(config('hydra.bling.formas_pagamento.cheque'));
-            } elseif ($status === 'todos') {
-                $todosPedidos = $this->model->getAllPedidos();
-            } elseif ($status === 'todos_pendentes') {
-                $todosPedidos = $this->model->getAllPedidosPendentesGerais();
-            } else {
-                $todosPedidos = $this->model->getAllPedidosPendentes();
-            }
-
-            // Agrupar pedidos pelo NUM_PEDIDO
-            $pedidosAgrupados = [];
-            foreach ($todosPedidos as $ped) {
-                $num = trim($ped['NUM_PEDIDO'] ?? '');
-                $key = (!empty($num) && $num !== '—') ? $num : 'single_' . $ped['ID_PEDIDO'];
-                
-                if (!isset($pedidosAgrupados[$key])) {
-                    $pedidosAgrupados[$key] = [
-                        'NUM_PEDIDO' => $num,
-                        'NOME_CLIENTE' => $ped['NOME_CLIENTE'],
-                        'NOME_REPRESENTANTE' => $ped['NOME_REPRESENTANTE'],
-                        'TOTAL_PEDIDO' => 0,
-                        'VALOR_PAGO' => 0,
-                        'DATA_VENCIMENTO_MIN' => $ped['DATA_VENCIMENTO'],
-                        'DATA_VENCIMENTO_MAX' => $ped['DATA_VENCIMENTO'],
-                        'SITUACAO_PEDIDO' => $ped['SITUACAO_PEDIDO'], // situação representativa
-                        'PARCELAS' => [],
-                        'ID_PEDIDO' => $ped['ID_PEDIDO'] // para sincronizar individual se for 1 só
-                    ];
-                }
-                
-                $pedidosAgrupados[$key]['TOTAL_PEDIDO'] += $ped['TOTAL_PEDIDO'];
-                $pedidosAgrupados[$key]['VALOR_PAGO'] += $ped['VALOR_PAGO'];
-                $pedidosAgrupados[$key]['PARCELAS'][] = $ped;
-                
-                if ($ped['DATA_VENCIMENTO'] < $pedidosAgrupados[$key]['DATA_VENCIMENTO_MIN']) {
-                    $pedidosAgrupados[$key]['DATA_VENCIMENTO_MIN'] = $ped['DATA_VENCIMENTO'];
-                }
-                if ($ped['DATA_VENCIMENTO'] > $pedidosAgrupados[$key]['DATA_VENCIMENTO_MAX']) {
-                    $pedidosAgrupados[$key]['DATA_VENCIMENTO_MAX'] = $ped['DATA_VENCIMENTO'];
-                }
-            }
-            
-            // Reordenar por vencimento mais antigo
-            usort($pedidosAgrupados, function($a, $b) {
-                return strcmp($a['DATA_VENCIMENTO_MIN'], $b['DATA_VENCIMENTO_MIN']);
-            });
-            $todosPedidos = $pedidosAgrupados;
-        }
-
-        $totais = $this->model->getTotalEmAberto();
-        $ultimaSinc = $this->model->getUltimaSincronizacao();
-        $contagensAbas = $this->model->getContagensAbas();
-        $cobrancasAtivas = $this->cobrancaService->getCobrancasAtivas();
-        $exibirAte = $this->model->getExibirAte();
-        $exibirAPartirDe = $this->model->getExibirAPartirDe();
-        
-        // Calcula o total do banner vermelho de acordo com a aba selecionada (antes dos filtros do Javascript)
-        $totalBannerVermelho = 0;
-        if ($aba === 'clientes' || $aba === 'representantes' || $aba === 'pedras') {
-            $dadosAtivos = [];
-            if ($grupo === 'padrao' || $grupo === 'cheques' || $grupo === 'antecipados') {
-                $dadosAtivos = ($aba === 'representantes') ? $resumoRepresentantes : $resumoClientes;
-            } elseif ($grupo === 'financeiro') {
-                $dadosAtivos = $resumoContatosFinanceiros;
-            }
-            
-            foreach ($dadosAtivos as $item) {
-                $totalBannerVermelho += (float)($item['TOTAL_VALOR'] ?? 0);
-            }
-        } elseif ($aba === 'pedidos') {
-            $isPagos = ($status ?? 'pendentes') === 'pagos';
-            foreach ($todosPedidos as $item) {
-                if ($isPagos) {
-                    $totalBannerVermelho += (float)($item['TOTAL_PEDIDO'] ?? 0);
-                } else {
-                    $totalBannerVermelho += ((float)($item['TOTAL_PEDIDO'] ?? 0) - (float)($item['VALOR_PAGO'] ?? 0));
-                }
-            }
-        }
-        
-        $todasBaixas = [];
-        $divergencias = [];
-        if ($aba === 'baixas') {
-            $todasBaixas = \Illuminate\Support\Facades\DB::table('DETALHE_PAGAMENTO as dp')
-                ->join('REGISTRO_PAGAMENTO as rp', 'rp.ID_REGISTRO', '=', 'dp.ID_REGISTRO')
-                ->join('PEDIDO as p', 'p.ID_PEDIDO', '=', 'dp.ID_PEDIDO')
-                ->leftJoin('CONTATO_EXTERNO as c', 'c.ID_CONTATO_BLING', '=', 'p.ID_CLIENTE')
-                ->select(
-                    'p.ID_CLIENTE',
-                    'c.NOME_CONTATO',
-                    \Illuminate\Support\Facades\DB::raw('COUNT(dp.ID_DETALHE) as QTD_BAIXAS'),
-                    \Illuminate\Support\Facades\DB::raw('SUM(dp.VALOR_PAGO_PEDIDO) as TOTAL_BAIXADO'),
-                    \Illuminate\Support\Facades\DB::raw('MAX(rp.DATA_REGISTRO) as ULTIMA_BAIXA')
-                )
-                ->groupBy('p.ID_CLIENTE', 'c.NOME_CONTATO')
-                ->orderBy('ULTIMA_BAIXA', 'desc')
-                ->get();
-
-            // Carregar divergências para filtro inline
-            $pedidoModel = new PedidoRepository();
-            $divergencias = $pedidoModel->getDivergencias();
-        }
-
-        $totalInadimplenteFiltrado = $totalBannerVermelho;
-
-        return view('pages.contas_receber', [
+        return view('pages.contas_receber.index', [
             'aba' => $aba,
             'grupo' => $grupo,
-            'resumoClientes' => $resumoClientes,
-            'resumoRepresentantes' => $resumoRepresentantes,
-            'resumoContatosFinanceiros' => $resumoContatosFinanceiros,
-            'todosPedidos' => $todosPedidos,
-            'totalInadimplenteFiltrado' => $totalInadimplenteFiltrado,
-            'isPagos' => $isPagos,
-            'totais' => $totais,
-            'ultimaSinc' => $ultimaSinc,
-            'contagensAbas' => $contagensAbas,
-            'cobrancasAtivas' => $cobrancasAtivas,
-            'exibirAte' => $exibirAte,
-            'exibirAPartirDe' => $exibirAPartirDe,
-            'todasBaixas' => $todasBaixas,
-            'divergencias' => $divergencias
+            'resumoClientes' => $dados['resumoClientes'],
+            'resumoRepresentantes' => $dados['resumoRepresentantes'],
+            'resumoContatosFinanceiros' => $dados['resumoContatosFinanceiros'],
+            'todosPedidos' => $dados['todosPedidos'],
+            'isPagos' => ($status === 'pagos'),
+            'todasBaixas' => $dados['todasBaixas'],
+            'divergencias' => $dados['divergencias'],
+            'totalInadimplenteFiltrado' => $dados['totalBannerVermelho'],
+            'totais' => $dados['totais'],
+            'ultimaSinc' => $dados['ultimaSinc'],
+            'contagensAbas' => $dados['contagensAbas'],
+            'cobrancasAtivas' => $dados['cobrancasAtivas'],
+            'exibirAte' => $dados['exibirAte'],
+            'exibirAPartirDe' => $dados['exibirAPartirDe'],
         ]);
     }
 
@@ -420,7 +284,14 @@ class ContasReceberController extends Controller {
                 }
             }
 
-            $html = view('components.modal_detalhes_contas', ['data' => $data, 'tipo' => $tipo])->render();
+            $modalService = new \App\Services\ModalDetalhesService();
+            if ($tipo === 'financeiros' || $tipo === 'representantes') {
+                $grupos = $modalService->agruparParaFinanceirosOuRepresentantes($data);
+            } else {
+                $grupos = $modalService->agruparParaClientes($data);
+            }
+
+            $html = view('components.modal_detalhes_contas', ['data' => $data, 'grupos' => $grupos, 'tipo' => $tipo])->render();
 
             return response()->json(['data' => $data, 'total' => count($data), 'html' => $html]);
         } catch (\Throwable $e) {

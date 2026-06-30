@@ -25,7 +25,7 @@ class ContatosController extends Controller {
         $contatosFinanceiros = $this->model->getAllContatosFinanceiros($somenteConfirmados, $somenteTentativas);
         $pedras = $this->model->getClientesPedras();
 
-        return view('pages.contatos', [
+        return view('pages.contatos.index', [
             'aba' => $aba,
             'somenteComTelefone' => $somenteComTelefone,
             'somenteConfirmados' => $somenteConfirmados,

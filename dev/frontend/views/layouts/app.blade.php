@@ -62,26 +62,12 @@
         @yield('content')
     </main>
 
-    <!-- Inicialização do WebSockets -->
+    <meta name="reverb-key" content="{{ env('REVERB_APP_KEY', 'hydra_key') }}">
     <script>
-        try {
-            // O Reverb precisa dessas variáveis que virão do .env / Railway
-            window.Pusher = window.Pusher || (typeof Pusher !== 'undefined' ? Pusher : null);
-            if (typeof Echo !== 'undefined') {
-                window.EchoApp = new Echo({
-                    broadcaster: 'reverb',
-                    key: '{{ env("REVERB_APP_KEY", "hydra_key") }}',
-                    wsHost: window.location.hostname,
-                    wsPort: 80,
-                    wssPort: 443,
-                    forceTLS: (window.location.protocol === 'https:'),
-                    enabledTransports: ['ws', 'wss'],
-                });
-            }
-        } catch(e) {
-            console.warn("WebSockets offline (talvez bloqueado por AdBlock). O sistema continuará funcionando.", e);
-        }
+        // Disponibiliza a chave Reverb para o echo_init.js
+        window.__REVERB_APP_KEY__ = document.querySelector('meta[name="reverb-key"]')?.content || 'hydra_key';
     </script>
+    <script src="{{ asset('js/echo_init.js') }}"></script>
 
     @stack('scripts')
 </body>

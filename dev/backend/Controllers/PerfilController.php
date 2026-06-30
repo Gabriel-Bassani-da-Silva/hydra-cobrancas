@@ -135,7 +135,7 @@ class PerfilController extends Controller {
                 ->get();
         }
 
-        return view('pages.perfil', [
+        return view('pages.perfil.index', [
             'aba' => $aba,
             'grupo' => $grupo,
             'minhasCobrancas' => $minhasCobrancas,
@@ -181,7 +181,13 @@ class PerfilController extends Controller {
             $data = $contas;
 
             // Retorna a view do Laravel em formato string (renderizado)
-            $html = view('components.modal_detalhes_contas', ['data' => $contas, 'tipo' => $tipo])->render();
+            $modalService = new \App\Services\ModalDetalhesService();
+            if ($tipo === 'financeiros' || $tipo === 'representantes') {
+                $grupos = $modalService->agruparParaFinanceirosOuRepresentantes($contas);
+            } else {
+                $grupos = $modalService->agruparParaClientes($contas);
+            }
+            $html = view('components.modal_detalhes_contas', ['data' => $contas, 'grupos' => $grupos, 'tipo' => $tipo])->render();
 
             return response()->json(['success' => true, 'html' => $html]);
         } catch (\Exception $e) {
