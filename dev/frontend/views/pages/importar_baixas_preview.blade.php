@@ -35,7 +35,6 @@
                         <th>Cliente</th>
                         <th>Total Pedido</th>
                         <th>Valor a Baixar</th>
-                        <th>Data Pago</th>
                         <th>Colaborador</th>
                         <th class="text-center" style="color: #ea580c;">É Cheque?</th>
                     </tr>
@@ -54,7 +53,6 @@
                         <td>{{ $p['cliente'] }}</td>
                         <td>R$ {{ number_format($p['total_pedido'], 2, ',', '.') }}</td>
                         <td class="text-success fw-bold">R$ {{ number_format($p['valor_pago'], 2, ',', '.') }}</td>
-                        <td>{{ $p['data_pago'] ?: '(hoje)' }}</td>
                         <td>
                             <select name="colaboradores[{{ $idx }}]" class="form-select form-select-sm" required style="min-width:150px;">
                                 <option value="">-- Selecione --</option>

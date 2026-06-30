@@ -32,9 +32,9 @@ class BaixasImportController extends Controller {
         require_once $dir . 'SimpleXLSXGen.php';
 
         $linhas = [
-            ['NUM_PEDIDO', 'NOME_CLIENTE',     'TOTAL_PEDIDO', 'DATA_VENCIMENTO', 'VALOR_PAGO', 'DATA_PAGO'],
-            ['1234',       'João da Silva',     '500.00',       '2026-07-15',      '500.00',     '2026-07-10'],
-            ['NF-5678',    'Empresa ABC Ltda',  '320.50',       '2026-07-20',      '320.50',     '2026-07-18'],
+            ['NUM_PEDIDO', 'NOME_CLIENTE',     'TOTAL_PEDIDO', 'DATA_VENCIMENTO', 'VALOR_PAGO'],
+            ['1234',       'João da Silva',     '500.00',       '2026-07-15',      '500.00'],
+            ['NF-5678',    'Empresa ABC Ltda',  '320.50',       '2026-07-20',      '320.50'],
         ];
 
         $xlsx = \Shuchkin\SimpleXLSXGen::fromArray($linhas);
@@ -98,7 +98,6 @@ class BaixasImportController extends Controller {
         $idxTotal     = array_search('TOTAL_PEDIDO',    $map);
         $idxVenc      = array_search('DATA_VENCIMENTO', $map);
         $idxValor     = array_search('VALOR_PAGO',      $map);
-        $idxDataPago  = array_search('DATA_PAGO',       $map);
         $idxColab     = array_search('COLABORADOR',     $map);
 
         if ($idxValor === false || $idxNum === false || $idxColab === false) {
@@ -137,7 +136,6 @@ class BaixasImportController extends Controller {
                 'total_pedido'   => ($idxTotal !== false) ? (float)str_replace(['.', ','], ['', '.'], str_replace('R$', '', $row[$idxTotal] ?? '0')) : (float)$valor,
                 'data_vencimento'=> ($idxVenc  !== false) ? $parseDate($row[$idxVenc] ?? '') : null,
                 'valor_pago'     => (float)$valor,
-                'data_pago'      => ($idxDataPago !== false) ? $parseDate($row[$idxDataPago] ?? '') : null,
                 'nome_colaborador'=> ($idxColab !== false) ? trim((string)($row[$idxColab] ?? '')) : '',
             ];
         }
@@ -201,7 +199,6 @@ class BaixasImportController extends Controller {
                     'total_pedido'   => $p['TOTAL_PEDIDO'],
                     'cliente'        => $p['NOME_CONTATO'],
                     'valor_pago'     => $item['valor_pago'],
-                    'data_pago'      => $item['data_pago'],
                     'id_colaborador' => $idColaboradorPlanilha,
                     'status'         => 'existente',
                 ];
@@ -245,7 +242,6 @@ class BaixasImportController extends Controller {
                 'total_pedido'   => $item['total_pedido'],
                 'cliente'        => $item['nome_cliente'],
                 'valor_pago'     => $item['valor_pago'],
-                'data_pago'      => $item['data_pago'],
                 'id_colaborador' => $idColaboradorPlanilha,
                 'status'         => 'criado',
             ];
@@ -293,7 +289,7 @@ class BaixasImportController extends Controller {
                     [
                         'id'        => $item['id_pedido'],
                         'valor'     => $item['valor_pago'],
-                        'data_pago' => !empty($item['data_pago']) ? $item['data_pago'] : null,
+                        'data_pago' => null,
                     ]
                 ], $idColab, true);
 
