@@ -148,6 +148,8 @@ Route::middleware('auth')->group(function () {
     // Testes de Sistema (Isolados)
     Route::get('/testes', [\App\Controllers\TestesController::class, 'index'])->name('testes-page');
     Route::post('/testes/baixas', [\App\Controllers\TestesController::class, 'testarBaixas']);
-    Route::post('/testes/telefones', [\App\Controllers\TestesController::class, 'testarTelefones']);
+    Route::post('/testes/contatos', [\App\Controllers\TestesController::class, 'testarContatos']);
     Route::post('/testes/webhook', [\App\Controllers\TestesController::class, 'testarWebhook']);
+    Route::post('/testes/cobrancas', [\App\Controllers\TestesController::class, 'testarCobrancas']);
+    Route::post('/testes/divergencias', [\App\Controllers\TestesController::class, 'testarDivergencias']);
 });

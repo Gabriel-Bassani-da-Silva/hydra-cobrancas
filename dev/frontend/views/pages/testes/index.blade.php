@@ -30,9 +30,9 @@
 
             <div style="background: var(--bg-body); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
                 <i class="ph ph-phone" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
-                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Contatos e Telefones</h3>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; min-height: 60px;">Testa a adição, marcação de confirmação e exclusão de telefones.</p>
-                <button onclick="executarTeste('/testes/telefones')" class="btn btn-primary" style="width: 100%;">Rodar Teste</button>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Contatos, Fin. e Pedras</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; min-height: 60px;">Testa telefones, contatos financeiros, exclusões e status Pedra.</p>
+                <button onclick="executarTeste('/testes/contatos')" class="btn btn-primary" style="width: 100%;">Rodar Teste</button>
             </div>
 
             <div style="background: var(--bg-body); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
@@ -40,6 +40,20 @@
                 <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Webhook (Bling)</h3>
                 <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; min-height: 60px;">Simula a chegada de um pedido e seu posterior cancelamento.</p>
                 <button onclick="executarTeste('/testes/webhook')" class="btn btn-primary" style="width: 100%;">Rodar Teste</button>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
+                <i class="ph ph-headset" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Cobranças (CRM)</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; min-height: 60px;">Testa a régua de cobrança: iniciar agrupamento e desistir de cobrança.</p>
+                <button onclick="executarTeste('/testes/cobrancas')" class="btn btn-primary" style="width: 100%;">Rodar Teste</button>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
+                <i class="ph ph-warning-circle" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 1rem;"></i>
+                <h3 style="margin-bottom: 0.5rem; color: var(--text-primary);">Divergências</h3>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1rem; min-height: 60px;">Testa o painel de auditoria, corrigindo valor de baixa e estorno.</p>
+                <button onclick="executarTeste('/testes/divergencias')" class="btn btn-primary" style="width: 100%;">Rodar Teste</button>
             </div>
 
         </div>
