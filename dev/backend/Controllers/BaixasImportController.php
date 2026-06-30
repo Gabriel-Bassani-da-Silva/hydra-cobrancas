@@ -99,13 +99,26 @@ class BaixasImportController extends Controller {
         $idxVenc      = array_search('DATA_VENCIMENTO', $map);
         $idxValor     = array_search('VALOR_PAGO',      $map);
         $idxDataPago  = array_search('DATA_PAGO',       $map);
+        $idxColab     = array_search('COLABORADOR',     $map);
 
-        if ($idxValor === false || $idxNum === false) {
-            session()->flash('flash_msg', "Mapeie as colunas NUM_PEDIDO e VALOR_PAGO obrigatoriamente.");
+        if ($idxValor === false || $idxNum === false || $idxColab === false) {
+            session()->flash('flash_msg', "Mapeie as colunas NUM_PEDIDO, VALOR_PAGO e COLABORADOR obrigatoriamente.");
             return redirect(url('/') . '/contas-receber/importar');
         }
 
         if ($ignorar) array_shift($raw);
+
+        // Função auxiliar para converter datas do Excel d/m/Y para Y-m-d
+        $parseDate = function($dateStr) {
+            if (empty($dateStr)) return null;
+            $dateStr = trim($dateStr);
+            if (preg_match('/^\d{4}-\d{2}-\d{2}/', $dateStr)) return substr($dateStr, 0, 10);
+            $d = \DateTime::createFromFormat('d/m/Y', $dateStr);
+            if ($d) return $d->format('Y-m-d');
+            $d = \DateTime::createFromFormat('d/m/y', $dateStr);
+            if ($d) return $d->format('Y-m-d');
+            return null;
+        };
 
         // Extrai linhas válidas
         $linhas = [];
@@ -122,9 +135,10 @@ class BaixasImportController extends Controller {
                 'num_pedido'     => $num,
                 'nome_cliente'   => ($idxNome  !== false) ? trim((string)($row[$idxNome]  ?? '')) : '',
                 'total_pedido'   => ($idxTotal !== false) ? (float)str_replace(['.', ','], ['', '.'], str_replace('R$', '', $row[$idxTotal] ?? '0')) : (float)$valor,
-                'data_vencimento'=> ($idxVenc  !== false) ? trim((string)($row[$idxVenc]  ?? '')) : null,
+                'data_vencimento'=> ($idxVenc  !== false) ? $parseDate($row[$idxVenc] ?? '') : null,
                 'valor_pago'     => (float)$valor,
-                'data_pago'      => ($idxDataPago !== false) ? trim((string)($row[$idxDataPago] ?? '')) : '',
+                'data_pago'      => ($idxDataPago !== false) ? $parseDate($row[$idxDataPago] ?? '') : null,
+                'nome_colaborador'=> ($idxColab !== false) ? trim((string)($row[$idxColab] ?? '')) : '',
             ];
         }
 
@@ -136,14 +150,14 @@ class BaixasImportController extends Controller {
             foreach ($chunks as $chunk) {
                 $in = implode(',', array_fill(0, count($chunk), '?'));
                 $stmt = DB::connection()->getPdo()->prepare("
-                    SELECT p.ID_PEDIDO, p.NUM_PEDIDO, p.TOTAL_PEDIDO, c.NOME_CONTATO, c.ID_CONTATO_BLING
+                    SELECT p.ID_PEDIDO, p.NUM_PEDIDO, p.TOTAL_PEDIDO, c.NOME_CONTATO, c.ID_CONTATO_BLING, p.DATA_VENCIMENTO
                     FROM PEDIDO p
                     LEFT JOIN CONTATO_EXTERNO c ON c.ID_CONTATO_BLING = p.ID_CLIENTE
                     WHERE p.NUM_PEDIDO IN ($in)
                 ");
                 $stmt->execute(array_values($chunk));
                 foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $r) {
-                    $existentes[$r['NUM_PEDIDO']] = $r;
+                    $existentes[$r['NUM_PEDIDO']][] = $r;
                 }
             }
         }
@@ -152,20 +166,44 @@ class BaixasImportController extends Controller {
         $criados        = [];
         $naoEncontrados = [];
 
+        $colaboradoresRaw = DB::table('COLABORADOR')->get(['ID_COLABORADOR', 'NOME_COLABORADOR']);
+        $colabMap = [];
+        foreach($colaboradoresRaw as $c) {
+            $colabMap[mb_strtolower(trim($c->NOME_COLABORADOR))] = $c->ID_COLABORADOR;
+        }
+
         foreach ($linhas as $item) {
             $num = $item['num_pedido'];
+            $nomeColabLower = mb_strtolower(trim($item['nome_colaborador']));
+            $idColaboradorPlanilha = $colabMap[$nomeColabLower] ?? null;
 
             // ── Pedido já existe ─────────────────────────────────────────────
+            $p = null;
             if (isset($existentes[$num])) {
-                $p = $existentes[$num];
+                if (!empty($item['data_vencimento'])) {
+                    // Se enviou vencimento, tenta casar com o mesmo vencimento
+                    foreach ($existentes[$num] as $ext) {
+                        if ($ext['DATA_VENCIMENTO'] === $item['data_vencimento']) {
+                            $p = $ext;
+                            break;
+                        }
+                    }
+                } else {
+                    // Se não enviou vencimento, pega o primeiro que aparecer
+                    $p = $existentes[$num][0];
+                }
+            }
+
+            if ($p) {
                 $prontos[] = [
-                    'id_pedido'    => $p['ID_PEDIDO'],
-                    'num_pedido'   => $num,
-                    'total_pedido' => $p['TOTAL_PEDIDO'],
-                    'cliente'      => $p['NOME_CONTATO'],
-                    'valor_pago'   => $item['valor_pago'],
-                    'data_pago'    => $item['data_pago'],
-                    'status'       => 'existente',
+                    'id_pedido'      => $p['ID_PEDIDO'],
+                    'num_pedido'     => $num,
+                    'total_pedido'   => $p['TOTAL_PEDIDO'],
+                    'cliente'        => $p['NOME_CONTATO'],
+                    'valor_pago'     => $item['valor_pago'],
+                    'data_pago'      => $item['data_pago'],
+                    'id_colaborador' => $idColaboradorPlanilha,
+                    'status'         => 'existente',
                 ];
                 continue;
             }
@@ -188,10 +226,10 @@ class BaixasImportController extends Controller {
                 continue;
             }
 
-            // Cria o pedido com ORIGEM='excel'
+            // Cria o pedido com ORIGEM='excel' e EXIBIR=0 (só para baixas)
             $stmtInsert = DB::connection()->getPdo()->prepare("
                 INSERT INTO PEDIDO (ORIGEM, NUM_PEDIDO, TOTAL_PEDIDO, DATA_VENCIMENTO, SITUACAO_PEDIDO, ID_CLIENTE, EXIBIR)
-                VALUES ('excel', :num, :total, :venc, 2, :id_cliente, 1)
+                VALUES ('excel', :num, :total, :venc, 2, :id_cliente, 0)
             ");
             $stmtInsert->execute([
                 'num'        => $num,
@@ -202,13 +240,14 @@ class BaixasImportController extends Controller {
             $novoId = DB::connection()->getPdo()->lastInsertId();
 
             $criados[] = [
-                'id_pedido'    => $novoId,
-                'num_pedido'   => $num,
-                'total_pedido' => $item['total_pedido'],
-                'cliente'      => $item['nome_cliente'],
-                'valor_pago'   => $item['valor_pago'],
-                'data_pago'    => $item['data_pago'],
-                'status'       => 'criado',
+                'id_pedido'      => $novoId,
+                'num_pedido'     => $num,
+                'total_pedido'   => $item['total_pedido'],
+                'cliente'        => $item['nome_cliente'],
+                'valor_pago'     => $item['valor_pago'],
+                'data_pago'      => $item['data_pago'],
+                'id_colaborador' => $idColaboradorPlanilha,
+                'status'         => 'criado',
             ];
         }
 
@@ -222,6 +261,7 @@ class BaixasImportController extends Controller {
             'prontos'        => $todosProntos,
             'criados'        => $criados,
             'naoEncontrados' => $naoEncontrados,
+            'colaboradoresDb'=> $colaboradoresRaw,
         ]);
     }
 
@@ -230,25 +270,30 @@ class BaixasImportController extends Controller {
      */
     public function confirmarImportacao() {
         $prontos = session()->get('baixas_prontas', []);
+        $colabsEditados = request()->input('colaboradores', []);
 
         if (empty($prontos)) {
             session()->flash('flash_msg', "Não há registros para importar.");
             return redirect(url('/') . '/contas-receber');
         }
 
-        $idColaborador = auth()->id() ?? 0;
         $sucessos = 0;
         $erros    = [];
 
-        foreach ($prontos as $item) {
+        foreach ($prontos as $idx => $item) {
             try {
+                $idColab = $colabsEditados[$idx] ?? $item['id_colaborador'];
+                if (!$idColab) {
+                    throw new \Exception("Colaborador não selecionado.");
+                }
+
                 $this->pedidoRepository->registrarBaixaManual([
                     [
                         'id'        => $item['id_pedido'],
                         'valor'     => $item['valor_pago'],
                         'data_pago' => !empty($item['data_pago']) ? $item['data_pago'] : null,
                     ]
-                ], $idColaborador, true);
+                ], $idColab, true);
                 $sucessos++;
             } catch (\Exception $e) {
                 $erros[] = "Pedido #{$item['num_pedido']}: " . $e->getMessage();

@@ -24,6 +24,8 @@
         </h5>
 
         @if(count($prontos) > 0)
+        <form action="{{ route('confirmar-importacao-baixas') }}" method="POST">
+            @csrf
         <div style="overflow-x:auto;">
             <table class="table table-sm table-bordered table-hover">
                 <thead class="table-dark">
@@ -34,10 +36,11 @@
                         <th>Total Pedido</th>
                         <th>Valor a Baixar</th>
                         <th>Data Pago</th>
+                        <th>Colaborador</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach(array_slice($prontos, 0, 100) as $p)
+                    @foreach($prontos as $idx => $p)
                     <tr>
                         <td>
                             @if(($p['status'] ?? '') === 'criado')
@@ -51,14 +54,22 @@
                         <td>R$ {{ number_format($p['total_pedido'], 2, ',', '.') }}</td>
                         <td class="text-success fw-bold">R$ {{ number_format($p['valor_pago'], 2, ',', '.') }}</td>
                         <td>{{ $p['data_pago'] ?: '(hoje)' }}</td>
+                        <td>
+                            <select name="colaboradores[{{ $idx }}]" class="form-select form-select-sm" required style="min-width:150px;">
+                                <option value="">-- Selecione --</option>
+                                @foreach($colaboradoresDb ?? [] as $colab)
+                                    <option value="{{ $colab->ID_COLABORADOR }}" {{ ($p['id_colaborador'] ?? null) == $colab->ID_COLABORADOR ? 'selected' : '' }}>
+                                        {{ $colab->NOME_COLABORADOR }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </td>
                     </tr>
                     @endforeach
                 </tbody>
             </table>
+            </table>
         </div>
-        @if(count($prontos) > 100)
-            <p class="text-muted small">Exibindo 100 de {{ count($prontos) }} registros.</p>
-        @endif
         @else
             <p class="text-muted">Nenhum pedido localizado ou criável.</p>
         @endif
@@ -91,8 +102,6 @@
         <div class="mt-4 d-flex justify-content-between align-items-center">
             <a href="{{ route('importar-baixas-page') }}" class="btn btn-outline-secondary">✕ Cancelar</a>
             @if(count($prontos) > 0)
-            <form action="{{ route('confirmar-importacao-baixas') }}" method="POST">
-                @csrf
                 <button type="submit" class="btn btn-success px-5">
                     ✓ Confirmar e Baixar {{ count($prontos) }} registro(s)
                 </button>

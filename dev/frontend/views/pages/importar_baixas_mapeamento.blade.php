@@ -61,6 +61,7 @@
                                 <optgroup label="Dados do Pagamento">
                                     <option value="VALOR_PAGO">VALOR_PAGO — Valor recebido ⚠️ Obrigatório</option>
                                     <option value="DATA_PAGO">DATA_PAGO — Data do recebimento</option>
+                                    <option value="COLABORADOR">COLABORADOR — Nome do usuário ⚠️ Obrigatório</option>
                                 </optgroup>
                             </select>
                         </td>
