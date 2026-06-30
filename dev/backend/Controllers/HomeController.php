@@ -11,19 +11,25 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        $ranking = \Illuminate\Support\Facades\DB::table('vw_ranking_total')
-            ->orderByDesc('PONTOS_TOTAIS')
-            ->orderByDesc('TOTAL_RECEBIDO')
-            ->get();
+        try {
+            $ranking = \Illuminate\Support\Facades\DB::table('vw_ranking_total')
+                ->orderByDesc('PONTOS_TOTAIS')
+                ->orderByDesc('TOTAL_RECEBIDO')
+                ->get();
 
-        $rankingDiario = \Illuminate\Support\Facades\DB::table('vw_ranking_diario')
-            ->orderByDesc('PONTOS_TOTAIS')
-            ->orderByDesc('TOTAL_RECEBIDO')
-            ->get();
+            $rankingDiario = \Illuminate\Support\Facades\DB::table('vw_ranking_diario')
+                ->orderByDesc('PONTOS_TOTAIS')
+                ->orderByDesc('TOTAL_RECEBIDO')
+                ->get();
 
-        // Data início diário
-        $config = \Illuminate\Support\Facades\DB::table('CONFIGURACOES_RANKING')->first();
-        $dataFiltro = $config ? $config->DATA_INICIO_DIARIO : date('Y-m-d');
+            // Data início diário
+            $config = \Illuminate\Support\Facades\DB::table('CONFIGURACOES_RANKING')->first();
+            $dataFiltro = $config ? $config->DATA_INICIO_DIARIO : date('Y-m-d');
+        } catch (\Exception $e) {
+            $ranking = collect();
+            $rankingDiario = collect();
+            $dataFiltro = date('Y-m-d');
+        }
 
         return view('dashboard', [
             'ranking' => $ranking,
