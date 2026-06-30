@@ -59,8 +59,8 @@
         </div>
 
         <div style="margin-bottom: 2rem; display: flex; justify-content: flex-end;">
-            <button onclick="testarTodasRotas()" class="btn btn-primary" style="background: var(--warning-color); color: #fff; border: none; font-weight: 600;">
-                <i class="ph ph-heartbeat"></i> Testar 200 em Todas as Páginas
+            <button onclick="testarTodasRotas()" style="background-color: #fd971f; color: #ffffff; padding: 10px 20px; border-radius: 6px; border: none; font-weight: bold; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="ph ph-heartbeat" style="font-size: 1.2rem;"></i> Testar 200 em Todas as Páginas
             </button>
         </div>
 
