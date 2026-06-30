@@ -24,8 +24,15 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 Route::get('/logout', [AuthController::class, 'logout']); // Fallback para get se necessário
 
-
-
+// Rota temporária para limpar nomes de colaboradores
+Route::get('/limpar-nomes', function () {
+    try {
+        \Illuminate\Support\Facades\DB::statement("UPDATE COLABORADOR SET NOME_COLABORADOR = REPLACE(NOME_COLABORADOR, '@gmail.com', '') WHERE NOME_COLABORADOR LIKE '%@gmail.com'");
+        return 'Nomes dos colaboradores atualizados com sucesso (removido @gmail.com)!';
+    } catch (\Exception $e) {
+        return 'Erro: ' . $e->getMessage();
+    }
+});
 // Rota temporária para atualizar a view de ranking diário
 Route::get('/update-ranking-vencimento', function () {
     try {
