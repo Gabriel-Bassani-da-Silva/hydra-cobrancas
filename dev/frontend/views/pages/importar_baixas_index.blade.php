@@ -24,7 +24,7 @@
                 Voltar
             </a>
             <a href="{{ route('historico-importacao-baixas') }}" class="btn-sync" title="Histórico de Importações" style="background: #64748b;">
-                <x-icons.history width="16" height="16" />
+                <x-icons.folder-open width="16" height="16" />
                 Histórico
             </a>
             <a href="{{ route('baixar-template-baixas') }}" class="btn-sync secondary" title="Baixar planilha base">
