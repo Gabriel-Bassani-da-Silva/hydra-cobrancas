@@ -15,6 +15,7 @@ use App\Controllers\ExportController;
 use App\Controllers\CsvExportController;
 use App\Controllers\RankingConfigController;
 use App\Controllers\ChequesController;
+use App\Controllers\BaixasImportController;
 
 // Exportação Google Sheets (sem auth middleware para ser lido publicamente pelo Sheets)
 Route::get('/api/exportar-contatos-csv', [CsvExportController::class, 'exportarContatos'])->name('api-export-csv');
@@ -131,16 +132,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/contas-receber/toggle-pedra', [ContasReceberController::class, 'togglePedra'])->name('toggle-pedra-contas-receber');
 
     // Contas a Receber - Importação (Excel)
-    Route::get('/contas-receber/importar', [\\App\\Controllers\\BaixasImportController::class, 'importar'])->name('importar-baixas-page');
-    Route::get('/contas-receber/importar/template', [\\App\\Controllers\\BaixasImportController::class, 'downloadTemplate'])->name('baixar-template-baixas');
-    Route::post('/contas-receber/importar/processar', [\\App\\Controllers\\BaixasImportController::class, 'processarImportacao'])->name('processar-importacao-baixas');
-    Route::post('/contas-receber/importar/mapeamento', [\\App\\Controllers\\BaixasImportController::class, 'processarMapeamento'])->name('salvar-mapeamento-baixas');
-    Route::post('/contas-receber/importar/confirmar', [\\App\\Controllers\\BaixasImportController::class, 'confirmarImportacao'])->name('confirmar-importacao-baixas');
-    Route::get('/contas-receber/importar/log', [\\App\\Controllers\\BaixasImportController::class, 'logImportacao'])->name('log-importacao-baixas');
-    Route::get('/contas-receber/importar/historico', [\\App\\Controllers\\BaixasImportController::class, 'historico'])->name('historico-importacao-baixas');
-    Route::get('/contas-receber/importar/lote/{id}/editar', [\\App\\Controllers\\BaixasImportController::class, 'editarLote'])->name('editar-lote-baixas');
-    Route::post('/contas-receber/importar/lote/{id}/salvar', [\\App\\Controllers\\BaixasImportController::class, 'salvarLote'])->name('salvar-lote-baixas');
-    Route::post('/contas-receber/importar/lote/{id}/excluir', [\\App\\Controllers\\BaixasImportController::class, 'excluirLote'])->name('excluir-lote-baixas');
+    Route::get('/contas-receber/importar', [BaixasImportController::class, 'importar'])->name('importar-baixas-page');
+    Route::get('/contas-receber/importar/template', [BaixasImportController::class, 'downloadTemplate'])->name('baixar-template-baixas');
+    Route::post('/contas-receber/importar/processar', [BaixasImportController::class, 'processarImportacao'])->name('processar-importacao-baixas');
+    Route::post('/contas-receber/importar/mapeamento', [BaixasImportController::class, 'processarMapeamento'])->name('salvar-mapeamento-baixas');
+    Route::post('/contas-receber/importar/confirmar', [BaixasImportController::class, 'confirmarImportacao'])->name('confirmar-importacao-baixas');
+    Route::get('/contas-receber/importar/log', [BaixasImportController::class, 'logImportacao'])->name('log-importacao-baixas');
+    Route::get('/contas-receber/importar/historico', [BaixasImportController::class, 'historico'])->name('historico-importacao-baixas');
+    Route::get('/contas-receber/importar/lote/{id}/editar', [BaixasImportController::class, 'editarLote'])->name('editar-lote-baixas');
+    Route::post('/contas-receber/importar/lote/{id}/salvar', [BaixasImportController::class, 'salvarLote'])->name('salvar-lote-baixas');
+    Route::post('/contas-receber/importar/lote/{id}/excluir', [BaixasImportController::class, 'excluirLote'])->name('excluir-lote-baixas');
 
     // Contatos
     Route::get('/contatos', [ContatosController::class, 'index'])->name('contatos-page');
