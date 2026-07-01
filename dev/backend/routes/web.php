@@ -35,6 +35,16 @@ Route::get('/limpar-nomes', function () {
         return 'Erro: ' . $e->getMessage();
     }
 });
+
+Route::get('/limpar-testes-excel', function () {
+    try {
+        // Limpa pedidos antigos que foram criados por testes de excel
+        \Illuminate\Support\Facades\DB::table('PEDIDO')->where('ORIGEM', 'excel')->delete();
+        return 'Todos os pedidos gerados via Excel foram apagados! Você pode testar a importação do zero agora.';
+    } catch (\Exception $e) {
+        return 'Erro: ' . $e->getMessage();
+    }
+});
 // Rota temporária para criar coluna STATUS_CHEQUE e atualizar views de ranking
 Route::get('/update-ranking-cheques', function () {
     try {
