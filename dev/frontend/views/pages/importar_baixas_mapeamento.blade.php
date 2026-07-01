@@ -43,6 +43,7 @@
                 </thead>
                 <tbody>
                     @foreach($headers as $idx => $headerName)
+                    @php $h = trim(mb_strtoupper($headerName)); @endphp
                     <tr>
                         <td class="text-muted small">{{ $idx + 1 }}</td>
                         <td><strong>{{ $headerName }}</strong></td>
@@ -51,16 +52,16 @@
                             <select name="map[{{ $idx }}]" class="form-select form-select-sm">
                                 <option value="">— Ignorar —</option>
                                 <optgroup label="Identificação do Pedido">
-                                    <option value="NUM_PEDIDO">NUM_PEDIDO — Nº da Nota Fiscal ⚠️ Obrigatório</option>
-                                    <option value="NOME_CLIENTE">NOME_CLIENTE — Nome do cliente (para criar pedidos)</option>
+                                    <option value="NUM_PEDIDO" {{ $h === 'NUM_PEDIDO' ? 'selected' : '' }}>NUM_PEDIDO — Nº da Nota Fiscal ⚠️ Obrigatório</option>
+                                    <option value="NOME_CLIENTE" {{ $h === 'NOME_CLIENTE' ? 'selected' : '' }}>NOME_CLIENTE — Nome do cliente (para criar pedidos)</option>
                                 </optgroup>
                                 <optgroup label="Dados do Pedido (ao criar novo)">
-                                    <option value="TOTAL_PEDIDO">TOTAL_PEDIDO — Valor total do pedido</option>
-                                    <option value="DATA_VENCIMENTO">DATA_VENCIMENTO — Data de vencimento</option>
+                                    <option value="TOTAL_PEDIDO" {{ $h === 'TOTAL_PEDIDO' ? 'selected' : '' }}>TOTAL_PEDIDO — Valor total do pedido</option>
+                                    <option value="DATA_VENCIMENTO" {{ $h === 'DATA_VENCIMENTO' ? 'selected' : '' }}>DATA_VENCIMENTO — Data de vencimento</option>
                                 </optgroup>
                                 <optgroup label="Dados do Pagamento">
-                                    <option value="VALOR_PAGO">VALOR_PAGO — Valor recebido ⚠️ Obrigatório</option>
-                                    <option value="COLABORADOR">COLABORADOR — Nome do usuário ⚠️ Obrigatório</option>
+                                    <option value="VALOR_PAGO" {{ $h === 'VALOR_PAGO' ? 'selected' : '' }}>VALOR_PAGO — Valor recebido ⚠️ Obrigatório</option>
+                                    <option value="COLABORADOR" {{ $h === 'COLABORADOR' ? 'selected' : '' }}>COLABORADOR — Nome do usuário ⚠️ Obrigatório</option>
                                 </optgroup>
                             </select>
                         </td>
