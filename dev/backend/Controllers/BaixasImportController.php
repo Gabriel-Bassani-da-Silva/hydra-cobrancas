@@ -100,8 +100,13 @@ class BaixasImportController extends Controller {
         $idxValor     = array_search('VALOR_PAGO',      $map);
         $idxColab     = array_search('COLABORADOR',     $map);
 
-        if ($idxValor === false || $idxNum === false || $idxColab === false) {
-            session()->flash('flash_msg', "Mapeie as colunas NUM_PEDIDO, VALOR_PAGO e COLABORADOR obrigatoriamente.");
+        if ($idxValor === false || $idxColab === false) {
+            session()->flash('flash_msg', "Mapeie as colunas VALOR_PAGO e COLABORADOR obrigatoriamente.");
+            return redirect(url('/') . '/contas-receber/importar');
+        }
+
+        if ($idxNum === false && $idxNome === false) {
+            session()->flash('flash_msg', "Mapeie a coluna NUM_PEDIDO ou NOME_CLIENTE para identificar os pedidos.");
             return redirect(url('/') . '/contas-receber/importar');
         }
 
@@ -122,9 +127,12 @@ class BaixasImportController extends Controller {
         // Extrai linhas válidas
         $linhas = [];
         foreach ($raw as $row) {
-            $num   = trim((string)($row[$idxNum]   ?? ''));
+            $num   = ($idxNum !== false) ? trim((string)($row[$idxNum] ?? '')) : '';
             $valor = trim((string)($row[$idxValor] ?? ''));
-            if (empty($num) || empty($valor)) continue;
+            $nome  = ($idxNome !== false) ? trim((string)($row[$idxNome] ?? '')) : '';
+
+            if (empty($valor)) continue;
+            if (empty($num) && empty($nome)) continue;
 
             // Normaliza valor
             $valor = str_replace(['R$', ' ', '.'], '', $valor);
@@ -141,7 +149,7 @@ class BaixasImportController extends Controller {
         }
 
         // Busca pedidos existentes em lote
-        $nums = array_unique(array_column($linhas, 'num_pedido'));
+        $nums = array_filter(array_unique(array_column($linhas, 'num_pedido')));
         $existentes = [];
         if (!empty($nums)) {
             $chunks = array_chunk($nums, 300);
@@ -177,7 +185,7 @@ class BaixasImportController extends Controller {
 
             // ── Pedido já existe ─────────────────────────────────────────────
             $p = null;
-            if (isset($existentes[$num])) {
+            if (!empty($num) && isset($existentes[$num])) {
                 if (!empty($item['data_vencimento'])) {
                     // Se enviou vencimento, tenta casar com o mesmo vencimento
                     foreach ($existentes[$num] as $ext) {
@@ -189,6 +197,31 @@ class BaixasImportController extends Controller {
                 } else {
                     // Se não enviou vencimento, pega o primeiro que aparecer
                     $p = $existentes[$num][0];
+                }
+            } elseif (empty($num) && !empty($item['nome_cliente']) && !empty($item['data_vencimento'])) {
+                // Tenta achar por cliente + vencimento
+                $stmtCliente = DB::connection()->getPdo()->prepare("
+                    SELECT ID_CONTATO_BLING FROM CONTATO_EXTERNO
+                    WHERE NOME_CONTATO LIKE :nome LIMIT 1
+                ");
+                $stmtCliente->execute(['nome' => '%' . $item['nome_cliente'] . '%']);
+                $rowCliente = $stmtCliente->fetch(\PDO::FETCH_ASSOC);
+                $idClienteSearch = $rowCliente['ID_CONTATO_BLING'] ?? null;
+
+                if ($idClienteSearch) {
+                    $stmtPedido = DB::connection()->getPdo()->prepare("
+                        SELECT p.ID_PEDIDO, p.NUM_PEDIDO, p.TOTAL_PEDIDO, c.NOME_CONTATO, c.ID_CONTATO_BLING, p.DATA_VENCIMENTO
+                        FROM PEDIDO p
+                        LEFT JOIN CONTATO_EXTERNO c ON c.ID_CONTATO_BLING = p.ID_CLIENTE
+                        WHERE p.ID_CLIENTE = :id_cliente AND p.DATA_VENCIMENTO = :venc AND p.SITUACAO_PEDIDO = 2
+                        AND (p.NUM_PEDIDO IS NULL OR p.NUM_PEDIDO = '')
+                        LIMIT 1
+                    ");
+                    $stmtPedido->execute(['id_cliente' => $idClienteSearch, 'venc' => $item['data_vencimento']]);
+                    $p = $stmtPedido->fetch(\PDO::FETCH_ASSOC);
+                    if ($p) {
+                        $num = $p['NUM_PEDIDO']; // atualiza o num_pedido com o real
+                    }
                 }
             }
 
@@ -224,12 +257,13 @@ class BaixasImportController extends Controller {
             }
 
             // Cria o pedido com ORIGEM='excel' e EXIBIR=0 (só para baixas)
+            $numFinal = $num ?: '';
             $stmtInsert = DB::connection()->getPdo()->prepare("
                 INSERT INTO PEDIDO (ORIGEM, NUM_PEDIDO, TOTAL_PEDIDO, DATA_VENCIMENTO, SITUACAO_PEDIDO, ID_CLIENTE, EXIBIR)
                 VALUES ('excel', :num, :total, :venc, 2, :id_cliente, 0)
             ");
             $stmtInsert->execute([
-                'num'        => $num,
+                'num'        => $numFinal,
                 'total'      => $item['total_pedido'],
                 'venc'       => $item['data_vencimento'] ?: null,
                 'id_cliente' => $idCliente,
@@ -238,7 +272,7 @@ class BaixasImportController extends Controller {
 
             $criados[] = [
                 'id_pedido'      => $novoId,
-                'num_pedido'     => $num,
+                'num_pedido'     => $numFinal,
                 'total_pedido'   => $item['total_pedido'],
                 'cliente'        => $item['nome_cliente'],
                 'valor_pago'     => $item['valor_pago'],
