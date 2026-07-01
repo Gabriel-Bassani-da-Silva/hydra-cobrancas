@@ -231,7 +231,7 @@ class ContasReceberController extends Controller {
             return response()->json(['success' => false, 'error' => 'Dados inválidos']);
         }
 
-        $idColaborador = auth()->user()->ID_COLABORADOR ?? 0;
+        $idColaborador = !empty($data['colaborador_id']) ? (int)$data['colaborador_id'] : (auth()->user()->ID_COLABORADOR ?? 0);
 
         try {
             $sucesso = $this->model->registrarBaixaManual($data['baixas'], $idColaborador);

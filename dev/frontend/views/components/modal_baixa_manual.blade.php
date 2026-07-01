@@ -7,6 +7,20 @@
             <button class="cr-modal-close" onclick="fecharModalBaixa()">&times;</button>
         </div>
         <div class="cr-modal-body">
+            @php
+                $colaboradoresDb = \Illuminate\Support\Facades\DB::table('COLABORADOR')->orderBy('NOME_COLABORADOR')->get();
+                $meuId = auth()->user()->ID_COLABORADOR ?? 0;
+            @endphp
+            <div style="margin-bottom: 15px;">
+                <label for="modal-colaborador-select" style="font-size: 0.85rem; color: #475569; font-weight: 600; margin-bottom: 4px; display: block;">Vincular Baixa a:</label>
+                <select id="modal-colaborador-select" class="cr-input" style="width: 100%; padding: 8px;">
+                    @foreach($colaboradoresDb as $colab)
+                        <option value="{{ $colab->ID_COLABORADOR }}" {{ $colab->ID_COLABORADOR == $meuId ? 'selected' : '' }}>
+                            {{ $colab->NOME_COLABORADOR }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
             <div id="baixa-parcelas-container" class="baixa-container">
                 <!-- Preenchido via JS -->
             </div>

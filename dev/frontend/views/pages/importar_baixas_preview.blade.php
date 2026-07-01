@@ -56,7 +56,7 @@
                                 @endif
                             </td>
                             <td>
-                                <strong>{{ $p['num_pedido'] ?: '(Gerado)' }}</strong>
+                                <strong>{{ $p['num_pedido'] ?: '-' }}</strong>
                             </td>
                             <td>{{ $p['cliente'] }}</td>
                             <td class="text-right text-muted">R$ {{ number_format($p['total_pedido'], 2, ',', '.') }}</td>

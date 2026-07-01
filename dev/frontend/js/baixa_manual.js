@@ -331,6 +331,9 @@ function confirmarBaixa() {
         btnConfirma.disabled = true;
     }
 
+    const selectColab = document.getElementById('modal-colaborador-select');
+    const colaboradorId = selectColab ? selectColab.value : null;
+
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     fetch(getBaseUrl() + '/contas-receber/baixar', {
         method: 'POST',
@@ -338,7 +341,7 @@ function confirmarBaixa() {
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': csrfToken
         },
-        body: JSON.stringify({ baixas })
+        body: JSON.stringify({ baixas, colaborador_id: colaboradorId })
     })
         .then(r => r.json())
         .then(res => {

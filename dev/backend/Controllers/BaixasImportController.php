@@ -306,7 +306,7 @@ class BaixasImportController extends Controller {
             $stmtInsert->execute([
                 'num'        => $numFinal,
                 'total'      => $item['total_pedido'],
-                'venc'       => $item['data_vencimento'] ?: null,
+                'venc'       => $item['data_vencimento'] ?: now()->toDateString(),
                 'id_cliente' => $idCliente,
                 'forma'      => $fallbackFormaPagamento
             ]);
