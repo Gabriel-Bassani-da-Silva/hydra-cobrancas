@@ -256,17 +256,24 @@ class BaixasImportController extends Controller {
                 continue;
             }
 
+            // Busca uma forma de pagamento válida como fallback para evitar erro de Foreign Key
+            static $fallbackFormaPagamento = null;
+            if ($fallbackFormaPagamento === null) {
+                $fallbackFormaPagamento = \Illuminate\Support\Facades\DB::table('FORMA_PAGAMENTO')->value('ID_FORMA_PAGAMENTO') ?? 1;
+            }
+
             // Cria o pedido com ORIGEM='excel' e EXIBIR=0 (só para baixas)
             $numFinal = $num ?: '';
             $stmtInsert = DB::connection()->getPdo()->prepare("
-                INSERT INTO PEDIDO (ORIGEM, NUM_PEDIDO, TOTAL_PEDIDO, DATA_VENCIMENTO, SITUACAO_PEDIDO, ID_CLIENTE, EXIBIR)
-                VALUES ('excel', :num, :total, :venc, 2, :id_cliente, 0)
+                INSERT INTO PEDIDO (ORIGEM, NUM_PEDIDO, TOTAL_PEDIDO, DATA_VENCIMENTO, SITUACAO_PEDIDO, ID_CLIENTE, EXIBIR, ID_FORMA_PAGAMENTO)
+                VALUES ('excel', :num, :total, :venc, 2, :id_cliente, 0, :forma)
             ");
             $stmtInsert->execute([
                 'num'        => $numFinal,
                 'total'      => $item['total_pedido'],
                 'venc'       => $item['data_vencimento'] ?: null,
                 'id_cliente' => $idCliente,
+                'forma'      => $fallbackFormaPagamento
             ]);
             $novoId = DB::connection()->getPdo()->lastInsertId();
 
