@@ -386,16 +386,22 @@ class BaixasImportController extends Controller {
                 // Vincula o REGISTRO_PAGAMENTO ao lote
                 if ($idLote) {
                     try {
-                        DB::statement("
-                            UPDATE REGISTRO_PAGAMENTO rp
+                        $rp = DB::selectOne("
+                            SELECT rp.ID_REGISTRO 
+                            FROM REGISTRO_PAGAMENTO rp
                             JOIN DETALHE_PAGAMENTO dp ON dp.ID_REGISTRO = rp.ID_REGISTRO
-                            SET rp.ID_LOTE = ?
-                            WHERE dp.ID_PEDIDO = ?
-                              AND rp.ID_LOTE IS NULL
-                            ORDER BY rp.ID_REGISTRO DESC
-                            LIMIT 1
-                        ", [$idLote, $item['id_pedido']]);
-                    } catch (\Exception $e) {}
+                            WHERE dp.ID_PEDIDO = ? AND rp.ID_LOTE IS NULL
+                            ORDER BY rp.ID_REGISTRO DESC LIMIT 1
+                        ", [$item['id_pedido']]);
+                        
+                        if ($rp) {
+                            DB::table('REGISTRO_PAGAMENTO')
+                                ->where('ID_REGISTRO', $rp->ID_REGISTRO)
+                                ->update(['ID_LOTE' => $idLote]);
+                        }
+                    } catch (\Exception $e) {
+                        \Illuminate\Support\Facades\Log::error("Erro ao vincular lote: " . $e->getMessage());
+                    }
                 }
 
                 if (!empty($isChequeEditados[$idx])) {

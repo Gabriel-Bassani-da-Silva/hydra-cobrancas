@@ -39,7 +39,15 @@ Route::get('/limpar-nomes', function () {
 Route::get('/limpar-testes-excel', function () {
     try {
         // Limpa pedidos antigos que foram criados por testes de excel
-        \Illuminate\Support\Facades\DB::table('PEDIDO')->where('ORIGEM', 'excel')->delete();
+        $pedidosExcel = \Illuminate\Support\Facades\DB::table('PEDIDO')->where('ORIGEM', 'excel')->pluck('ID_PEDIDO')->toArray();
+        if(!empty($pedidosExcel)) {
+            $registros = \Illuminate\Support\Facades\DB::table('DETALHE_PAGAMENTO')->whereIn('ID_PEDIDO', $pedidosExcel)->pluck('ID_REGISTRO')->toArray();
+            if(!empty($registros)) {
+                \Illuminate\Support\Facades\DB::table('DETALHE_PAGAMENTO')->whereIn('ID_PEDIDO', $pedidosExcel)->delete();
+                \Illuminate\Support\Facades\DB::table('REGISTRO_PAGAMENTO')->whereIn('ID_REGISTRO', $registros)->delete();
+            }
+            \Illuminate\Support\Facades\DB::table('PEDIDO')->where('ORIGEM', 'excel')->delete();
+        }
         return 'Todos os pedidos gerados via Excel foram apagados! Você pode testar a importação do zero agora.';
     } catch (\Exception $e) {
         return 'Erro: ' . $e->getMessage();
