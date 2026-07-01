@@ -259,7 +259,14 @@ class BaixasImportController extends Controller {
             // Busca uma forma de pagamento válida como fallback para evitar erro de Foreign Key
             static $fallbackFormaPagamento = null;
             if ($fallbackFormaPagamento === null) {
-                $fallbackFormaPagamento = \Illuminate\Support\Facades\DB::table('FORMA_PAGAMENTO')->value('ID_FORMA_PAGAMENTO') ?? 1;
+                $fallbackFormaPagamento = \Illuminate\Support\Facades\DB::table('FORMA_PAGAMENTO')->value('ID_FORMA_PAGAMENTO');
+                if (!$fallbackFormaPagamento) {
+                    $fallbackFormaPagamento = 1;
+                    \Illuminate\Support\Facades\DB::statement("
+                        INSERT IGNORE INTO FORMA_PAGAMENTO (ID_FORMA_PAGAMENTO, DESCRICAO_FORMA_PAGAMENTO) 
+                        VALUES (1, 'Padrão (Importação)')
+                    ");
+                }
             }
 
             // Cria o pedido com ORIGEM='excel' e EXIBIR=0 (só para baixas)
