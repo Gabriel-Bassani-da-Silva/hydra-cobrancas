@@ -62,9 +62,11 @@ class BaixasImportController extends Controller {
         }
 
         $file = request()->file('arquivo_xlsx')->getRealPath();
+        $nomeOriginal = request()->file('arquivo_xlsx')->getClientOriginalName();
         if ($xlsx = \Shuchkin\SimpleXLSX::parse($file)) {
             $allRows = $xlsx->rows();
             session()->put('baixas_raw_data', $allRows);
+            session()->put('baixas_nome_arquivo', $nomeOriginal);
 
             $headers = $allRows[0] ?? [];
             $amostra = array_slice($allRows, 0, 6);
@@ -336,12 +338,13 @@ class BaixasImportController extends Controller {
     }
 
     /**
-     * Efetiva as baixas na tela de preview.
+     * Efetiva as baixas na tela de preview e registra o lote de importação.
      */
     public function confirmarImportacao() {
         $prontos = session()->get('baixas_prontas', []);
-        $colabsEditados = request()->input('colaboradores', []);
+        $colabsEditados   = request()->input('colaboradores', []);
         $isChequeEditados = request()->input('is_cheque', []);
+        $nomeArquivo      = session()->get('baixas_nome_arquivo', 'planilha');
 
         if (empty($prontos)) {
             session()->flash('flash_msg', "Não há registros para importar.");
@@ -351,6 +354,19 @@ class BaixasImportController extends Controller {
         $sucessos = 0;
         $erros    = [];
         $idFormaCheque = config('hydra.bling.formas_pagamento.cheque', 7179734);
+
+        // Cria o registro do lote (pode falhar silenciosamente se a tabela ainda não existir)
+        $idLote = null;
+        try {
+            $idLote = DB::table('LOTE_IMPORTACAO')->insertGetId([
+                'NOME_ARQUIVO'  => $nomeArquivo,
+                'QTD_REGISTROS' => count($prontos),
+                'ID_USUARIO'    => auth()->id(),
+                'DATA_CRIACAO'  => now(),
+            ]);
+        } catch (\Exception $e) {
+            // Tabela ainda não existe (antes do deploy da migration) — continua sem lote
+        }
 
         foreach ($prontos as $idx => $item) {
             try {
@@ -366,6 +382,21 @@ class BaixasImportController extends Controller {
                         'data_pago' => null,
                     ]
                 ], $idColab, true);
+
+                // Vincula o REGISTRO_PAGAMENTO ao lote
+                if ($idLote) {
+                    try {
+                        DB::statement("
+                            UPDATE REGISTRO_PAGAMENTO rp
+                            JOIN DETALHE_PAGAMENTO dp ON dp.ID_REGISTRO = rp.ID_REGISTRO
+                            SET rp.ID_LOTE = ?
+                            WHERE dp.ID_PEDIDO = ?
+                              AND rp.ID_LOTE IS NULL
+                            ORDER BY rp.ID_REGISTRO DESC
+                            LIMIT 1
+                        ", [$idLote, $item['id_pedido']]);
+                    } catch (\Exception $e) {}
+                }
 
                 if (!empty($isChequeEditados[$idx])) {
                     \Illuminate\Support\Facades\DB::table('PEDIDO')
@@ -383,7 +414,7 @@ class BaixasImportController extends Controller {
         }
 
         session()->put('baixas_log_importacao', ['sucessos' => $sucessos, 'erros' => $erros]);
-        session()->forget(['baixas_raw_data', 'baixas_prontas', 'baixas_nao_encontradas']);
+        session()->forget(['baixas_raw_data', 'baixas_prontas', 'baixas_nao_encontradas', 'baixas_nome_arquivo']);
 
         return redirect(url('/') . '/contas-receber/importar/log');
     }
@@ -391,5 +422,148 @@ class BaixasImportController extends Controller {
     public function logImportacao() {
         $log = session()->get('baixas_log_importacao', ['sucessos' => 0, 'erros' => []]);
         return view('pages.importar_baixas_log', ['log' => $log]);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // HISTÓRICO DE LOTES
+    // ═══════════════════════════════════════════════════════════════════
+
+    public function historico() {
+        try {
+            $lotes = DB::select("
+                SELECT l.ID_LOTE, l.DATA_CRIACAO, l.NOME_ARQUIVO, l.QTD_REGISTROS,
+                       u.name AS NOME_USUARIO,
+                       COUNT(DISTINCT rp.ID_REGISTRO) AS REGISTROS_EXISTENTES
+                FROM LOTE_IMPORTACAO l
+                LEFT JOIN users u ON u.id = l.ID_USUARIO
+                LEFT JOIN REGISTRO_PAGAMENTO rp ON rp.ID_LOTE = l.ID_LOTE
+                GROUP BY l.ID_LOTE
+                ORDER BY l.DATA_CRIACAO DESC
+            ");
+        } catch (\Exception $e) {
+            $lotes = [];
+        }
+
+        return view('pages.importar_baixas_historico', compact('lotes'));
+    }
+
+    public function editarLote($id) {
+        try {
+            $lote = DB::table('LOTE_IMPORTACAO')->where('ID_LOTE', $id)->first();
+            if (!$lote) abort(404);
+
+            $registros = DB::select("
+                SELECT
+                    rp.ID_REGISTRO,
+                    rp.VALOR_REGISTRO,
+                    rp.DATA_REGISTRO,
+                    rp.ID_COLABORADOR,
+                    col.NOME_COLABORADOR,
+                    dp.ID_PEDIDO,
+                    dp.VALOR_PAGO_PEDIDO,
+                    p.NUM_PEDIDO,
+                    p.ORIGEM,
+                    c.NOME_CONTATO AS NOME_CLIENTE,
+                    p.ID_FORMA_PAGAMENTO,
+                    p.STATUS_CHEQUE
+                FROM REGISTRO_PAGAMENTO rp
+                JOIN DETALHE_PAGAMENTO dp ON dp.ID_REGISTRO = rp.ID_REGISTRO
+                JOIN PEDIDO p ON p.ID_PEDIDO = dp.ID_PEDIDO
+                JOIN COLABORADOR col ON col.ID_COLABORADOR = rp.ID_COLABORADOR
+                LEFT JOIN CONTATO_EXTERNO c ON c.ID_CONTATO_BLING = p.ID_CLIENTE
+                WHERE rp.ID_LOTE = ?
+                ORDER BY rp.ID_REGISTRO
+            ", [$id]);
+
+            $colaboradores = DB::table('COLABORADOR')->get(['ID_COLABORADOR', 'NOME_COLABORADOR']);
+            $idFormaCheque = config('hydra.bling.formas_pagamento.cheque', 7179734);
+
+            return view('pages.importar_baixas_editar_lote', compact('lote', 'registros', 'colaboradores', 'idFormaCheque'));
+        } catch (\Exception $e) {
+            session()->flash('flash_msg', 'Erro ao carregar lote: ' . $e->getMessage());
+            return redirect(url('/') . '/contas-receber/importar/historico');
+        }
+    }
+
+    public function salvarLote($id) {
+        $colabs   = request()->input('colaboradores', []);
+        $cheques  = request()->input('is_cheque', []);
+        $idFormaCheque = config('hydra.bling.formas_pagamento.cheque', 7179734);
+
+        try {
+            foreach ($colabs as $idRegistro => $idColab) {
+                if (!$idColab) continue;
+                DB::table('REGISTRO_PAGAMENTO')
+                    ->where('ID_REGISTRO', $idRegistro)
+                    ->where('ID_LOTE', $id)
+                    ->update(['ID_COLABORADOR' => $idColab]);
+
+                // Recupera ID_PEDIDO para atualizar cheque
+                $detalhes = DB::table('DETALHE_PAGAMENTO')->where('ID_REGISTRO', $idRegistro)->get();
+                foreach ($detalhes as $det) {
+                    if (!empty($cheques[$idRegistro])) {
+                        DB::table('PEDIDO')->where('ID_PEDIDO', $det->ID_PEDIDO)->update([
+                            'ID_FORMA_PAGAMENTO' => $idFormaCheque,
+                            'STATUS_CHEQUE'      => 'pendente',
+                        ]);
+                    } else {
+                        // Remove marcação de cheque caso tenha sido desmarcado
+                        DB::table('PEDIDO')
+                            ->where('ID_PEDIDO', $det->ID_PEDIDO)
+                            ->where('ID_FORMA_PAGAMENTO', $idFormaCheque)
+                            ->update(['STATUS_CHEQUE' => null]);
+                    }
+                }
+            }
+
+            session()->flash('flash_msg', "Lote #{$id} atualizado com sucesso.");
+        } catch (\Exception $e) {
+            session()->flash('flash_msg', "Erro ao salvar: " . $e->getMessage());
+        }
+
+        return redirect(url('/') . '/contas-receber/importar/historico');
+    }
+
+    public function excluirLote($id) {
+        try {
+            DB::connection()->getPdo()->beginTransaction();
+
+            // Busca todos os REGISTRO_PAGAMENTO do lote
+            $registros = DB::table('REGISTRO_PAGAMENTO')->where('ID_LOTE', $id)->get();
+
+            foreach ($registros as $reg) {
+                // Busca pedidos vinculados a esse registro
+                $detalhes = DB::table('DETALHE_PAGAMENTO')->where('ID_REGISTRO', $reg->ID_REGISTRO)->get();
+
+                // Apaga os detalhes de pagamento
+                DB::table('DETALHE_PAGAMENTO')->where('ID_REGISTRO', $reg->ID_REGISTRO)->delete();
+
+                foreach ($detalhes as $det) {
+                    // Se o pedido foi criado pela importação (ORIGEM='excel'), apaga permanentemente
+                    $pedido = DB::table('PEDIDO')->where('ID_PEDIDO', $det->ID_PEDIDO)->first();
+                    if ($pedido && $pedido->ORIGEM === 'excel') {
+                        // Apaga outros detalhes do mesmo pedido (caso haja)
+                        DB::table('DETALHE_PAGAMENTO')->where('ID_PEDIDO', $det->ID_PEDIDO)->delete();
+                        DB::table('PEDIDO')->where('ID_PEDIDO', $det->ID_PEDIDO)->delete();
+                    }
+                    // Se ORIGEM='bling' ou outro, mantém o pedido — só apagou a baixa acima
+                }
+
+                // Apaga o registro de pagamento
+                DB::table('REGISTRO_PAGAMENTO')->where('ID_REGISTRO', $reg->ID_REGISTRO)->delete();
+            }
+
+            // Apaga o lote
+            DB::table('LOTE_IMPORTACAO')->where('ID_LOTE', $id)->delete();
+
+            DB::connection()->getPdo()->commit();
+
+            session()->flash('flash_msg', "Lote #{$id} excluído com sucesso. As baixas foram revertidas.");
+        } catch (\Exception $e) {
+            DB::connection()->getPdo()->rollBack();
+            session()->flash('flash_msg', "Erro ao excluir lote: " . $e->getMessage());
+        }
+
+        return redirect(url('/') . '/contas-receber/importar/historico');
     }
 }

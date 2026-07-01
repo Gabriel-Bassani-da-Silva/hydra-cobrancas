@@ -21,7 +21,8 @@
             </div>
         @endif
 
-        <div class="mt-4 text-center">
+        <div class="mt-4 text-center" style="display:flex;gap:1rem;justify-content:center;">
+            <a href="{{ url('/contas-receber/importar/historico') }}" class="btn btn-secondary">📋 Ver Histórico de Importações</a>
             <a href="{{ route('contas-receber-page') }}" class="btn btn-primary">Voltar para Contas a Receber</a>
         </div>
     </div>
