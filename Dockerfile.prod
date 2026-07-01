@@ -8,7 +8,7 @@ ENV APP_ENV=production
 
 # INTERRUPTOR: Define se o Laravel roda migrations e limpa cache sozinho ao iniciar o contêiner
 # Para desligar, basta ir nas Variáveis do Railway e setar AUTORUN_ENABLED=false
-ENV AUTORUN_ENABLED=false
+ENV AUTORUN_ENABLED=true
 
 # Configurações padrão do WebSockets (Reverb) para subir sozinho sem precisar configurar no Railway
 ENV BROADCAST_CONNECTION=reverb
