@@ -124,26 +124,52 @@ class BaixasImportController extends Controller {
             return null;
         };
 
+        // Função auxiliar para normalizar valores monetários vindos do Excel
+        // Suporta: "R$ 1.447,19", "1.447,19", "1447.19", "1447,19", 1447.19 (número)
+        $parseValor = function($raw) {
+            if (is_numeric($raw)) return (float)$raw; // célula numérica do Excel, já é decimal
+            $s = trim(str_replace(['R$', ' '], '', (string)$raw));
+            if ($s === '' || $s === '-') return 0.0;
+            // Se tem vírgula E ponto: temos separador de milhar + decimal
+            // Ex: "1.447,19" → 1447.19  |  "1,447.19" → 1447.19
+            if (strpos($s, ',') !== false && strpos($s, '.') !== false) {
+                if (strrpos($s, ',') > strrpos($s, '.')) {
+                    // Ponto é milhar, vírgula é decimal (BR): "1.447,19"
+                    $s = str_replace('.', '', $s);
+                    $s = str_replace(',', '.', $s);
+                } else {
+                    // Vírgula é milhar, ponto é decimal (US): "1,447.19"
+                    $s = str_replace(',', '', $s);
+                }
+                return (float)$s;
+            }
+            // Só vírgula: assume decimal BR "1447,19"
+            if (strpos($s, ',') !== false) {
+                return (float)str_replace(',', '.', $s);
+            }
+            // Só ponto: já é decimal "1447.19"
+            return (float)$s;
+        };
+
         // Extrai linhas válidas
         $linhas = [];
         foreach ($raw as $row) {
             $num   = ($idxNum !== false) ? trim((string)($row[$idxNum] ?? '')) : '';
-            $valor = trim((string)($row[$idxValor] ?? ''));
+            $valor = ($row[$idxValor] ?? '');
             $nome  = ($idxNome !== false) ? trim((string)($row[$idxNome] ?? '')) : '';
 
-            if (empty($valor)) continue;
+            if ($valor === '' || $valor === null) continue;
             if (empty($num) && empty($nome)) continue;
 
-            // Normaliza valor
-            $valor = str_replace(['R$', ' ', '.'], '', $valor);
-            $valor = str_replace(',', '.', $valor);
+            $valorFloat = $parseValor($valor);
+            $totalFloat = ($idxTotal !== false) ? $parseValor($row[$idxTotal] ?? 0) : $valorFloat;
 
             $linhas[] = [
-                'num_pedido'     => $num,
-                'nome_cliente'   => ($idxNome  !== false) ? trim((string)($row[$idxNome]  ?? '')) : '',
-                'total_pedido'   => ($idxTotal !== false) ? (float)str_replace(['.', ','], ['', '.'], str_replace('R$', '', $row[$idxTotal] ?? '0')) : (float)$valor,
-                'data_vencimento'=> ($idxVenc  !== false) ? $parseDate($row[$idxVenc] ?? '') : null,
-                'valor_pago'     => (float)$valor,
+                'num_pedido'      => $num,
+                'nome_cliente'    => ($idxNome  !== false) ? trim((string)($row[$idxNome]  ?? '')) : '',
+                'total_pedido'    => $totalFloat,
+                'data_vencimento' => ($idxVenc  !== false) ? $parseDate($row[$idxVenc] ?? '') : null,
+                'valor_pago'      => $valorFloat,
                 'nome_colaborador'=> ($idxColab !== false) ? trim((string)($row[$idxColab] ?? '')) : '',
             ];
         }
