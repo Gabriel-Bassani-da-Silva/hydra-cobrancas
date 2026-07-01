@@ -11,9 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('CLIENTE', function (Blueprint $table) {
-            $table->boolean('PEDRAS')->default(0)->after('EXIBIR');
-        });
+        if (!Schema::hasColumn('CLIENTE', 'PEDRAS')) {
+            Schema::table('CLIENTE', function (Blueprint $table) {
+                $table->boolean('PEDRAS')->default(0)->after('EXIBIR');
+            });
+        }
     }
 
     /**
