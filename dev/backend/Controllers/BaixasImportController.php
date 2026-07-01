@@ -263,8 +263,8 @@ class BaixasImportController extends Controller {
                 if (!$fallbackFormaPagamento) {
                     $fallbackFormaPagamento = 1;
                     \Illuminate\Support\Facades\DB::statement("
-                        INSERT IGNORE INTO FORMA_PAGAMENTO (ID_FORMA_PAGAMENTO, DESCRICAO_FORMA_PAGAMENTO) 
-                        VALUES (1, 'Padrão (Importação)')
+                        INSERT IGNORE INTO FORMA_PAGAMENTO (ID_FORMA_PAGAMENTO, COBRANCA_PADRAO) 
+                        VALUES (1, 1)
                     ");
                 }
             }
